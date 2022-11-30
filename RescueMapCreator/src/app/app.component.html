@@ -1,0 +1,22 @@
+<nav class="navbar navbar-expand-lg fixed-top bg-dark text-light p-0" role="navigation">
+  <div class="container-fluid navbar-brand p-0">
+    <a routerLink="">
+      <img src="../assets/resources/rc_logo.png" style="height: 60px; padding-left: 20px; padding-right: 20px">
+    </a>
+    <button class="navbar-toggler second-button navbar-dark" type="button" data-bs-toggle="collapse"
+            data-bs-target=".navbar-collapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse fs-6">
+      <div class="d-flex flex-column flex-lg-row justify-content-between w-100">
+        <div class="d-flex link-base flex-column flex-lg-row justify-content-center justify-content-md-start align-items-center text-center">
+          <!--Übersicht-->
+          <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light p-3 d-none d-lg-block">Übersicht</a>
+          <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light p-3 d-block d-lg-none" data-bs-toggle="collapse"
+             data-bs-target=".navbar-collapse">Übersicht</a>
+
+      </div>
+    </div>
+  </div>
