@@ -1,0 +1,80 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css");
+
+$base-color: rgb(241, 137, 4);
+$base-color-hover: rgba(238, 113, 11, 0.918);
+$base-card-color: hsl(0, 0%, 24%);
+$dark-color: #7e7e7e;
+$dark-color-bg: #212529;
+$base-bg-btn-color: rgb(68, 45, 9);
+$base-blue: rgb(7, 139, 186);
+
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.base-color-blue {
+  color: $base-blue !important;
+}
+
+.link-base {
+  cursor: pointer;
+  color: whitesmoke;
+  transition-duration: 0.15s, 0.15s, 0.15s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  text-decoration: none;
+
+  .link-base.active {
+    border-bottom: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+    border-bottom-width: 100% !important;
+    border-bottom-style: inset !important;
+    border-bottom-color: $base-color !important;
+    color: $base-color !important;
+  }
+
+  .link-base:hover {
+    color: $base-color !important;
+  }
+}
+
+.card {
+  background-color: $base-card-color;
+  border: none !important;
+}
+
+.card-shadow {
+  box-shadow: 10px 10px 10px 1px rgba(20, 20, 20, 0.3);
+}
+
+h1 {
+  color: $base-color;
+  padding-bottom: 20px;
+}
+
+.base-color {
+  color: $base-color !important;
+}
+
+.card-color {
+  background-color: $base-card-color !important;
+}
+
+.base-bg {
+  background-color: $base-color !important;
+}
+
+.dark-bg {
+  border: none;
+  background-color: $dark-color-bg !important;
+}
+
+.base-outline {
+  border-color: $base-color !important;
+  color: white;
+}
