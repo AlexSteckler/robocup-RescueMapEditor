@@ -1,4 +1,5 @@
-<nav class="navbar navbar-expand-lg fixed-top bg-dark text-light p-0" role="navigation">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top bg-dark text-light p-0">
   <div class="container-fluid navbar-brand p-0">
     <a routerLink="">
       <img src="../assets/resources/rc_logo.png" style="height: 60px; padding-left: 20px; padding-right: 20px">
@@ -16,7 +17,30 @@
           <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
              class="link-base link-light p-3 d-block d-lg-none" data-bs-toggle="collapse"
              data-bs-target=".navbar-collapse">Übersicht</a>
-
+        </div>
       </div>
     </div>
   </div>
+</nav>
+
+
+
+<!--Footer-->
+<footer class="dark-bg mt-auto">
+
+  <div class="d-flex flex-sm-row flex-column justify-content-center align-items-center">
+    <a class="nav-link link-light p-2 p-sm-3 link-base" href="https://robocupjunior.de/impressum">Impressum</a>
+    <a class="nav-link link-light p-2 p-sm-3 link-base"
+       href="https://robocupjunior.de/datenschutz">Datenschutz</a>
+    <a class="nav-link link-light p-2 p-sm-3 link-base" href="mailto:support@robocupjunior.de">Support</a>
+  </div>
+
+
+  <div class="mx-auto m-2 d-sm-flex justify-content-center">
+    <div class="d-flex flex-column flex-sm-row align-items-center">
+      <span class="text-muted mx-auto d-block" style="font-size: 13px;text-align: center">&copy; 2022 RoboCup</span>
+      <span class="p-3 text-white d-sm-block d-none pt-0 pb-0">|</span>
+      <a class="nav-link link-light p-1 p-sm-0 base-color white-color-hover" href="https://robocupjunior.de/">robocupjunior.de</a>
+    </div>
+  </div>
+</footer>
