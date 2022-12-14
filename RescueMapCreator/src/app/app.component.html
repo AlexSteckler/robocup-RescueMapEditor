@@ -1,7 +1,7 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg fixed-top bg-dark text-light p-0">
   <div class="container-fluid navbar-brand p-0">
-    <a routerLink="">
+    <a routerLink="home">
       <img src="../assets/resources/rc_logo.png" style="height: 60px; padding-left: 20px; padding-right: 20px">
     </a>
     <button class="navbar-toggler second-button navbar-dark" type="button" data-bs-toggle="collapse"
@@ -12,17 +12,38 @@
       <div class="d-flex flex-column flex-lg-row justify-content-between w-100">
         <div class="d-flex link-base flex-column flex-lg-row justify-content-center justify-content-md-start align-items-center text-center">
           <!--Übersicht-->
-          <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
-             class="link-base link-light p-3 d-none d-lg-block">Übersicht</a>
-          <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+          <a routerLink="home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light p-3 d-none d-lg-block">Home
+          </a>
+          <a routerLink="home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
              class="link-base link-light p-3 d-block d-lg-none" data-bs-toggle="collapse"
-             data-bs-target=".navbar-collapse">Übersicht</a>
+             data-bs-target=".navbar-collapse">Home
+          </a>
+
+          <!--Neue Karte-->
+          <a routerLink="createEdit" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light p-3 d-none d-lg-block">Neue Karte erstellen
+          </a>
+          <a routerLink="createEdit" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light p-3 d-block d-lg-none" data-bs-toggle="collapse"
+             data-bs-target=".navbar-collapse">Neue Karte erstellen
+          </a>
+
+          <!--Einstellungen-->
+          <a routerLink="settings" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light p-3 d-none d-lg-block">Einstellungen
+          </a>
+          <a routerLink="settings" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light p-3 d-block d-lg-none" data-bs-toggle="collapse"
+             data-bs-target=".navbar-collapse">Einstellungen
+          </a>
         </div>
       </div>
     </div>
   </div>
 </nav>
 
+<router-outlet></router-outlet>
 
 
 <!--Footer-->
