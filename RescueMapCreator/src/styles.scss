@@ -78,3 +78,6 @@ h1 {
   border-color: $base-color !important;
   color: white;
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
