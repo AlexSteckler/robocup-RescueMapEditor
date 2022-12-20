@@ -1,5 +1,5 @@
 <div class="row m-0" cdkDropListGroup>
-  <div class="col-4 border-end border-dark border-4 h-auto">
+  <div class="col-4 border-end border-dark border-4">
     <h2 class="p-3 fw-bold">Kacheln</h2>
     <div class="p-3 d-flex d-flex align-content-around flex-wrap"
          cdkDropList
@@ -7,13 +7,13 @@
       <app-tile *ngFor="let tile of tiles" class="p-1 mb-2 me-2" [tile]="tile" cdkDrag></app-tile>
     </div>
   </div>
-
-  <div id="canvas-wrapper">
-    <div #canvas class="col-8">
+  <div id="canvas-wrapper" class="col-8">
+    <div #canvas>
       <div *ngFor="let level of grids" class="level">
         <div *ngFor="let row of level; let rowCount = index" class="row">
           <app-tile *ngFor="let tile of row; let colCount = index" [tile]="tile" class="p-1" cdkDropList
-                    (cdkDropListDropped)="drop($event, rowCount, colCount)"></app-tile>
+                    (cdkDropListDropped)="drop($event, rowCount, colCount)">
+          </app-tile>
         </div>
       </div>
     </div>

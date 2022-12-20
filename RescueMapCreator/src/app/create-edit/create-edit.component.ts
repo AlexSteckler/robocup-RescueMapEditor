@@ -50,7 +50,7 @@ export class CreateEditComponent {
   ngAfterViewInit() {
     this.panzoomCanvas = panzoom(this.canvasElement?.nativeElement, {
       maxZoom: 1,
-      minZoom: 0.1,
+      minZoom: 0.5,
     });
 
     if(this.panzoomCanvas != null) {
