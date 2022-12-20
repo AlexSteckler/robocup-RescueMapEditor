@@ -1,6 +1,7 @@
-import {Component} from '@angular/core';
+import {Component, ElementRef, ViewChild} from '@angular/core';
 import {CdkDragDrop, transferArrayItem} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
+import panzoom from 'panzoom';
 
 @Component({
   selector: 'app-create-edit',
@@ -40,5 +41,32 @@ export class CreateEditComponent {
       }
       this.grids[0].push(row);
     }
+  }
+  zoomScale = 1;
+  zoomFactor = 0.05;
+  panzoomCanvas: any = null;
+  @ViewChild('canvas') canvasElement: ElementRef | undefined;
+
+  ngAfterViewInit() {
+    this.panzoomCanvas = panzoom(this.canvasElement?.nativeElement, {
+      maxZoom: 1,
+      minZoom: 0.1,
+    });
+
+    if(this.panzoomCanvas != null) {
+      this.panzoomCanvas.on('transform', (e: any) => {
+        let result = this.panzoomCanvas.getTransform();
+        this.zoomScale = result.scale;
+      });
+    }
+
+  }
+
+  pausePanzoom() {
+    this.panzoomCanvas.pause();
+  }
+
+  resumePanzoom() {
+    this.panzoomCanvas.resume();
   }
 }
