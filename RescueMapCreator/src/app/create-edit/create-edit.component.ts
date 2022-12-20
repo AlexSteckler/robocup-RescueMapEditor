@@ -21,6 +21,11 @@ export class CreateEditComponent {
   ];
   grid: (Tile | undefined)[] = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
 
+  grids: Array<Array<Array<Tile>>> = [
+    [[{number: 0},{number: 1}]],
+    [[{number: 2},{number: 3}]]
+  ];
+
   drop($event: CdkDragDrop<Tile[]>, tileNumber: number) {
     //console.log($event.previousContainer.data[$event.previousIndex]);
     this.grid[tileNumber] = $event.previousContainer.data[$event.previousIndex]

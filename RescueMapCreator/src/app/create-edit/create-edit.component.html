@@ -7,6 +7,19 @@
       <app-tile *ngFor="let tile of tiles" class="p-1 mb-2 me-2" [tile]="tile" cdkDrag></app-tile>
     </div>
   </div>
+
+  <div class="col-8">
+    <div *ngFor="let level of grids" >
+      <div *ngFor="let row of level">
+        <div *ngFor="let tile of row">
+          <div class="tile d-flex align-items-center justify-content-center m-3">
+            <span>{{tile.number}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--
   <div class="col-8">
     <div class="p-3 d-flex d-flex align-content-around flex-wrap">
       <div class="p-3 d-flex d-flex align-content-around flex-wrap">
@@ -15,5 +28,7 @@
                   (cdkDropListDropped)="drop($event, i)" [tile]="tile"></app-tile>
       </div>
     </div>
+
   </div>
+  -->
 </div>
