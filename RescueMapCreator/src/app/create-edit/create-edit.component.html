@@ -9,13 +9,10 @@
   </div>
 
   <div class="col-8">
-    <div *ngFor="let level of grids" >
-      <div *ngFor="let row of level">
-        <div *ngFor="let tile of row">
-          <div class="tile d-flex align-items-center justify-content-center m-3">
-            <span>{{tile.number}}</span>
-          </div>
-        </div>
+    <div *ngFor="let level of grids" class="level">
+      <div *ngFor="let row of level; let rowCount = index" class="row">
+          <app-tile *ngFor="let tile of row; let colCount = index" [tile]="tile" class="p-1" cdkDropList
+                    (cdkDropListDropped)="drop($event, rowCount, colCount)"></app-tile>
       </div>
     </div>
   </div>

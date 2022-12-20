@@ -1,7 +1,9 @@
-app-tile, li {
+app-tile {
   width: 100px;
   height:100px;
   background-color: grey;
+  padding: 0;
+  border: greenyellow solid 1px;
 }
 
 li {
@@ -12,4 +14,7 @@ li {
   width: 150px;
   height: 150px;
   background-color: grey;
+}
+.row {
+  height: 100px;
 }

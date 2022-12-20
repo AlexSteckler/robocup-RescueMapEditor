@@ -22,12 +22,23 @@ export class CreateEditComponent {
   grid: (Tile | undefined)[] = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
 
   grids: Array<Array<Array<Tile>>> = [
-    [[{number: 0},{number: 1}]],
-    [[{number: 2},{number: 3}]]
+    [
+    ],
   ];
 
-  drop($event: CdkDragDrop<Tile[]>, tileNumber: number) {
+  drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
     //console.log($event.previousContainer.data[$event.previousIndex]);
-    this.grid[tileNumber] = $event.previousContainer.data[$event.previousIndex]
+    this.grids[0][rowCount][colCount] = $event.previousContainer.data[$event.previousIndex]
+  }
+
+  constructor() {
+    const count = 10;
+    for (let i = 1; i <= count; i++) {
+      let row: Array<Tile> = [];
+      for (let j = 1; j <= count; j++) {
+        row.push({number: i * j});
+      }
+      this.grids[0].push(row);
+    }
   }
 }
