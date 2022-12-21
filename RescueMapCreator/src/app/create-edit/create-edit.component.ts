@@ -34,10 +34,10 @@ export class CreateEditComponent {
 
   constructor() {
     const count = 10;
-    for (let i = 1; i <= count; i++) {
+    for (let i = 0; i < count; i++) {
       let row: Array<Tile> = [];
-      for (let j = 1; j <= count; j++) {
-        row.push({number: i * j});
+      for (let j = 0; j < count; j++) {
+        row.push({number: (i*count) + j + 1});
       }
       this.grids[0].push(row);
     }
@@ -46,20 +46,35 @@ export class CreateEditComponent {
   zoomFactor = 0.05;
   panzoomCanvas: any = null;
   @ViewChild('canvas') canvasElement: ElementRef | undefined;
+  @ViewChild('canvas_wrapper') canvasWrapperElement: ElementRef | undefined;
 
   ngAfterViewInit() {
-    this.panzoomCanvas = panzoom(this.canvasElement?.nativeElement, {
-      maxZoom: 1,
+    this.panzoomCanvas = panzoom(this.canvasElement!.nativeElement, {
+      maxZoom: 2,
       minZoom: 0.5,
     });
 
     if(this.panzoomCanvas != null) {
       this.panzoomCanvas.on('transform', (e: any) => {
         let result = this.panzoomCanvas.getTransform();
+        const reference = 500 * result.scale;
+        console.log(reference, result.y);
+        if(result.x < -reference) {
+          this.panzoomCanvas.moveTo(-reference, result.y);
+        }
+        if(result.y < -reference) {
+          this.panzoomCanvas.moveTo(result.x, -reference);
+        }
+        if(result.x > this.canvasWrapperElement?.nativeElement.offsetWidth - reference) {
+          this.panzoomCanvas.moveTo(this.canvasWrapperElement?.nativeElement.offsetWidth - reference, result.y);
+        }
+        if(result.y > this.canvasWrapperElement?.nativeElement.offsetHeight - reference) {
+          this.panzoomCanvas.moveTo(result.x, this.canvasWrapperElement?.nativeElement.offsetHeight - reference);
+        }
         this.zoomScale = result.scale;
       });
     }
-
+    this.panzoomCanvas.setZoomSpeed(0.05);
   }
 
   pausePanzoom() {
