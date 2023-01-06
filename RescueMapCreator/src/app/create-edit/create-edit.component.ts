@@ -3,6 +3,7 @@ import {CdkDragDrop, transferArrayItem} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
 import panzoom from 'panzoom';
 import { TilesService } from './tile/tiles.service';
+import {DomSanitizer} from "@angular/platform-browser";
 
 const TileCount = 30;
 const OutsideDrag = 100;
@@ -33,13 +34,15 @@ export class CreateEditComponent {
     this.grids[0][rowCount][colCount] = $event.previousContainer.data[$event.previousIndex]
   }
 
-  constructor(private tilesService: TilesService) {
+  constructor(private tilesService: TilesService,
+              private sanitizer: DomSanitizer) {
     for (let i = 0; i < TileCount; i++) {
       let row: Array<Tile> = [];
       for (let j = 0; j < TileCount; j++) {
         row.push({
           id: (i * TileCount) + j + 1,
-          source: ''
+          source: '',
+          image: undefined,
         });
       }
       this.grids[0].push(row);
@@ -47,7 +50,17 @@ export class CreateEditComponent {
   }
 
   ngOnInit(): void {
-    this.tilesService.getTiles().subscribe((tiles : Tile[]) => this.tiles = tiles);
+    this.tilesService.getTiles().subscribe((tiles : Tile[]) => {
+      tiles.forEach((tile: Tile) => {
+        this.tilesService.getTileImg(tile.source).subscribe((blob: Blob) => {
+          console.log(blob);
+          let objectURL = URL.createObjectURL(blob);
+          let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+          tile.image = img;
+        });
+      });
+      this.tiles = tiles
+    });
   }
 
   ngAfterViewInit() {

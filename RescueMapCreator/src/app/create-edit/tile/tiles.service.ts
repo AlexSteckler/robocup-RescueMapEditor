@@ -20,6 +20,6 @@ export class TilesService {
   }
 
   getTileImg(source : string) : Observable<Blob> {
-    return this.httpClient.get<Blob>(source);
+    return this.httpClient.get(source, {responseType: 'blob'});
   }
 }
