@@ -2,6 +2,7 @@ import {Component, ElementRef, ViewChild} from '@angular/core';
 import {CdkDragDrop, transferArrayItem} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
 import panzoom from 'panzoom';
+import { TilesService } from './tile/tiles.service';
 
 const TileCount = 30;
 const OutsideDrag = 100;
@@ -19,22 +20,9 @@ export class CreateEditComponent {
 
   zoomScale = 1;
   zoomFactor = 0.05;
-
-  center = 0;
   panzoomCanvas: any = null;
 
-  tiles = [
-    {number: 1},
-    {number: 2},
-    {number: 3},
-    {number: 4},
-    {number: 5},
-    {number: 6},
-    {number: 7},
-    {number: 8},
-    {number: 9},
-  ];
-  grid: (Tile | undefined)[] = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+  tiles : Tile[] = [];
 
   grids: Array<Array<Array<Tile>>> = [
     [
@@ -42,30 +30,32 @@ export class CreateEditComponent {
   ];
 
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
-    //console.log($event.previousContainer.data[$event.previousIndex]);
     this.grids[0][rowCount][colCount] = $event.previousContainer.data[$event.previousIndex]
   }
 
-  constructor() {
+  constructor(private tilesService: TilesService) {
     for (let i = 0; i < TileCount; i++) {
       let row: Array<Tile> = [];
       for (let j = 0; j < TileCount; j++) {
-        row.push({number: (i*TileCount) + j + 1});
+        row.push({
+          id: (i * TileCount) + j + 1,
+          source: ''
+        });
       }
       this.grids[0].push(row);
     }
   }
 
+  ngOnInit(): void {
+    this.tilesService.getTiles().subscribe((tiles : Tile[]) => this.tiles = tiles);
+  }
+
   ngAfterViewInit() {
 
-    this.center = (TileCount * 100) / 2;
-    //console.log("center " + this.center);
 
     this.panzoomCanvas = panzoom(this.canvasElement!.nativeElement, {
       maxZoom: 2,
       minZoom: 0.5,
-
-
     });
 
     if(this.panzoomCanvas != null) {

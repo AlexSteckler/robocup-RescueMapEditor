@@ -1,3 +1,4 @@
 export interface Tile {
-   readonly number: number;
+   readonly id: number;
+   source : string;
 }

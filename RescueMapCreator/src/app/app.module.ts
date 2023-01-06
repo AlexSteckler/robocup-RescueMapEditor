@@ -9,6 +9,7 @@ import {SettingsComponent} from './settings/settings.component';
 import {TileComponent} from './create-edit/tile/tile.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {DragDropModule} from "@angular/cdk/drag-drop";
+import {HttpClientModule} from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -16,13 +17,14 @@ import {DragDropModule} from "@angular/cdk/drag-drop";
     CreateEditComponent,
     HomeComponent,
     SettingsComponent,
-    TileComponent,
+    TileComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     DragDropModule,
     BrowserAnimationsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

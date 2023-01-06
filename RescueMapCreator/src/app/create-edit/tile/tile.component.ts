@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {Tile} from "./dto/tile.dto";
+import { TilesService } from './tiles.service';
 
 @Component({
   selector: 'app-tile',
@@ -9,4 +10,10 @@ import {Tile} from "./dto/tile.dto";
 export class TileComponent {
   @Input() tile: Tile | undefined;
 
+  constructor(
+    private tileService : TilesService
+  )
+  {
+    console.log(this.tile);
+  }
 }
