@@ -7,4 +7,6 @@ export interface Tile {
    image: SafeUrl | undefined;
    paths: Array<Array<number>> | undefined;
    rotation: number;
+
+   temp?: boolean
 }

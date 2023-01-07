@@ -1,5 +1,5 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {CdkDragDrop, CdkDragMove, CdkDragStart, copyArrayItem, moveItemInArray, transferArrayItem} from "@angular/cdk/drag-drop";
+import {CdkDragDrop} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
 import panzoom from 'panzoom';
 import {TilesService} from './tile/tiles.service';
@@ -8,7 +8,6 @@ import {DomSanitizer} from "@angular/platform-browser";
 
 const TileCount = 30;
 const OutsideDrag = 100;
-
 
 
 @Component({
@@ -24,13 +23,13 @@ export class CreateEditComponent {
   zoomFactor = 0.05;
   panzoomCanvas: any = null;
 
-  tiles : Tile[] = [];
-  greenTiles : Tile[] = [];
+  tiles: Tile[] = [];
+  greenTiles: Tile[] = [];
 
   grids: Array<Array<Array<Tile>>> = [
-    [
-    ],
+    [],
   ];
+  private currentDraggedTile: Tile | undefined;
 
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
     this.grids[0][rowCount][colCount] = $event.previousContainer.data[$event.previousIndex]
@@ -55,7 +54,7 @@ export class CreateEditComponent {
   }
 
   ngOnInit(): void {
-    this.tilesService.getTiles().subscribe((tiles : Tile[]) => {
+    this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
       tiles.forEach((tile: Tile) => {
         this.tilesService.getTileImg(tile.source).subscribe((blob: Blob) => {
           let objectURL = URL.createObjectURL(blob);
@@ -78,7 +77,7 @@ export class CreateEditComponent {
       minZoom: 0.5,
     });
 
-    if(this.panzoomCanvas != null) {
+    if (this.panzoomCanvas != null) {
       this.panzoomCanvas.on('transform', (e: any) => {
 
         let result = this.panzoomCanvas.getTransform();
@@ -93,7 +92,7 @@ export class CreateEditComponent {
           }
 
           if (result.x < this.canvasWrapperElement?.nativeElement.offsetWidth - (TileCount * 100 * result.scale) - OutsideDrag) {
-            this.panzoomCanvas.moveTo(this.canvasWrapperElement?.nativeElement.offsetWidth  - (TileCount * 100 * result.scale) - OutsideDrag, result.y);
+            this.panzoomCanvas.moveTo(this.canvasWrapperElement?.nativeElement.offsetWidth - (TileCount * 100 * result.scale) - OutsideDrag, result.y);
           }
 
           if (result.y < this.canvasWrapperElement?.nativeElement.offsetHeight - (TileCount * 100 * result.scale) - OutsideDrag) {
@@ -102,19 +101,19 @@ export class CreateEditComponent {
         } else {
           const reference = 500 * result.scale;
 
-          if(result.x < TileCount * 100 * -result.scale + 500 * result.scale) {
+          if (result.x < TileCount * 100 * -result.scale + 500 * result.scale) {
             this.panzoomCanvas.moveTo(TileCount * 100 * -result.scale + 500 * result.scale, result.y);
           }
 
-          if(result.y < TileCount * 100 * -result.scale + 500 * result.scale) {
+          if (result.y < TileCount * 100 * -result.scale + 500 * result.scale) {
             this.panzoomCanvas.moveTo(result.x, TileCount * 100 * -result.scale + 500 * result.scale);
           }
 
-          if(result.x > this.canvasWrapperElement?.nativeElement.offsetWidth - reference) {
+          if (result.x > this.canvasWrapperElement?.nativeElement.offsetWidth - reference) {
             this.panzoomCanvas.moveTo(this.canvasWrapperElement?.nativeElement.offsetWidth - reference, result.y);
           }
 
-          if(result.y > this.canvasWrapperElement?.nativeElement.offsetHeight - reference) {
+          if (result.y > this.canvasWrapperElement?.nativeElement.offsetHeight - reference) {
             this.panzoomCanvas.moveTo(result.x, this.canvasWrapperElement?.nativeElement.offsetHeight - reference);
           }
         }
@@ -134,16 +133,26 @@ export class CreateEditComponent {
   }
 
   exited(event: any) {
-    console.log(event);
-    const currentIdx = event.container.data.findIndex(
-      (f : any) => f.id === event.item.data.id
+    console.log(this.currentDraggedTile);
+    const currentIdx = this.tiles.findIndex(
+      (f: Tile) => f.id === this.currentDraggedTile?.id
     );
-    this.tiles.splice(currentIdx + 1, 0, {
-      ...event.item.data,
-      temp: true,
-    });
+    this.tiles.splice(currentIdx + 1, 0, ({
+      ...this.currentDraggedTile,
+      temp: true
+    }) as Tile);
   }
+
   entered() {
-    this.tiles = this.tiles.filter((f : any) => !f.temp);
+    this.tiles = this.tiles.filter((f: any) => !f.temp);
+  }
+
+  dragStart(tile: Tile) {
+    this.currentDraggedTile = tile;
+  }
+
+  dragEnd(tile: Tile) {
+    tile.temp = false;
+    this.tiles = this.tiles.filter((f: any) => !f.temp);
   }
 }
