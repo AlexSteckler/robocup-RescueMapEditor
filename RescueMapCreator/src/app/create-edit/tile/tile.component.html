@@ -1,1 +1,1 @@
-<img [src]="tile?tile.image:''" style="width: 100px; height: 100px">
+<img [@rotatedState]='state' [src]="tile?tile.image:''" class="w-100" (contextmenu)="onRightClick()">

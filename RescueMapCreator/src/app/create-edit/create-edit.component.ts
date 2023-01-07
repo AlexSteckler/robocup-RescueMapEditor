@@ -1,9 +1,10 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {CdkDragDrop, transferArrayItem} from "@angular/cdk/drag-drop";
+import {CdkDragDrop, CdkDragMove, CdkDragStart, copyArrayItem, moveItemInArray, transferArrayItem} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
 import panzoom from 'panzoom';
-import { TilesService } from './tile/tiles.service';
+import {TilesService} from './tile/tiles.service';
 import {DomSanitizer} from "@angular/platform-browser";
+
 
 const TileCount = 30;
 const OutsideDrag = 100;
@@ -24,6 +25,7 @@ export class CreateEditComponent {
   panzoomCanvas: any = null;
 
   tiles : Tile[] = [];
+  greenTiles : Tile[] = [];
 
   grids: Array<Array<Array<Tile>>> = [
     [
@@ -40,9 +42,12 @@ export class CreateEditComponent {
       let row: Array<Tile> = [];
       for (let j = 0; j < TileCount; j++) {
         row.push({
-          id: (i * TileCount) + j + 1,
+          id: '0',
+          name: 'null',
           source: '',
           image: undefined,
+          paths: undefined,
+          rotation: 0,
         });
       }
       this.grids[0].push(row);
@@ -53,18 +58,20 @@ export class CreateEditComponent {
     this.tilesService.getTiles().subscribe((tiles : Tile[]) => {
       tiles.forEach((tile: Tile) => {
         this.tilesService.getTileImg(tile.source).subscribe((blob: Blob) => {
-          console.log(blob);
           let objectURL = URL.createObjectURL(blob);
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           tile.image = img;
         });
+        if (tile.name.includes('default')) {
+          this.tiles.push(tile);
+        } else if (tile.name.includes('cross')) {
+          this.greenTiles.push(tile);
+        }
       });
-      this.tiles = tiles
     });
   }
 
   ngAfterViewInit() {
-
 
     this.panzoomCanvas = panzoom(this.canvasElement!.nativeElement, {
       maxZoom: 2,
@@ -124,5 +131,19 @@ export class CreateEditComponent {
 
   resumePanzoom() {
     this.panzoomCanvas.resume();
+  }
+
+  exited(event: any) {
+    console.log(event);
+    const currentIdx = event.container.data.findIndex(
+      (f : any) => f.id === event.item.data.id
+    );
+    this.tiles.splice(currentIdx + 1, 0, {
+      ...event.item.data,
+      temp: true,
+    });
+  }
+  entered() {
+    this.tiles = this.tiles.filter((f : any) => !f.temp);
   }
 }

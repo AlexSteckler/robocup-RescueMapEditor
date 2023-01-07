@@ -1,15 +1,14 @@
 app-tile {
   width: 100px;
   height:100px;
-  background-color: grey;
+  background-color: rgb(197, 197, 197);
   padding: 0;
-  border: greenyellow solid 1px;
+  border: solid 0.1px grey;
 }
 
 li {
   list-style-type: none;
 }
-
 
 #canvas-wrapper {
   background: lightgrey;
@@ -17,3 +16,6 @@ li {
   height: 700px;
 }
 
+.white {
+  background-color: white;
+}
