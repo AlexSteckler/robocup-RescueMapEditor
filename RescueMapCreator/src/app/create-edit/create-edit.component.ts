@@ -1,5 +1,6 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
-import {CdkDragDrop} from "@angular/cdk/drag-drop";
+
+import {Component, ElementRef, EventEmitter, Output, ViewChild} from '@angular/core';
+import {CdkDrag, CdkDragDrop, CdkDragStart, moveItemInArray} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
 import panzoom from 'panzoom';
 import {TilesService} from './tile/tiles.service';
@@ -30,6 +31,7 @@ export class CreateEditComponent {
     [],
   ];
   private currentDraggedTile: Tile | undefined;
+  moveEnabled: any;
 
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
     this.grids[0][rowCount][colCount] = $event.previousContainer.data[$event.previousIndex]
@@ -82,6 +84,10 @@ export class CreateEditComponent {
 
         let result = this.panzoomCanvas.getTransform();
 
+        if(!this.moveEnabled) {
+          return;
+        }
+
         if (result.scale >= 1) {
           if (result.x > OutsideDrag) {
             this.panzoomCanvas.moveTo(OutsideDrag, result.y);
@@ -129,13 +135,13 @@ export class CreateEditComponent {
   }
 
   resumePanzoom() {
-    this.panzoomCanvas.resume();
+;    this.panzoomCanvas.resume();
   }
 
   exited(event: any) {
-    console.log(this.currentDraggedTile);
+    console.log('exited');
     const currentIdx = this.tiles.findIndex(
-      (f: Tile) => f.id === this.currentDraggedTile?.id
+      (tile: Tile) => tile.id === this.currentDraggedTile?.id
     );
     this.tiles.splice(currentIdx + 1, 0, ({
       ...this.currentDraggedTile,
@@ -154,5 +160,28 @@ export class CreateEditComponent {
   dragEnd(tile: Tile) {
     tile.temp = false;
     this.tiles = this.tiles.filter((f: any) => !f.temp);
+  }
+
+  dragStartMovement(tile: Tile) {
+    if(tile.id != '0') {
+      this.pausePanzoom();
+    }
+  }
+
+  dragEndMovement(tile: Tile) {
+      this.moveEnabled = true;
+  }
+
+  dropped(event: any) {
+    console.log('dropped');
+    moveItemInArray(
+       this.tiles,
+       event.previousIndex,
+       event.currentIndex
+      );
+  }
+
+  dragged(event: any) {
+    console.log(event);
   }
 }

@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Tile} from "./dto/tile.dto";
 import { TilesService } from './tiles.service';
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
@@ -19,6 +19,16 @@ import {trigger, state, style, animate, transition} from '@angular/animations';
 })
 
 export class TileComponent {
+
+  @Input() zoomScale = 1;
+  @Input() pos = { x: 0, y: 0 };
+
+  @Output() dragStart = new EventEmitter<any>();
+  @Output() dragEnd = new EventEmitter<any>();
+
+  
+
+
   @Input() tile: Tile | undefined;
 
   state: string = '0';

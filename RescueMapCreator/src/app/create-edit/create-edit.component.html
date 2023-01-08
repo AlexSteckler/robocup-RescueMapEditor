@@ -19,6 +19,8 @@
         >
       </app-tile>
     </div>
+
+    <!--
     <div class="p-3 d-flex d-flex align-content-around flex-wrap"
          cdkDropList
          [cdkDropListData]="tiles">
@@ -26,14 +28,21 @@
         <app-tile [class.white]="tile.id" *ngFor="let tile of greenTiles" class="mb-2 me-2" [tile]="tile" cdkDrag></app-tile>
       </div>
     </div>
-
+    -->
   </div>
   <div id="canvas-wrapper" #canvas_wrapper class="col-8">
-    <div #canvas>
+    <div #canvas >
       <div *ngFor="let level of grids" class="level">
         <div *ngFor="let row of level; let rowCount = index" class="row d-flex flex-nowrap">
-          <app-tile [class.white]="tile.id" *ngFor="let tile of row; let colCount = index" [tile]="tile" cdkDropList
-                    (cdkDropListDropped)="drop($event, rowCount, colCount)">
+          <app-tile [class.white]="tile.id"
+                    *ngFor="let tile of row; let colCount = index"
+                    [tile]="tile"
+                    cdkDropList
+                    (cdkDropListDropped)="drop($event, rowCount, colCount)"
+                    cdkDrag
+                    [cdkDragDisabled]="tile.id =='0'"
+                    (cdkDragStarted)="dragStartMovement(tile)"
+                    (cdkDragEnded)="resumePanzoom()">
           </app-tile>
         </div>
       </div>
