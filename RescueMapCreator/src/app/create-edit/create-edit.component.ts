@@ -1,6 +1,5 @@
-
-import {Component, ElementRef, EventEmitter, Output, ViewChild} from '@angular/core';
-import {CdkDrag, CdkDragDrop, CdkDragStart, moveItemInArray} from "@angular/cdk/drag-drop";
+import {Component, ElementRef, ViewChild} from '@angular/core';
+import {CdkDragDrop, CdkDragEnd, moveItemInArray} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
 import panzoom from 'panzoom';
 import {TilesService} from './tile/tiles.service';
@@ -34,6 +33,7 @@ export class CreateEditComponent {
   moveEnabled: any;
 
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
+    console.log('drop');
     this.grids[0][rowCount][colCount] = $event.previousContainer.data[$event.previousIndex]
   }
 
@@ -84,7 +84,7 @@ export class CreateEditComponent {
 
         let result = this.panzoomCanvas.getTransform();
 
-        if(!this.moveEnabled) {
+        if (!this.moveEnabled) {
           return;
         }
 
@@ -135,7 +135,7 @@ export class CreateEditComponent {
   }
 
   resumePanzoom() {
-;    this.panzoomCanvas.resume();
+    ;this.panzoomCanvas.resume();
   }
 
   exited(event: any) {
@@ -163,25 +163,60 @@ export class CreateEditComponent {
   }
 
   dragStartMovement(tile: Tile) {
-    if(tile.id != '0') {
+    console.log('dragStartMovement');
+    if (tile.id != '0') {
       this.pausePanzoom();
     }
   }
 
-  dragEndMovement(tile: Tile) {
-      this.moveEnabled = true;
+  dragEndMovement(tile: Tile, $event: CdkDragEnd, rowCount: number, colCount: number, layerCount: number) {
+    let x = $event.distance.x;
+    let y = $event.distance.y;
+    if (Math.abs(x) > 50 || Math.abs(y) > 50) {
+      const xDirection = x > 0 ? 1 : -1;
+      const yDirection = y > 0 ? 1 : -1;
+      x *= xDirection;
+      y *= yDirection;
+      let xMove = (Math.floor((x - 50) / 100) + 1) * xDirection
+      let yMove = (Math.floor((y - 50) / 100) + 1) * yDirection
+      if (rowCount + yMove >= 0 && rowCount + yMove < TileCount && colCount + xMove >= 0 && colCount + xMove < TileCount) {
+        this.grids[layerCount][rowCount + yMove][colCount + xMove] = {
+          ...tile
+        }
+        this.grids[layerCount][rowCount][colCount] = {
+          id: '0',
+          name: '',
+          source: '',
+          image: undefined,
+          paths: undefined,
+          rotation: 0,
+        }
+      }
+    }
+    $event.source._dragRef.reset();
+    this.resumePanzoom();
   }
 
-  dropped(event: any) {
+  dropped(event
+            :
+            any
+  ) {
     console.log('dropped');
     moveItemInArray(
-       this.tiles,
-       event.previousIndex,
-       event.currentIndex
-      );
+      this.tiles,
+      event.previousIndex,
+      event.currentIndex
+    );
   }
 
-  dragged(event: any) {
+  dragged(event
+            :
+            any
+  ) {
     console.log(event);
+  }
+
+  test() {
+    console.log('test');
   }
 }

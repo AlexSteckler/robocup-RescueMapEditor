@@ -31,8 +31,8 @@
     -->
   </div>
   <div id="canvas-wrapper" #canvas_wrapper class="col-8">
-    <div #canvas >
-      <div *ngFor="let level of grids" class="level">
+    <div #canvas>
+      <div *ngFor="let level of grids; let levelCount = index" class="level">
         <div *ngFor="let row of level; let rowCount = index" class="row d-flex flex-nowrap">
           <app-tile [class.white]="tile.id"
                     *ngFor="let tile of row; let colCount = index"
@@ -42,7 +42,7 @@
                     cdkDrag
                     [cdkDragDisabled]="tile.id =='0'"
                     (cdkDragStarted)="dragStartMovement(tile)"
-                    (cdkDragEnded)="resumePanzoom()">
+                    (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)">
           </app-tile>
         </div>
       </div>
