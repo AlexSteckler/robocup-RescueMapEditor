@@ -25,10 +25,6 @@ export class TileComponent {
 
   @Output() dragStart = new EventEmitter<any>();
   @Output() dragEnd = new EventEmitter<any>();
-
-  
-
-
   @Input() tile: Tile | undefined;
 
   state: string = '0';

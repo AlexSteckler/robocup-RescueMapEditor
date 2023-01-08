@@ -30,11 +30,9 @@ export class CreateEditComponent {
     [],
   ];
   private currentDraggedTile: Tile | undefined;
-  moveEnabled: any;
 
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
-    console.log('drop');
-    this.grids[0][rowCount][colCount] = $event.previousContainer.data[$event.previousIndex]
+    this.grids[0][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
   }
 
   constructor(private tilesService: TilesService,
@@ -83,10 +81,6 @@ export class CreateEditComponent {
       this.panzoomCanvas.on('transform', (e: any) => {
 
         let result = this.panzoomCanvas.getTransform();
-
-        if (!this.moveEnabled) {
-          return;
-        }
 
         if (result.scale >= 1) {
           if (result.x > OutsideDrag) {
@@ -139,7 +133,6 @@ export class CreateEditComponent {
   }
 
   exited(event: any) {
-    console.log('exited');
     const currentIdx = this.tiles.findIndex(
       (tile: Tile) => tile.id === this.currentDraggedTile?.id
     );
@@ -163,7 +156,6 @@ export class CreateEditComponent {
   }
 
   dragStartMovement(tile: Tile) {
-    console.log('dragStartMovement');
     if (tile.id != '0') {
       this.pausePanzoom();
     }
@@ -195,28 +187,5 @@ export class CreateEditComponent {
     }
     $event.source._dragRef.reset();
     this.resumePanzoom();
-  }
-
-  dropped(event
-            :
-            any
-  ) {
-    console.log('dropped');
-    moveItemInArray(
-      this.tiles,
-      event.previousIndex,
-      event.currentIndex
-    );
-  }
-
-  dragged(event
-            :
-            any
-  ) {
-    console.log(event);
-  }
-
-  test() {
-    console.log('test');
   }
 }

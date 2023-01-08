@@ -40,7 +40,7 @@
                     cdkDropList
                     (cdkDropListDropped)="drop($event, rowCount, colCount)"
                     cdkDrag
-                    [cdkDragDisabled]="tile.id =='0'"
+                    [cdkDragDisabled]="tile.id == '0'"
                     (cdkDragStarted)="dragStartMovement(tile)"
                     (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)">
           </app-tile>
