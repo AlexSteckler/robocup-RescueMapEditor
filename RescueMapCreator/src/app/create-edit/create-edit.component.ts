@@ -1,5 +1,5 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
-import {CdkDragDrop, CdkDragEnd, moveItemInArray} from "@angular/cdk/drag-drop";
+import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {CdkDrag, CdkDragDrop, CdkDragEnd, moveItemInArray} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
 import panzoom from 'panzoom';
 import {TilesService} from './tile/tiles.service';
@@ -19,7 +19,13 @@ export class CreateEditComponent {
   @ViewChild('canvas') canvasElement: ElementRef | undefined;
   @ViewChild('canvas_wrapper') canvasWrapperElement: ElementRef | undefined;
 
-  zoomScale = 1;
+  @Input() zoomScale = 1;
+  @Input() pos = { x: 0, y: 0 };
+
+  @Output() dragStart = new EventEmitter<any>();
+  @Output() dragEnd = new EventEmitter<any>();
+  @Input() tile: Tile | undefined;
+
   zoomFactor = 0.05;
   panzoomCanvas: any = null;
 
@@ -146,11 +152,11 @@ export class CreateEditComponent {
     this.tiles = this.tiles.filter((f: any) => !f.temp);
   }
 
-  dragStart(tile: Tile) {
+  draggedStart(tile: Tile) {
     this.currentDraggedTile = tile;
   }
 
-  dragEnd(tile: Tile) {
+  draggedEnd(tile: Tile) {
     tile.temp = false;
     this.tiles = this.tiles.filter((f: any) => !f.temp);
   }
@@ -162,6 +168,7 @@ export class CreateEditComponent {
   }
 
   dragEndMovement(tile: Tile, $event: CdkDragEnd, rowCount: number, colCount: number, layerCount: number) {
+    let zoomFactor = this.panzoomCanvas.getTransform().scale;
     let x = $event.distance.x;
     let y = $event.distance.y;
     if (Math.abs(x) > 50 || Math.abs(y) > 50) {
@@ -169,6 +176,8 @@ export class CreateEditComponent {
       const yDirection = y > 0 ? 1 : -1;
       x *= xDirection;
       y *= yDirection;
+      x /= zoomFactor;
+      y /= zoomFactor;
       let xMove = (Math.floor((x - 50) / 100) + 1) * xDirection
       let yMove = (Math.floor((y - 50) / 100) + 1) * yDirection
       if (rowCount + yMove >= 0 && rowCount + yMove < TileCount && colCount + xMove >= 0 && colCount + xMove < TileCount) {
@@ -187,5 +196,25 @@ export class CreateEditComponent {
     }
     $event.source._dragRef.reset();
     this.resumePanzoom();
+  }
+
+  dragConstrainPoint = (point : any, dragRef: any) => {
+
+    let zoomMoveXDifference = 0;
+    let zoomMoveYDifference = 0;
+    ;
+
+    if (this.zoomScale != 1) {
+      zoomMoveXDifference = (1 - this.zoomScale) * dragRef.getFreeDragPosition().x;
+      zoomMoveYDifference = (1 - this.zoomScale) * dragRef.getFreeDragPosition().y;
+    }
+    return {
+      x: point.x + zoomMoveXDifference - 50,
+      y: point.y + zoomMoveYDifference - 50,
+    };
+  };
+
+  startDragging($event : any) {
+    this.dragStart.emit();
   }
 }
