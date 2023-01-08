@@ -17,6 +17,9 @@
         (cdkDragStarted)="draggedStart(tile)"
         (cdkDragEnded)="draggedEnd(tile)"
         >
+        <app-tile *cdkDragPreview [tile]="tile"
+                  [ngStyle]="{'width.px': 100 * zoomScale, 'height.px': 100 * zoomScale}"
+        ></app-tile>
       </app-tile>
     </div>
 
