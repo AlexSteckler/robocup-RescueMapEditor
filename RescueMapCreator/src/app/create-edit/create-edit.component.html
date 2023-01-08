@@ -41,9 +41,8 @@
                     (cdkDropListDropped)="drop($event, rowCount, colCount)"
                     cdkDrag
 
-                    (cdkDragStarted)="startDragging($event)"
+
                     [cdkDragConstrainPosition]="dragConstrainPoint"
-                    [cdkDragFreeDragPosition]="pos"
 
                     [cdkDragDisabled]="tile.id == '0'"
                     (cdkDragStarted)="dragStartMovement(tile)"

@@ -205,12 +205,13 @@ export class CreateEditComponent {
     ;
 
     if (this.zoomScale != 1) {
+      console.log(this.zoomScale);
       zoomMoveXDifference = (1 - this.zoomScale) * dragRef.getFreeDragPosition().x;
       zoomMoveYDifference = (1 - this.zoomScale) * dragRef.getFreeDragPosition().y;
     }
     return {
-      x: point.x + zoomMoveXDifference - 50,
-      y: point.y + zoomMoveYDifference - 50,
+      x: point.x + zoomMoveXDifference - this.zoomScale * 50,
+      y: point.y + zoomMoveYDifference - this.zoomScale * 50
     };
   };
 
