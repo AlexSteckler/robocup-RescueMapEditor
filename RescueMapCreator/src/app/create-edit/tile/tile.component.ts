@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Tile} from "./dto/tile.dto";
 import { TilesService } from './tiles.service';
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
@@ -19,7 +19,10 @@ import { CdkDrag } from '@angular/cdk/drag-drop';
   ]
 })
 
-export class TileComponent {
+export class TileComponent implements OnInit{
+  ngOnInit(): void {
+    this.state = this.tile?.rotation.toString()!;
+  }
 
   @Input() tile: Tile | undefined;
 
@@ -28,19 +31,7 @@ export class TileComponent {
   onRightClick() {
     this.tile!.rotation = (this.tile!.rotation + 1) % 4;
 
-    this.rotate();
+    this.state = this.tile?.rotation.toString()!;
     return false;
-  }
-
-  rotate() {
-    if (this.tile?.rotation == 0) {
-      this.state = '0';
-    } else if (this.tile?.rotation == 1) {
-      this.state = '1';
-    } else if (this.tile?.rotation == 2) {
-      this.state = '2';
-    } else if (this.tile?.rotation == 3) {
-      this.state = '3';
-    }
   }
 }
