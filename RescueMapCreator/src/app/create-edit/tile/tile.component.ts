@@ -21,7 +21,7 @@ import { CdkDrag } from '@angular/cdk/drag-drop';
 
 export class TileComponent implements OnInit{
   ngOnInit(): void {
-    this.state = this.tile?.rotation.toString()!;
+    this.state = this.tile?.rotation?.toString()!;
   }
 
   @Input() tile: Tile | undefined;
@@ -29,7 +29,7 @@ export class TileComponent implements OnInit{
   state: string = '0';
 
   onRightClick() {
-    this.tile!.rotation = (this.tile!.rotation + 1) % 4;
+    this.tile!.rotation = (this.tile!.rotation! + 1) % 4;
 
     this.state = this.tile?.rotation.toString()!;
     return false;

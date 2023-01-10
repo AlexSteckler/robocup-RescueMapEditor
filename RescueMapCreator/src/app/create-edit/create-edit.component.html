@@ -7,8 +7,7 @@
         cdkDropListSortingDisabled
         #tileList
         (cdkDropListExited)="exited($event)"
-        (cdkDropListEntered)="entered()"
-          >
+        (cdkDropListEntered)="entered()">
       <app-tile
         [class.white]="tile.id"
         *ngFor="let tile of tiles"
@@ -21,6 +20,16 @@
                   [ngStyle]="{'width.px': 100 * zoomScale, 'height.px': 100 * zoomScale}"
         ></app-tile>
       </app-tile>
+    </div>
+
+    <div class="p-3" cdkDropList>
+      <h3>Opferraum</h3>
+      <div class="evacuationZone m-2" cdkDrag cdkDropListSortingDisabled>
+        <div class="evacuationZone" *cdkDragPreview style="width: 500px; background-color: red;" [ngStyle]="{'width.px': 400 * zoomScale, 'height.px': 300 * zoomScale}">
+        </div>
+      </div>
+
+      <div class="evacuationZoneUpright m-2" cdkDrag></div>
     </div>
 
     <!--
@@ -43,12 +52,9 @@
                     cdkDropList
                     (cdkDropListDropped)="drop($event, rowCount, colCount)"
                     cdkDrag
-
-
                     [cdkDragConstrainPosition]="dragConstrainPoint"
-
                     [cdkDragDisabled]="tile.id == '0'"
-                    (cdkDragStarted)="dragStartMovement(tile)"
+                    (cdkDragStarted)="dragStartMovement(tile, rowCount, colCount, levelCount)"
                     (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)">
           </app-tile>
         </div>

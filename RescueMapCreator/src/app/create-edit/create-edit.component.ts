@@ -38,7 +38,24 @@ export class CreateEditComponent {
   private currentDraggedTile: Tile | undefined;
 
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
-    this.grids[0][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
+    if ($event.previousContainer.data) {
+      this.grids[0][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
+    } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4) {
+      this.grids[0][rowCount][colCount] = {name: 'evacuationZone_00', border: ['black','','','black']};
+      this.grids[0][rowCount][colCount + 1] = {name: 'evacuationZone_01', border: ['black','','','']};
+      this.grids[0][rowCount][colCount + 2] = {name: 'evacuationZone_02', border: ['black','','','']};
+      this.grids[0][rowCount][colCount + 3] = {name: 'evacuationZone_03', border: ['black','black','','']};
+      this.grids[0][rowCount + 1][colCount + 3] = {name: 'evacuationZone_13', border: ['','black','','']};
+      this.grids[0][rowCount + 2][colCount + 3] = {name: 'evacuationZone_23', border: ['','black','black','']};
+      this.grids[0][rowCount + 2][colCount + 2] = {name: 'evacuationZone_22', border: ['','','black','']};
+      this.grids[0][rowCount + 2][colCount + 1] = {name: 'evacuationZone_21', border: ['','','black','']};
+      this.grids[0][rowCount + 2][colCount] = {name: 'evacuationZone_20', border: ['','','black','black']};
+      this.grids[0][rowCount + 1][colCount] = {name: 'evacuationZone_10', border: ['','','','black']};
+      this.grids[0][rowCount + 1][colCount + 1] = {name: 'evacuationZone_11', border: ['','','','']};
+      this.grids[0][rowCount + 1][colCount + 2] = {name: 'evacuationZone_12', border: ['','','','']};
+    } else if ($event.previousIndex == 1) {
+
+    }
   }
 
   constructor(private tilesService: TilesService,
@@ -62,7 +79,7 @@ export class CreateEditComponent {
   ngOnInit(): void {
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
       tiles.forEach((tile: Tile) => {
-        this.tilesService.getTileImg(tile.source).subscribe((blob: Blob) => {
+        this.tilesService.getTileImg(tile.source!).subscribe((blob: Blob) => {
           let objectURL = URL.createObjectURL(blob);
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           tile.image = img;
@@ -161,7 +178,26 @@ export class CreateEditComponent {
     this.tiles = this.tiles.filter((f: any) => !f.temp);
   }
 
-  dragStartMovement(tile: Tile) {
+  dragStartMovement(tile: Tile, rowCount: number, colCount: number, levelCount: number) {
+    if (tile.name.includes('evacuationZone')) {
+      let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
+      let y = +tile.name.substring(tile.name.length - 1);
+
+      for (let i = 0; i < 4; i++ ) {
+        for (let j = 0; j < 3; j++) {
+
+          this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
+            id: '0',
+            name: '',
+            source: '',
+            image: undefined,
+            paths: undefined,
+            rotation: 0,
+          }
+        }
+      }
+    }
+
     if (tile.id != '0') {
       this.pausePanzoom();
     }
@@ -205,7 +241,6 @@ export class CreateEditComponent {
     ;
 
     if (this.zoomScale != 1) {
-      console.log(this.zoomScale);
       zoomMoveXDifference = (1 - this.zoomScale) * dragRef.getFreeDragPosition().x;
       zoomMoveYDifference = (1 - this.zoomScale) * dragRef.getFreeDragPosition().y;
     }

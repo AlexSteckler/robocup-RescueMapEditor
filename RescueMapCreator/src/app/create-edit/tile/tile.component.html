@@ -1,1 +1,11 @@
-<img [@rotatedState]='state' [src]="tile?tile.image:''" class="w-100" (contextmenu)="onRightClick()">
+<img *ngIf="tile?.image" [@rotatedState]='state' [src]="tile?.image" class="w-100" (contextmenu)="onRightClick()">
+
+<div class="tile-size" *ngIf="tile?.border"
+[ngClass]="{'ez-border-top': tile!.border![0] === 'black',
+            'ez-border-end': tile!.border![1] === 'black',
+            'ez-border-bottom': tile!.border![2] === 'black',
+            'ez-border-start': tile!.border![3] === 'black'
+          }">
+</div>
+
+
