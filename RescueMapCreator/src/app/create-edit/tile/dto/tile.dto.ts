@@ -9,5 +9,6 @@ export interface Tile {
    source?: string;
    rotation?: number;
    border?: string[];
-   temp?: boolean
+   temp?: boolean;
+   isBeingDragged?: boolean;
 }

@@ -1,9 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Tile} from "./dto/tile.dto";
-import { TilesService } from './tiles.service';
-import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {trigger, state, style, animate, transition} from '@angular/animations';
-import { CdkDrag } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-tile',

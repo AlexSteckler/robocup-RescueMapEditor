@@ -1,14 +1,12 @@
 import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
-import {CdkDrag, CdkDragDrop, CdkDragEnd, moveItemInArray} from "@angular/cdk/drag-drop";
+import {CdkDrag, CdkDragDrop, CdkDragEnd, CdkDragStart, moveItemInArray} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
 import panzoom from 'panzoom';
 import {TilesService} from './tile/tiles.service';
-import {DomSanitizer} from "@angular/platform-browser";
-
+import {DomSanitizer, Title} from "@angular/platform-browser";
 
 const TileCount = 30;
 const OutsideDrag = 100;
-
 
 @Component({
   selector: 'app-create-edit',
@@ -29,6 +27,9 @@ export class CreateEditComponent {
   zoomFactor = 0.05;
   panzoomCanvas: any = null;
 
+  evacuationEnabled: boolean = true;
+  tileIsDragged: boolean = false;
+
   tiles: Tile[] = [];
   greenTiles: Tile[] = [];
 
@@ -36,27 +37,6 @@ export class CreateEditComponent {
     [],
   ];
   private currentDraggedTile: Tile | undefined;
-
-  drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
-    if ($event.previousContainer.data) {
-      this.grids[0][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
-    } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4) {
-      this.grids[0][rowCount][colCount] = {name: 'evacuationZone_00', border: ['black','','','black']};
-      this.grids[0][rowCount][colCount + 1] = {name: 'evacuationZone_01', border: ['black','','','']};
-      this.grids[0][rowCount][colCount + 2] = {name: 'evacuationZone_02', border: ['black','','','']};
-      this.grids[0][rowCount][colCount + 3] = {name: 'evacuationZone_03', border: ['black','black','','']};
-      this.grids[0][rowCount + 1][colCount + 3] = {name: 'evacuationZone_13', border: ['','black','','']};
-      this.grids[0][rowCount + 2][colCount + 3] = {name: 'evacuationZone_23', border: ['','black','black','']};
-      this.grids[0][rowCount + 2][colCount + 2] = {name: 'evacuationZone_22', border: ['','','black','']};
-      this.grids[0][rowCount + 2][colCount + 1] = {name: 'evacuationZone_21', border: ['','','black','']};
-      this.grids[0][rowCount + 2][colCount] = {name: 'evacuationZone_20', border: ['','','black','black']};
-      this.grids[0][rowCount + 1][colCount] = {name: 'evacuationZone_10', border: ['','','','black']};
-      this.grids[0][rowCount + 1][colCount + 1] = {name: 'evacuationZone_11', border: ['','','','']};
-      this.grids[0][rowCount + 1][colCount + 2] = {name: 'evacuationZone_12', border: ['','','','']};
-    } else if ($event.previousIndex == 1) {
-
-    }
-  }
 
   constructor(private tilesService: TilesService,
               private sanitizer: DomSanitizer) {
@@ -94,7 +74,6 @@ export class CreateEditComponent {
   }
 
   ngAfterViewInit() {
-
     this.panzoomCanvas = panzoom(this.canvasElement!.nativeElement, {
       maxZoom: 2,
       minZoom: 0.5,
@@ -147,12 +126,23 @@ export class CreateEditComponent {
     this.panzoomCanvas.setZoomSpeed(0.05);
   }
 
+  drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
+    if ($event.previousContainer.data && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
+      this.grids[0][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
+    } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4 && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
+      this.addEvacuationZone(rowCount, colCount);
+      this.evacuationEnabled = false;
+    } else if ($event.previousIndex == 1) {
+
+    }
+  }
+
   pausePanzoom() {
     this.panzoomCanvas.pause();
   }
 
   resumePanzoom() {
-    ;this.panzoomCanvas.resume();
+    this.panzoomCanvas.resume();
   }
 
   exited(event: any) {
@@ -178,32 +168,15 @@ export class CreateEditComponent {
     this.tiles = this.tiles.filter((f: any) => !f.temp);
   }
 
-  dragStartMovement(tile: Tile, rowCount: number, colCount: number, levelCount: number) {
-    if (tile.name.includes('evacuationZone')) {
-      let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
-      let y = +tile.name.substring(tile.name.length - 1);
-
-      for (let i = 0; i < 4; i++ ) {
-        for (let j = 0; j < 3; j++) {
-
-          this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
-            id: '0',
-            name: '',
-            source: '',
-            image: undefined,
-            paths: undefined,
-            rotation: 0,
-          }
-        }
-      }
-    }
-
+  dragStartMovement(tile: Tile, $event: CdkDragStart, rowCount: number, colCount: number, levelCount: number) {
+    tile.isBeingDragged = true;
     if (tile.id != '0') {
       this.pausePanzoom();
     }
   }
 
-  dragEndMovement(tile: Tile, $event: CdkDragEnd, rowCount: number, colCount: number, layerCount: number) {
+  dragEndMovement(tile: Tile, $event: CdkDragEnd, rowCount: number, colCount: number, levelCount: number) {
+    tile.isBeingDragged = false;
     let zoomFactor = this.panzoomCanvas.getTransform().scale;
     let x = $event.distance.x;
     let y = $event.distance.y;
@@ -216,11 +189,43 @@ export class CreateEditComponent {
       y /= zoomFactor;
       let xMove = (Math.floor((x - 50) / 100) + 1) * xDirection
       let yMove = (Math.floor((y - 50) / 100) + 1) * yDirection
-      if (rowCount + yMove >= 0 && rowCount + yMove < TileCount && colCount + xMove >= 0 && colCount + xMove < TileCount) {
-        this.grids[layerCount][rowCount + yMove][colCount + xMove] = {
+
+      if (rowCount + yMove >= 0
+        && rowCount + yMove < TileCount - 2
+        && colCount + xMove >= 0
+        && colCount + xMove < TileCount - 3
+        && tile.name.includes('evacuationZone')
+        ) {
+        let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
+        let y = +tile.name.substring(tile.name.length - 1);
+
+        for (let i = 0; i < 4; i++ ) {
+          for (let j = 0; j < 3; j++) {
+            this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
+              id: '0',
+              name: '',
+              source: '',
+              image: undefined,
+              paths: undefined,
+              rotation: 0,
+            }
+          }
+        }
+
+        this.addEvacuationZone(rowCount + yMove, colCount + xMove);
+      }
+
+      else if (
+              rowCount + yMove >= 0
+              && rowCount + yMove < TileCount
+              && colCount + xMove >= 0
+              && colCount + xMove < TileCount
+              && !tile.name.includes('evacuationZone')
+              ) {
+        this.grids[levelCount][rowCount + yMove][colCount + xMove] = {
           ...tile
         }
-        this.grids[layerCount][rowCount][colCount] = {
+        this.grids[levelCount][rowCount][colCount] = {
           id: '0',
           name: '',
           source: '',
@@ -252,5 +257,20 @@ export class CreateEditComponent {
 
   startDragging($event : any) {
     this.dragStart.emit();
+  }
+
+  private addEvacuationZone(rowCount: number, colCount: number) {
+    this.grids[0][rowCount][colCount] = { name: 'evacuationZone_00', border: ['black', '', '', 'black'] };
+    this.grids[0][rowCount][colCount + 1] = { name: 'evacuationZone_01', border: ['black', '', '', ''] };
+    this.grids[0][rowCount][colCount + 2] = { name: 'evacuationZone_02', border: ['black', '', '', ''] };
+    this.grids[0][rowCount][colCount + 3] = { name: 'evacuationZone_03', border: ['black', 'black', '', ''] };
+    this.grids[0][rowCount + 1][colCount + 3] = { name: 'evacuationZone_13', border: ['', 'black', '', ''] };
+    this.grids[0][rowCount + 2][colCount + 3] = { name: 'evacuationZone_23', border: ['', 'black', 'black', ''] };
+    this.grids[0][rowCount + 2][colCount + 2] = { name: 'evacuationZone_22', border: ['', '', 'black', ''] };
+    this.grids[0][rowCount + 2][colCount + 1] = { name: 'evacuationZone_21', border: ['', '', 'black', ''] };
+    this.grids[0][rowCount + 2][colCount] = { name: 'evacuationZone_20', border: ['', '', 'black', 'black'] };
+    this.grids[0][rowCount + 1][colCount] = { name: 'evacuationZone_10', border: ['', '', '', 'black'] };
+    this.grids[0][rowCount + 1][colCount + 1] = { name: 'evacuationZone_11', border: ['', '', '', ''] };
+    this.grids[0][rowCount + 1][colCount + 2] = { name: 'evacuationZone_12', border: ['', '', '', ''] };
   }
 }

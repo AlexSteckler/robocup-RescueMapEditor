@@ -13,6 +13,7 @@
         *ngFor="let tile of tiles"
         class="mb-2 me-2" [tile]="tile"
         cdkDrag
+
         (cdkDragStarted)="draggedStart(tile)"
         (cdkDragEnded)="draggedEnd(tile)"
         >
@@ -22,13 +23,13 @@
       </app-tile>
     </div>
 
+    <h3>Opferraum</h3>
     <div class="p-3" cdkDropList>
-      <h3>Opferraum</h3>
-      <div class="evacuationZone m-2" cdkDrag cdkDropListSortingDisabled>
+      <div class="evacuationZone m-2" cdkDrag>
         <div class="evacuationZone" *cdkDragPreview style="width: 500px; background-color: red;" [ngStyle]="{'width.px': 400 * zoomScale, 'height.px': 300 * zoomScale}">
+
         </div>
       </div>
-
       <div class="evacuationZoneUpright m-2" cdkDrag></div>
     </div>
 
@@ -41,6 +42,7 @@
       </div>
     </div>
     -->
+
   </div>
   <div id="canvas-wrapper" #canvas_wrapper class="col-8">
     <div #canvas>
@@ -54,8 +56,9 @@
                     cdkDrag
                     [cdkDragConstrainPosition]="dragConstrainPoint"
                     [cdkDragDisabled]="tile.id == '0'"
-                    (cdkDragStarted)="dragStartMovement(tile, rowCount, colCount, levelCount)"
-                    (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)">
+                    (cdkDragStarted)="dragStartMovement(tile, $event, rowCount, colCount, levelCount)"
+                    (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)"
+                    >
           </app-tile>
         </div>
       </div>

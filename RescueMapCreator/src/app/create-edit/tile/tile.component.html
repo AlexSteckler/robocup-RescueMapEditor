@@ -1,6 +1,8 @@
 <img *ngIf="tile?.image" [@rotatedState]='state' [src]="tile?.image" class="w-100" (contextmenu)="onRightClick()">
 
-<div class="tile-size" *ngIf="tile?.border"
+<div *ngIf="tile?.name!.includes('evacuationZone') && tile?.isBeingDragged == true" class="draggedTile"></div>
+
+<div class="tile-size" *ngIf="tile?.border && !tile?.isBeingDragged! == true"
 [ngClass]="{'ez-border-top': tile!.border![0] === 'black',
             'ez-border-end': tile!.border![1] === 'black',
             'ez-border-bottom': tile!.border![2] === 'black',
