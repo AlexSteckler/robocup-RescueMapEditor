@@ -1,5 +1,5 @@
 <div class="row m-0" cdkDropListGroup>
-  <div class="col-4 border-end border-dark border-4">
+  <div class="col-4" style="overflow-y: auto" [ngStyle]=" {'height.px' : innerWidth }"> <!--border-end border-dark border-4-->
     <h2 class="p-3 fw-bold">Kacheln</h2>
     <div class="p-3 d-flex d-flex align-content-around flex-wrap"
         cdkDropList
@@ -46,22 +46,25 @@
     -->
 
   </div>
-  <div id="canvas-wrapper" #canvas_wrapper class="col-8">
-    <div #canvas>
-      <div *ngFor="let level of grids; let levelCount = index" class="level">
-        <div *ngFor="let row of level; let rowCount = index" class="row d-flex flex-nowrap">
-          <app-tile [class.white]="tile.id"
-                    *ngFor="let tile of row; let colCount = index"
-                    [tile]="tile"
-                    cdkDropList
-                    (cdkDropListDropped)="drop($event, rowCount, colCount)"
-                    cdkDrag
-                    [cdkDragConstrainPosition]="dragConstrainPoint"
-                    [cdkDragDisabled]="tile.id == '0'"
-                    (cdkDragStarted)="dragStartMovement(tile, $event, rowCount, colCount, levelCount)"
-                    (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)"
-                    >
-          </app-tile>
+
+  <div class="col-8">
+    <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerWidth }">
+      <div #canvas>
+        <div *ngFor="let level of grids; let levelCount = index" class="level">
+          <div *ngFor="let row of level; let rowCount = index" class="row d-flex flex-nowrap">
+            <app-tile [class.white]="tile.id"
+                      *ngFor="let tile of row; let colCount = index"
+                      [tile]="tile"
+                      cdkDropList
+                      (cdkDropListDropped)="drop($event, rowCount, colCount)"
+                      cdkDrag
+                      [cdkDragConstrainPosition]="dragConstrainPoint"
+                      [cdkDragDisabled]="tile.id == '0'"
+                      (cdkDragStarted)="dragStartMovement(tile, $event, rowCount, colCount, levelCount)"
+                      (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)"
+                      >
+            </app-tile>
+          </div>
         </div>
       </div>
     </div>

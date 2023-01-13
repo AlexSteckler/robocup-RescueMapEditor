@@ -9,8 +9,12 @@ $base-bg-btn-color: rgb(68, 45, 9);
 $base-blue: rgb(7, 139, 186);
 
 
-html, body {
+html {
   height: 100%;
+}
+
+body {
+  min-height: 100%;
 }
 
 body {

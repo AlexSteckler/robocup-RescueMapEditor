@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
 import {CdkDrag, CdkDragDrop, CdkDragEnd, CdkDragStart, moveItemInArray} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
 import panzoom from 'panzoom';
@@ -23,6 +23,14 @@ export class CreateEditComponent {
   @Output() dragStart = new EventEmitter<any>();
   @Output() dragEnd = new EventEmitter<any>();
   @Input() tile: Tile | undefined;
+
+
+  public innerWidth: any;
+
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+  this.innerWidth = window.innerHeight -240;
+}
 
   zoomFactor = 0.05;
   panzoomCanvas: any = null;
@@ -57,6 +65,8 @@ export class CreateEditComponent {
   }
 
   ngOnInit(): void {
+    this.innerWidth = window.innerHeight -240;
+
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
       tiles.forEach((tile: Tile) => {
         this.tilesService.getTileImg(tile.source!).subscribe((blob: Blob) => {
@@ -176,10 +186,12 @@ export class CreateEditComponent {
   }
 
   dragEndMovement(tile: Tile, $event: CdkDragEnd, rowCount: number, colCount: number, levelCount: number) {
+
     tile.isBeingDragged = false;
     let zoomFactor = this.panzoomCanvas.getTransform().scale;
     let x = $event.distance.x;
     let y = $event.distance.y;
+
     if (Math.abs(x) > 50 || Math.abs(y) > 50) {
       const xDirection = x > 0 ? 1 : -1;
       const yDirection = y > 0 ? 1 : -1;
@@ -190,15 +202,17 @@ export class CreateEditComponent {
       let xMove = (Math.floor((x - 50) / 100) + 1) * xDirection
       let yMove = (Math.floor((y - 50) / 100) + 1) * yDirection
 
-      if (rowCount + yMove >= 0
-        && rowCount + yMove < TileCount - 2
-        && colCount + xMove >= 0
-        && colCount + xMove < TileCount - 3
-        ) {
+      if (tile.name.includes('evacuationZone')) {
         let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
         let y = +tile.name.substring(tile.name.length - 1);
 
-        if (tile.name.includes('evacuationZoneUpright')) {
+
+        if (rowCount + yMove >= 0
+          && rowCount + yMove < TileCount - 2
+          && colCount + xMove >= 0
+          && colCount + xMove < TileCount - 3
+          && tile.name.includes('Upright')
+          ) {
           for (let i = 0; i < 3; i++ ) {
             for (let j = 0; j < 4; j++) {
               this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
@@ -214,7 +228,13 @@ export class CreateEditComponent {
 
           this.addEvacuationZoneUpright(rowCount + yMove, colCount + xMove);
         }
-        if (tile.name.includes('evacuationZoneAcross')) {
+
+        if (rowCount + yMove >= 0
+          && rowCount + yMove < TileCount - 3
+          && colCount + xMove >= 0
+          && colCount + xMove < TileCount - 2
+          && tile.name.includes('Across')
+          ) {
           for (let i = 0; i < 4; i++ ) {
             for (let j = 0; j < 3; j++) {
               this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
@@ -237,7 +257,7 @@ export class CreateEditComponent {
               && rowCount + yMove < TileCount
               && colCount + xMove >= 0
               && colCount + xMove < TileCount
-              && !tile.name.includes('evacuationZone')
+              && !this.grids[levelCount][rowCount + yMove][colCount + xMove].name.includes('evacuationZone')
               ) {
         this.grids[levelCount][rowCount + yMove][colCount + xMove] = {
           ...tile
