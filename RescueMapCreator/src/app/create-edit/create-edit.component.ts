@@ -24,12 +24,11 @@ export class CreateEditComponent {
   @Output() dragEnd = new EventEmitter<any>();
   @Input() tile: Tile | undefined;
 
-
-  public innerWidth: any;
+  public innerHeight: any;
 
   @HostListener('window:resize', ['$event'])
   onResize() {
-  this.innerWidth = window.innerHeight -240;
+  this.innerHeight = window.innerHeight -240;
 }
 
   zoomFactor = 0.05;
@@ -37,6 +36,7 @@ export class CreateEditComponent {
 
   evacuationEnabled: boolean = true;
   tileIsDragged: boolean = false;
+  isInTrash: boolean = false;
 
   tiles: Tile[] = [];
   greenTiles: Tile[] = [];
@@ -65,7 +65,7 @@ export class CreateEditComponent {
   }
 
   ngOnInit(): void {
-    this.innerWidth = window.innerHeight -240;
+    this.innerHeight = window.innerHeight -240;
 
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
       tiles.forEach((tile: Tile) => {
@@ -180,6 +180,8 @@ export class CreateEditComponent {
 
   dragStartMovement(tile: Tile, $event: CdkDragStart, rowCount: number, colCount: number, levelCount: number) {
     tile.isBeingDragged = true;
+    this.tileIsDragged = true;
+    this.isInTrash = false;
     if (tile.id != '0') {
       this.pausePanzoom();
     }
@@ -188,6 +190,7 @@ export class CreateEditComponent {
   dragEndMovement(tile: Tile, $event: CdkDragEnd, rowCount: number, colCount: number, levelCount: number) {
 
     tile.isBeingDragged = false;
+    this.tileIsDragged = false;
     let zoomFactor = this.panzoomCanvas.getTransform().scale;
     let x = $event.distance.x;
     let y = $event.distance.y;
@@ -204,8 +207,7 @@ export class CreateEditComponent {
 
       if (tile.name.includes('evacuationZone')) {
         let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
-        let y = +tile.name.substring(tile.name.length - 1);
-
+        let y = +tile.name.substring(tile.name.length - 1)
 
         if (rowCount + yMove >= 0
           && rowCount + yMove < TileCount - 2
@@ -225,8 +227,7 @@ export class CreateEditComponent {
               }
             }
           }
-
-          this.addEvacuationZoneUpright(rowCount + yMove, colCount + xMove);
+            this.addEvacuationZoneUpright(rowCount + yMove, colCount + xMove);
         }
 
         if (rowCount + yMove >= 0
@@ -247,7 +248,6 @@ export class CreateEditComponent {
               }
             }
           }
-
           this.addEvacuationZoneAcross(rowCount + yMove, colCount + xMove);
         }
       }
@@ -259,9 +259,11 @@ export class CreateEditComponent {
               && colCount + xMove < TileCount
               && !this.grids[levelCount][rowCount + yMove][colCount + xMove].name.includes('evacuationZone')
               ) {
-        this.grids[levelCount][rowCount + yMove][colCount + xMove] = {
-          ...tile
-        }
+                if(!this.isInTrash) {
+                  this.grids[levelCount][rowCount + yMove][colCount + xMove] = {
+                    ...tile
+                  }
+                }
         this.grids[levelCount][rowCount][colCount] = {
           id: '0',
           name: '',
@@ -324,5 +326,13 @@ export class CreateEditComponent {
     this.grids[0][rowCount + 1][colCount] = { name: 'evacuationZoneUpright_10', border: ['', '', '', 'black'] };
     this.grids[0][rowCount + 1][colCount + 1] = { name: 'evacuationZoneUpright_11', border: ['', '', '', ''] };
     this.grids[0][rowCount + 2][colCount + 1] = { name: 'evacuationZoneUpright_21', border: ['', '', '', ''] };
+  }
+
+  enterTrash() {
+    this.isInTrash = true;
+  }
+
+  outTrash() {
+    this.isInTrash = false;
   }
 }
