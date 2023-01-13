@@ -27,10 +27,12 @@
     <div class="p-3" cdkDropList>
       <div class="evacuationZone m-2" cdkDrag>
         <div class="evacuationZone" *cdkDragPreview style="width: 500px; background-color: red;" [ngStyle]="{'width.px': 400 * zoomScale, 'height.px': 300 * zoomScale}">
-
         </div>
       </div>
-      <div class="evacuationZoneUpright m-2" cdkDrag></div>
+      <div class="evacuationZoneUpright m-2" cdkDrag>
+        <div class="evacuationZoneUpright" *cdkDragPreview style="width: 300px; background-color: red;" [ngStyle]="{'width.px': 300 * zoomScale, 'height.px': 400 * zoomScale}">
+        </div>
+      </div>
     </div>
 
     <!--
