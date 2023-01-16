@@ -23,6 +23,7 @@ jobs:
           node-version: 16
       - name: Build and Publish
         run: |
+          cd RescueMapCreator
           docker login -u alexstecki -p ${{ secrets.DOCKERHUB_TOKEN }}
           docker build -t alexstecki/robocup-rescuemapeditor .
           docker push alexstecki/robocup-rescuemapeditor
