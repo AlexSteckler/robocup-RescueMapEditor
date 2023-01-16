@@ -71,7 +71,7 @@
       </div>
     </div>
     <div *ngIf="tileIsDragged" id="trashbin" class="d-flex align-items-center justify-content-center">
-      <div class="rounded border border-3 p-2 base-bg" (mouseenter)="enterTrash()" (mouseleave)="outTrash()">
+      <div class="rounded border border-3 p-2 base-bg" (mouseover)="enterTrash()" (mouseleave)="outTrash()">
         <i class="bi bi-trash-fill"></i>
       </div>
     </div>
