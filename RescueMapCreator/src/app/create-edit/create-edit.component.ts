@@ -1,5 +1,5 @@
 import {Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
-import {CdkDragDrop, CdkDragEnd, CdkDragStart} from "@angular/cdk/drag-drop";
+import {CdkDrag, CdkDragDrop, CdkDragEnd, CdkDragStart} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
 import panzoom from 'panzoom';
 import {TilesService} from './tile/tiles.service';
@@ -365,5 +365,9 @@ export class CreateEditComponent {
 
   outTrash() {
     this.isInTrash = false;
+  }
+
+  falseEnter() {
+    return false;
   }
 }

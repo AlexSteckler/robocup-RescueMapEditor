@@ -5,6 +5,7 @@
         cdkDropList
         [cdkDropListData]="tiles"
         cdkDropListSortingDisabled
+        [cdkDropListEnterPredicate]="falseEnter"
         #tileList
         (cdkDropListExited)="exited($event)"
         (cdkDropListEntered)="entered()">
@@ -24,7 +25,7 @@
     </div>
 
     <h3>Opferraum</h3>
-    <div class="p-3" cdkDropList>
+    <div class="p-3" cdkDropList cdkDropListSortingDisabled>
       <div class="evacuationZone m-2" cdkDrag>
         <div class="evacuationZone" *cdkDragPreview style="width: 500px; background-color: red;" [ngStyle]="{'width.px': 400 * zoomScale, 'height.px': 300 * zoomScale}">
         </div>
