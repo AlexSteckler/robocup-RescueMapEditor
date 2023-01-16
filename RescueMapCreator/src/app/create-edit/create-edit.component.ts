@@ -206,10 +206,7 @@ export class CreateEditComponent {
 
       if (tile.name.includes('evacuationZone')) {
         //delay to allow the tile to be removed from the grid
-        setTimeout(() => {
-          if (this.isInTrash) {
-            console.log("is in trash");
-          } else {
+
             let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
             let y = +tile.name.substring(tile.name.length - 1)
 
@@ -231,8 +228,13 @@ export class CreateEditComponent {
                   }
                 }
               }
-              this.addEvacuationZoneUpright(rowCount + yMove, colCount + xMove);
-            }
+              setTimeout(() => {
+                if (!this.isInTrash) {
+                  console.log("is in trash");
+                  this.addEvacuationZoneUpright(rowCount + yMove, colCount + xMove);
+                  }
+                }, 15);
+              }
 
             if (rowCount + yMove >= 0
               && rowCount + yMove < TileCount - 3
@@ -252,10 +254,14 @@ export class CreateEditComponent {
                   }
                 }
               }
-              this.addEvacuationZoneAcross(rowCount + yMove, colCount + xMove);
+              setTimeout(() => {
+                if (!this.isInTrash) {
+                  this.addEvacuationZoneAcross(rowCount + yMove, colCount + xMove);
+                  }
+                }, 15);
             }
-          }
-        }, 10);
+
+
       } else if (
         rowCount + yMove >= 0
         && rowCount + yMove < TileCount
@@ -268,14 +274,17 @@ export class CreateEditComponent {
             ...tile
           }
         }
-        this.grids[levelCount][rowCount][colCount] = {
-          id: '0',
-          name: '',
-          source: '',
-          image: undefined,
-          paths: undefined,
-          rotation: 0,
+        if(true) {
+          this.grids[levelCount][rowCount][colCount] = {
+            id: '0',
+            name: '',
+            source: '',
+            image: undefined,
+            paths: undefined,
+            rotation: 0,
+          }
         }
+
       }
     }
     setTimeout(() => {
