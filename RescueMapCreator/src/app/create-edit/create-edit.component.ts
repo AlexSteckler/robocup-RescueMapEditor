@@ -233,9 +233,9 @@ export class CreateEditComponent {
             let y = +tile.name.substring(tile.name.length - 1)
             setTimeout(() => {
               if (((rowCount + yMove >= 0
-                && rowCount + yMove < TileCount - 2
+                && rowCount + yMove < TileCount - 3
                 && colCount + xMove >= 0
-                && colCount + xMove < TileCount - 3)
+                && colCount + xMove < TileCount - 4)
                 || this.isInTrash)
                 && tile.name.includes('Upright')
               ) {
@@ -259,9 +259,9 @@ export class CreateEditComponent {
               }
 
               if (((rowCount + yMove >= 0
-                && rowCount + yMove < TileCount - 3
+                && rowCount + yMove < TileCount - 2
                 && colCount + xMove >= 0
-                && colCount + xMove < TileCount - 2)
+                && colCount + xMove < TileCount - 3)
                 || this.isInTrash)
                 && tile.name.includes('Across')
               ) {
