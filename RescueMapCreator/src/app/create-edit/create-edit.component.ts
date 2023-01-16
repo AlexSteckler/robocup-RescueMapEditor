@@ -4,7 +4,6 @@ import {Tile} from "./tile/dto/tile.dto";
 import panzoom from 'panzoom';
 import {TilesService} from './tile/tiles.service';
 import {DomSanitizer} from "@angular/platform-browser";
-import {MatMenuModule} from '@angular/material/menu';
 
 
 const TileCount = 30;
@@ -29,6 +28,7 @@ export class CreateEditComponent {
   public innerHeight: any;
 
   altActive: Boolean = false;
+  deleteActive: Boolean = false;
 
   @HostListener('window:resize', ['$event'])
   onResize() {
@@ -68,13 +68,19 @@ export class CreateEditComponent {
     }
     //keypress event
     document.addEventListener('keydown', (event) => {
-      if(event.key === 'Control'){
+      if (event.key === 'Control'){
         this.altActive = true;
+      }
+      if (event.key === 'Delete'){
+        this.deleteActive = true;
       }
     });
     document.addEventListener('keyup', (event) => {
-      if(event.key === 'Control'){
+      if (event.key === 'Control'){
         this.altActive = false;
+      }
+      if (event.key === 'Delete'){
+        this.deleteActive = false;
       }
     });
   }
@@ -159,6 +165,7 @@ export class CreateEditComponent {
       this.evacuationEnabled = false;
     } else if ($event.previousIndex == 1) {
       this.addEvacuationZoneUpright(rowCount, colCount)
+      this.evacuationEnabled = false;
     }
   }
 
@@ -224,57 +231,59 @@ export class CreateEditComponent {
 
             let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
             let y = +tile.name.substring(tile.name.length - 1)
-
-            if (rowCount + yMove >= 0
-              && rowCount + yMove < TileCount - 2
-              && colCount + xMove >= 0
-              && colCount + xMove < TileCount - 3
-              && tile.name.includes('Upright')
-            ) {
-              for (let i = 0; i < 3; i++) {
-                for (let j = 0; j < 4; j++) {
-                  this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
-                    id: '0',
-                    name: '',
-                    source: '',
-                    image: undefined,
-                    paths: undefined,
-                    rotation: 0,
+            setTimeout(() => {
+              if (((rowCount + yMove >= 0
+                && rowCount + yMove < TileCount - 2
+                && colCount + xMove >= 0
+                && colCount + xMove < TileCount - 3)
+                || this.isInTrash)
+                && tile.name.includes('Upright')
+              ) {
+                for (let i = 0; i < 3; i++) {
+                  for (let j = 0; j < 4; j++) {
+                    this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
+                      id: '0',
+                      name: '',
+                      source: '',
+                      image: undefined,
+                      paths: undefined,
+                      rotation: 0,
+                    }
                   }
                 }
-              }
-              setTimeout(() => {
                 if (!this.isInTrash) {
-                  console.log("is in trash");
                   this.addEvacuationZoneUpright(rowCount + yMove, colCount + xMove);
-                  }
-                }, 15);
-              }
-
-            if (rowCount + yMove >= 0
-              && rowCount + yMove < TileCount - 3
-              && colCount + xMove >= 0
-              && colCount + xMove < TileCount - 2
-              && tile.name.includes('Across')
-            ) {
-              for (let i = 0; i < 4; i++) {
-                for (let j = 0; j < 3; j++) {
-                  this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
-                    id: '0',
-                    name: '',
-                    source: '',
-                    image: undefined,
-                    paths: undefined,
-                    rotation: 0,
-                  }
+                } else {
+                  this.evacuationEnabled = true;
                 }
               }
-              setTimeout(() => {
+
+              if (((rowCount + yMove >= 0
+                && rowCount + yMove < TileCount - 3
+                && colCount + xMove >= 0
+                && colCount + xMove < TileCount - 2)
+                || this.isInTrash)
+                && tile.name.includes('Across')
+              ) {
+                for (let i = 0; i < 4; i++) {
+                  for (let j = 0; j < 3; j++) {
+                    this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
+                      id: '0',
+                      name: '',
+                      source: '',
+                      image: undefined,
+                      paths: undefined,
+                      rotation: 0,
+                    }
+                  }
+                }
                 if (!this.isInTrash) {
                   this.addEvacuationZoneAcross(rowCount + yMove, colCount + xMove);
-                  }
-                }, 15);
-            }
+                } else {
+                  this.evacuationEnabled = true;
+                }
+              }
+            }, 10);
 
 
       } else if (
@@ -300,6 +309,19 @@ export class CreateEditComponent {
           }
         }
 
+      } else {
+        setTimeout(() => {
+          if (this.isInTrash) {
+            this.grids[levelCount][rowCount][colCount] = {
+              id: '0',
+              name: '',
+              source: '',
+              image: undefined,
+              paths: undefined,
+              rotation: 0,
+            }
+          }
+        }, 50);
       }
     }
     setTimeout(() => {

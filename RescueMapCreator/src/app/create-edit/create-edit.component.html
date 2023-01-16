@@ -1,5 +1,5 @@
 <div class="d-flex row m-0 justify-content-between" cdkDropListGroup>
-  <div class="col-4" style="overflow-y: auto" [ngStyle]=" {'height.px' : innerHeight }"> <!--border-end border-dark border-4-->
+  <div class="col-4" (mouseover)="enterTrash()" (mouseleave)="outTrash()" style="overflow-y: auto" [ngStyle]=" {'height.px' : innerHeight }"> <!--border-end border-dark border-4-->
     <h2 class="p-3 fw-bold">Kacheln</h2>
     <div class="p-3 d-flex d-flex align-content-around flex-wrap"
         cdkDropList
@@ -25,7 +25,7 @@
     </div>
 
     <h3>Opferraum</h3>
-    <div class="p-3" cdkDropList cdkDropListSortingDisabled>
+    <div *ngIf="evacuationEnabled" class="p-3" cdkDropList cdkDropListSortingDisabled>
       <div class="evacuationZone m-2" cdkDrag>
         <div class="evacuationZone" *cdkDragPreview style="width: 500px; background-color: red;" [ngStyle]="{'width.px': 400 * zoomScale, 'height.px': 300 * zoomScale}">
         </div>
@@ -34,6 +34,9 @@
         <div class="evacuationZoneUpright" *cdkDragPreview style="width: 300px; background-color: red;" [ngStyle]="{'width.px': 300 * zoomScale, 'height.px': 400 * zoomScale}">
         </div>
       </div>
+    </div>
+    <div *ngIf="!evacuationEnabled">
+      -Ist gesetzt-
     </div>
 
     <!--
