@@ -1,15 +1,102 @@
-<div class="row m-0">
-  <div class="col-4 border-end border-dark border-4 h-auto">
+<div class="d-flex row m-0 justify-content-between" cdkDropListGroup>
+  <div class="col-4" (mouseover)="enterTrash()" (mouseleave)="outTrash()" style="overflow-y: auto" [ngStyle]=" {'height.px' : innerHeight }"> <!--border-end border-dark border-4-->
     <h2 class="p-3 fw-bold">Kacheln</h2>
-    <div class="p-3 d-flex d-flex align-content-around flex-wrap">
-      <div class="p-1 mb-2 me-2" style="width: 100px; height:100px; background-color: grey;"></div>
-      <div class="p-1 mb-2 me-2" style="width: 100px; height:100px; background-color: grey;"></div>
-      <div class="p-1 mb-2 me-2" style="width: 100px; height:100px; background-color: grey;"></div>
-      <div class="p-1 mb-2 me-2" style="width: 100px; height:100px; background-color: grey;"></div>
-      <div class="p-1 mb-2 me-2" style="width: 100px; height:100px; background-color: grey;"></div>
-    </div>
-  </div>
-  <div class="col-8">
+    <div class="p-3 d-flex d-flex align-content-around flex-wrap"
+        cdkDropList
+        [cdkDropListData]="tiles"
+        cdkDropListSortingDisabled
+        [cdkDropListEnterPredicate]="falseEnter"
+        #tileList
+        (cdkDropListExited)="exited($event)"
+        (cdkDropListEntered)="entered()">
+      <app-tile
+        [class.white]="tile.id"
+        *ngFor="let tile of tiles"
+        class="mb-2 me-2" [tile]="tile"
+        cdkDrag
 
+        (cdkDragStarted)="draggedStart(tile)"
+        (cdkDragEnded)="draggedEnd(tile)"
+        >
+        <app-tile *cdkDragPreview [tile]="tile"
+                  [ngStyle]="{'width.px': 100 * zoomScale, 'height.px': 100 * zoomScale}"
+        ></app-tile>
+      </app-tile>
+    </div>
+
+    <h3>Opferraum</h3>
+    <div *ngIf="evacuationEnabled" class="p-3" cdkDropList cdkDropListSortingDisabled [cdkDropListEnterPredicate]="falseEnter">
+      <div class="evacuationZone m-2" cdkDrag>
+        <div  class="evacuationZone"
+              *cdkDragPreview
+              style="width: 500px; background-color: red;"
+              [ngStyle]="{'width.px': 400 * zoomScale, 'height.px': 300 * zoomScale}">
+        </div>
+      </div>
+      <div class="evacuationZoneUpright m-2" cdkDrag>
+        <div  class="evacuationZoneUpright"
+              *cdkDragPreview style="width: 300px; background-color: red;"
+              [ngStyle]="{'width.px': 300 * zoomScale, 'height.px': 400 * zoomScale}">
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!evacuationEnabled">
+      -Ist gesetzt-
+    </div>
+
+
+    <div  class="p-3 d-flex d-flex align-content-around flex-wrap"
+          cdkDropList
+          cdkDropListSortingDisabled
+          [cdkDropListData]="greenTiles">
+      <div class="d-flex align-items-center flex-column">
+        <app-tile [class.white]="tile.id" *ngFor="let tile of greenTiles" class="mb-2 me-2" [tile]="tile" cdkDrag></app-tile>
+      </div>
+    </div>
+
+
+  </div>
+
+  <div class="col-7 position-relative p-0 m-3">
+
+    <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
+      <div #canvas>
+        <div *ngFor="let level of grids; let levelCount = index" class="level">
+          <div *ngFor="let row of level; let rowCount = index" class="row d-flex flex-nowrap">
+            <app-tile [class.white]="tile.id"
+                      *ngFor="let tile of row; let colCount = index"
+                      [tile]="tile"
+                      cdkDropList
+                      (cdkDropListDropped)="drop($event, rowCount, colCount)"
+                      cdkDrag
+                      [cdkDragConstrainPosition]="dragConstrainPoint"
+                      [cdkDragDisabled]="tile.id == '0'"
+                      (cdkDragStarted)="dragStartMovement(tile, $event, rowCount, colCount, levelCount)"
+                      (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)"
+                      >
+            </app-tile>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="tileIsDragged" id="trashbin" class="d-flex align-items-center justify-content-center">
+      <div class="rounded border border-3 p-2 base-bg" (mouseover)="enterTrash()" (mouseleave)="outTrash()">
+        <i class="bi bi-trash-fill"></i>
+      </div>
+    </div>
+
+    <div class="position-absolute w-100 d-flex align-items-center justify-content-start">
+      <div class="info p-3 base-color fs-3" mat-button [matMenuTriggerFor]="afterMenu">
+        <i class="bi bi-info-circle-fill"></i>
+      </div>
+      <mat-menu #afterMenu="matMenu" xPosition="after">
+        <div class="p-2 d-flex flex-column"><span>Kachel verschieben</span><span class="base-color">'Linke Maustaste' auf Kachel halten</span></div>
+        <div class="p-2 d-flex flex-column"><span>Raster verschieben</span><span class="base-color">'Linke Maustaste' oder 'Mausrad drücken'</span></div>
+        <div class="p-2 d-flex flex-column"><span>Im Raster zoomen</span><span class="base-color">'Mausrad drehen'</span></div>
+        <div class="p-2 d-flex flex-column"><span>Kachel drehen</span><span class="base-color">'Rechtsklick' auf Kachel / Doppel-Tippen</span></div>
+        <div class="p-2 d-flex flex-column"><span>Kachel im Raster kopieren</span><span class="base-color">'STRG' beim absetzen halten</span></div>
+        <div class="p-2 d-flex flex-column"><span>Kachel löschen</span><span class="base-color">Kachel halten und in den Papierkorb schieben</span></div>
+      </mat-menu>
+    </div>
   </div>
 </div>
