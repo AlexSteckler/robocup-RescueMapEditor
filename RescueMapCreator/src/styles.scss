@@ -91,3 +91,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   transform: translate(55px, -85px) !important;
 }
 
+.row {
+  --bs-gutter-x: 0;
+  --bs-gutter-y: 0;
+}

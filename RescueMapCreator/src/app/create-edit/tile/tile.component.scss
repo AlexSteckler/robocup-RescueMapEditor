@@ -1,38 +1,37 @@
 .tile-size {
   width: 100px;
   height: 100px;
+  border: 3px;
+  border-color: currentColor;
+}
+
+.tile-size:hover {
+  background-color: red;
 }
 
 .ez-border-top {
-  width: 100px !important;
   --bs-border-opacity: 1;
   border-color: black !important;
   border-top: solid !important;
-  position: absolute !important;
 }
 
 .ez-border-end {
-  height: 100px !important;
   --bs-border-opacity: 1;
   border-color: black !important;
   border-right: solid !important;
-  position: absolute !important;
+
 }
 
 .ez-border-bottom {
-  width: 100px !important;
   --bs-border-opacity: 1;
   border-color: black !important;
   border-bottom: solid !important;
-  position: absolute !important;
 }
 
 .ez-border-start {
-  height: 100px !important;
   --bs-border-opacity: 1;
   border-color: black !important;
   border-left: solid !important;
-  position: absolute !important;
 }
 
 .draggedTileAcross {

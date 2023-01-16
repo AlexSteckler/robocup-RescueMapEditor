@@ -1,7 +1,7 @@
 import {Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
 import {CdkDrag, CdkDragDrop, CdkDragEnd, CdkDragStart} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
-import panzoom from 'panzoom';
+import panzoom, { Transform } from 'panzoom';
 import {TilesService} from './tile/tiles.service';
 import {DomSanitizer} from "@angular/platform-browser";
 
@@ -18,8 +18,8 @@ export class CreateEditComponent {
   @ViewChild('canvas') canvasElement: ElementRef | undefined;
   @ViewChild('canvas_wrapper') canvasWrapperElement: ElementRef | undefined;
 
-  @Input() zoomScale = 1;
-  @Input() pos = {x: 0, y: 0};
+  zoomScale = 1;
+  canvasValues : Transform | undefined;
 
   @Output() dragStart = new EventEmitter<any>();
   @Output() dragEnd = new EventEmitter<any>();
@@ -113,47 +113,49 @@ export class CreateEditComponent {
     if (this.panzoomCanvas != null) {
       this.panzoomCanvas.on('transform', (e: any) => {
 
-        let result = this.panzoomCanvas.getTransform();
+        this.canvasValues = this.panzoomCanvas.getTransform();
+        if (this.canvasValues != undefined) {
+          if (this.canvasValues.scale >= 1) {
+            if (this.canvasValues.x > OutsideDrag) {
+              this.panzoomCanvas.moveTo(OutsideDrag, this.canvasValues.y);
+            }
 
-        if (result.scale >= 1) {
-          if (result.x > OutsideDrag) {
-            this.panzoomCanvas.moveTo(OutsideDrag, result.y);
+            if (this.canvasValues.y > OutsideDrag) {
+              this.panzoomCanvas.moveTo(this.canvasValues.x, OutsideDrag);
+            }
+
+            if (this.canvasValues.x < this.canvasWrapperElement?.nativeElement.offsetWidth - (TileCount * 100 * this.canvasValues.scale) - OutsideDrag) {
+              this.panzoomCanvas.moveTo(this.canvasWrapperElement?.nativeElement.offsetWidth - (TileCount * 100 * this.canvasValues.scale) - OutsideDrag, this.canvasValues.y);
+            }
+
+            if (this.canvasValues.y < this.canvasWrapperElement?.nativeElement.offsetHeight - (TileCount * 100 * this.canvasValues.scale) - OutsideDrag) {
+              this.panzoomCanvas.moveTo(this.canvasValues.x, this.canvasWrapperElement?.nativeElement.offsetHeight - (TileCount * 100 * this.canvasValues.scale) - OutsideDrag);
+            }
+          } else {
+            const reference = 500 * this.canvasValues.scale;
+
+            if (this.canvasValues.x < TileCount * 100 * -this.canvasValues.scale + 500 * this.canvasValues.scale) {
+              this.panzoomCanvas.moveTo(TileCount * 100 * -this.canvasValues.scale + 500 * this.canvasValues.scale, this.canvasValues.y);
+            }
+
+            if (this.canvasValues.y < TileCount * 100 * -this.canvasValues.scale + 500 * this.canvasValues.scale) {
+              this.panzoomCanvas.moveTo(this.canvasValues.x, TileCount * 100 * -this.canvasValues.scale + 500 * this.canvasValues.scale);
+            }
+
+            if (this.canvasValues.x > this.canvasWrapperElement?.nativeElement.offsetWidth - reference) {
+              this.panzoomCanvas.moveTo(this.canvasWrapperElement?.nativeElement.offsetWidth - reference, this.canvasValues.y);
+            }
+
+            if (this.canvasValues.y > this.canvasWrapperElement?.nativeElement.offsetHeight - reference) {
+              this.panzoomCanvas.moveTo(this.canvasValues.x, this.canvasWrapperElement?.nativeElement.offsetHeight - reference);
+            }
           }
 
-          if (result.y > OutsideDrag) {
-            this.panzoomCanvas.moveTo(result.x, OutsideDrag);
-          }
-
-          if (result.x < this.canvasWrapperElement?.nativeElement.offsetWidth - (TileCount * 100 * result.scale) - OutsideDrag) {
-            this.panzoomCanvas.moveTo(this.canvasWrapperElement?.nativeElement.offsetWidth - (TileCount * 100 * result.scale) - OutsideDrag, result.y);
-          }
-
-          if (result.y < this.canvasWrapperElement?.nativeElement.offsetHeight - (TileCount * 100 * result.scale) - OutsideDrag) {
-            this.panzoomCanvas.moveTo(result.x, this.canvasWrapperElement?.nativeElement.offsetHeight - (TileCount * 100 * result.scale) - OutsideDrag);
-          }
-        } else {
-          const reference = 500 * result.scale;
-
-          if (result.x < TileCount * 100 * -result.scale + 500 * result.scale) {
-            this.panzoomCanvas.moveTo(TileCount * 100 * -result.scale + 500 * result.scale, result.y);
-          }
-
-          if (result.y < TileCount * 100 * -result.scale + 500 * result.scale) {
-            this.panzoomCanvas.moveTo(result.x, TileCount * 100 * -result.scale + 500 * result.scale);
-          }
-
-          if (result.x > this.canvasWrapperElement?.nativeElement.offsetWidth - reference) {
-            this.panzoomCanvas.moveTo(this.canvasWrapperElement?.nativeElement.offsetWidth - reference, result.y);
-          }
-
-          if (result.y > this.canvasWrapperElement?.nativeElement.offsetHeight - reference) {
-            this.panzoomCanvas.moveTo(result.x, this.canvasWrapperElement?.nativeElement.offsetHeight - reference);
-          }
+          this.zoomScale = this.canvasValues.scale;
         }
-
-        this.zoomScale = result.scale;
       });
     }
+
     this.panzoomCanvas.setZoomSpeed(0.05);
   }
 
@@ -335,7 +337,7 @@ export class CreateEditComponent {
 
     let zoomMoveXDifference = 0;
     let zoomMoveYDifference = 0;
-    
+
     if (this.zoomScale != 1) {
       zoomMoveXDifference = (1 - this.zoomScale) * dragRef.getFreeDragPosition().x;
       zoomMoveYDifference = (1 - this.zoomScale) * dragRef.getFreeDragPosition().y;
