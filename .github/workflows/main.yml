@@ -24,6 +24,6 @@ jobs:
       - name: Build and Publish
         run: |
           docker login -u alexstecki -p ${{ secrets.DOCKERHUB_TOKEN }}
-          docker build -t alexstecki/robocup-RescueMapEditor .
-          docker push alexStecki/robocup-RescueMapEditor
+          docker build -t alexstecki/robocup-rescuemapeditor .
+          docker push alexstecki/robocup-rescuemapeditor
           echo "Finish building frontend"
