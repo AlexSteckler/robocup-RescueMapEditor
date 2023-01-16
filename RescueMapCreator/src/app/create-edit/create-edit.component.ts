@@ -26,6 +26,8 @@ export class CreateEditComponent {
 
   public innerHeight: any;
 
+  altActive: Boolean = false;
+
   @HostListener('window:resize', ['$event'])
   onResize() {
     this.innerHeight = window.innerHeight - 240;
@@ -62,6 +64,17 @@ export class CreateEditComponent {
       }
       this.grids[0].push(row);
     }
+    //keypress event
+    document.addEventListener('keydown', (event) => {
+      if(event.key === 'Alt'){
+        this.altActive = true;
+      }
+    });
+    document.addEventListener('keyup', (event) => {
+      if(event.key === 'Alt'){
+        this.altActive = false;
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -274,7 +287,7 @@ export class CreateEditComponent {
             ...tile
           }
         }
-        if(true) {
+        if(!this.altActive) {
           this.grids[levelCount][rowCount][colCount] = {
             id: '0',
             name: '',
