@@ -4,6 +4,8 @@ import {Tile} from "./tile/dto/tile.dto";
 import panzoom from 'panzoom';
 import {TilesService} from './tile/tiles.service';
 import {DomSanitizer} from "@angular/platform-browser";
+import {MatMenuModule} from '@angular/material/menu';
+
 
 const TileCount = 30;
 const OutsideDrag = 100;
@@ -66,12 +68,12 @@ export class CreateEditComponent {
     }
     //keypress event
     document.addEventListener('keydown', (event) => {
-      if(event.key === 'Alt'){
+      if(event.key === 'Control'){
         this.altActive = true;
       }
     });
     document.addEventListener('keyup', (event) => {
-      if(event.key === 'Alt'){
+      if(event.key === 'Control'){
         this.altActive = false;
       }
     });

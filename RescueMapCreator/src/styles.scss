@@ -85,3 +85,9 @@ h1 {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+.cdk-overlay-pane {
+  transform: translate(55px, -85px) !important;
+}
+
