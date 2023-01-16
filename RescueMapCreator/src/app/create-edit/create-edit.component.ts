@@ -335,8 +335,7 @@ export class CreateEditComponent {
 
     let zoomMoveXDifference = 0;
     let zoomMoveYDifference = 0;
-    ;
-
+    
     if (this.zoomScale != 1) {
       zoomMoveXDifference = (1 - this.zoomScale) * dragRef.getFreeDragPosition().x;
       zoomMoveYDifference = (1 - this.zoomScale) * dragRef.getFreeDragPosition().y;
