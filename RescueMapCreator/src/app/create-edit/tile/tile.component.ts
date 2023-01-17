@@ -2,6 +2,7 @@ import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} f
 import {Tile} from "./dto/tile.dto";
 import {trigger, state, style, animate, transition} from '@angular/animations';
 import { Transform } from 'panzoom';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 const SPACING = 20;
 
@@ -21,6 +22,9 @@ const SPACING = 20;
 
 export class TileComponent implements OnInit{
   @ViewChild('evacuationTile') evacuationTile: ElementRef | undefined;
+  @ViewChild(MatMenuTrigger)
+
+  contextMenu: MatMenuTrigger | undefined;
 
   ngOnInit(): void {
     this.state = this.tile?.rotation?.toString()!;
@@ -31,39 +35,49 @@ export class TileComponent implements OnInit{
 
   state: string = '0';
 
-  onRightClick(event: MouseEvent) {
-    //console.log(event);
-    var x = (event.pageX - this.evacuationTile!.nativeElement.offsetLeft) % 100;
-    var y = (event.pageY - this.evacuationTile!.nativeElement.offsetTop) % 100;
+  contextMenuPosition = { x: '0px', y: '0px' };
 
+  onRightClick(event: any) {
+    event.preventDefault();
 
+    let x = event.layerX - 54 / this.canvasValues?.scale!; //(event.pageX + Math.abs(this.canvasValues?.x!)) * this.canvasValues?.scale! ;
+    let y = event.layerY + 83 / this.canvasValues?.scale!; //(event.pageY + Math.abs(this.canvasValues?.y!)) * this.canvasValues?.scale! ;
+    this.contextMenuPosition.x = x + 'px';
+    this.contextMenuPosition.y = y + 'px';
 
-    //console.log(this.evacuationTile!.nativeElement);
-    //console.log(event.clientX % 100 + ' ' + event.clientY % 100)
-    let posX: number = (event.clientX + Math.abs(this.canvasValues!.x)) % 100;
-    let posY: number = (event.clientY + Math.abs(this.canvasValues!.y)) % 100;
+    console.log(event.pageX + ' ' + event.pageY + ' | ' + this.contextMenuPosition.x + ' ' + this.contextMenuPosition.y );
+    console.log( ' ClientX: ' + event.clientX + ' ClientY: '+ event.clientY + ' CanvasX: ' + this.canvasValues?.x + ' CanvasY: ' + this.canvasValues?.y + ' CanvasScale: ' + this.canvasValues?.scale)
 
-    console.log(posX + ' ' + posY + ' ClientX: ' + event.clientX + ' ClientY: '+ event.clientY + ' CanvasX: ' + this.canvasValues?.x + ' CanvasY: ' + this.canvasValues?.y + ' CanvasScale: ' + this.canvasValues?.scale)
+    let posX: number = event.layerX % 100;
+    let posY: number = event.layerY % 100;
 
-    if(this.tile?.name.includes('evacuationZone')) {
+    if (this.tile?.name.includes('evacuationZone')) {
+      this.contextMenu!.menu!.focusFirstItem('mouse');
+      this.contextMenu!.openMenu();
+
       if (posX > SPACING && posX < 100 - SPACING && posY < SPACING && this.tile?.border![0]) {
-        //console.log('Top');
+        console.log('Top');
       }
       else if (posY > SPACING && posY < 100 - SPACING && posX > 100 - SPACING && this.tile?.border![1]) {
-        //console.log('Right');
+        console.log('Right');
       }
       else if (posX > SPACING && posX < 100 - SPACING && posY > 100 - SPACING && this.tile?.border![2]) {
-        //console.log('Bottom');
+        console.log('Bottom');
       }
       else if (posY > SPACING && posY < 100 - SPACING && posX < SPACING && this.tile?.border![3]) {
-        //console.log('Left');
+        console.log('Left');
       }
+    } else {
+        this.tile!.rotation = (this.tile!.rotation! + 1) % 4;
+        this.state = this.tile?.rotation.toString()!;
+      }
+  }
 
-    //console.log(posX + ' ' + posY)
-    }
+  onContextMenuAction1() {
+    console.log('Action1');
+  }
 
-    this.tile!.rotation = (this.tile!.rotation! + 1) % 4;
-    this.state = this.tile?.rotation.toString()!;
-    return false;
+  onContextMenuAction2() {
+    console.log('Action2');
   }
 }
