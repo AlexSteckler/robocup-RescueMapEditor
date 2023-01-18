@@ -60,7 +60,7 @@ export class CreateEditComponent {
       for (let j = 0; j < TileCount; j++) {
         row.push({
           id: '0',
-          name: 'null',
+          name: '',
           source: '',
           image: undefined,
           paths: undefined,
@@ -466,11 +466,7 @@ export class CreateEditComponent {
         return;
       }
       let currentTile = this.grids[0][currentPosition.y][currentPosition.x]!;
-      if (currentTile!.name == 'null') {
-        return;
-      }
-      if(!currentTile.paths){
-        console.log("No Paths");
+      if (!currentTile!.name) {
         return;
       }
 
