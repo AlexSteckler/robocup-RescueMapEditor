@@ -98,6 +98,7 @@ export const Tiles : Tile[] = [
     image : undefined,
     paths : [{from: 0, to: 3}],
     rotation: 0,
+    value: 10,
   },
   {
     id : '18.3',
