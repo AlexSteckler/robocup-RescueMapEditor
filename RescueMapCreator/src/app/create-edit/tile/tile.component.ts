@@ -88,20 +88,23 @@ export class TileComponent implements OnInit{
       if (this.tile!.border![index] == ENTRANCECOLOR) {
         this.tile!.border![index] = 'black';
         this.evacuationZone!.entrancePlaced = false;
-        this.evacuationZone.exitPosition = {x: this.position.x, y : this.position.y, borderPosition: index};
+        this.evacuationZone.entrancePosition = {x: -1, y : -1, borderPosition: -1};
       }
       else if (this.tile!.border![index] == EXITCOLOR) {
         this.tile!.border![index] = 'black';
         this.evacuationZone!.exitPlaced = false;
+        this.evacuationZone.exitPosition = {x: -1, y : -1, borderPosition: -1};
       }
       else {
         if (this.evacuationZone!.exitPlaced == false) {
           this.tile!.border![index] = EXITCOLOR;
           this.evacuationZone!.exitPlaced = true;
+          this.evacuationZone.exitPosition = {x: this.position.x, y : this.position.y, borderPosition: index};
         }
         else if (this.evacuationZone!.entrancePlaced == false) {
           this.tile!.border![index] = ENTRANCECOLOR;
           this.evacuationZone!.entrancePlaced = true;
+          this.evacuationZone.entrancePosition = {x: this.position.x, y : this.position.y, borderPosition: index};
         }
       }
       this.evacuationZoneChange.emit(this.evacuationZone);

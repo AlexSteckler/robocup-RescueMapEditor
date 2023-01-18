@@ -46,7 +46,10 @@ export class CreateEditComponent {
   grids: Array<Array<Array<Tile>>> = [
     [],
   ];
-  private currentDraggedTile: Tile | undefined;
+
+  currentDraggedTile: Tile | undefined;
+
+  startPosition: { x: number, y: number }  = {x: -1, y: -1};
 
   constructor(private tilesService: TilesService,
               private sanitizer: DomSanitizer) {
@@ -93,7 +96,7 @@ export class CreateEditComponent {
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           tile.image = img;
         });
-        if (tile.name.includes('default')) {
+        if (tile.name.includes('default') || tile.name.includes('start')) {
           this.tiles.push(tile);
         } else if (tile.name.includes('cross')) {
           this.greenTiles.push(tile);
@@ -160,12 +163,15 @@ export class CreateEditComponent {
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
     if ($event.previousContainer.data && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
       this.grids[0][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
+      if(this.grids[0][rowCount][colCount].name.includes('start')) {
+        this.startPosition = {x: rowCount, y: colCount};
+      }
     }
     else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4 && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
-      this.addEvacuationZoneAcross(rowCount, colCount);
+      this.addEvacuationZoneAcross(colCount, rowCount);
       this.evacuation = this.getEvacuationDto(colCount, rowCount);
     } else if ($event.previousIndex == 1) {
-      this.addEvacuationZoneUpright(rowCount, colCount);
+      this.addEvacuationZoneUpright(colCount, rowCount);
       this.evacuation = this.getEvacuationDto(colCount, rowCount);
     }
   }
@@ -203,6 +209,7 @@ export class CreateEditComponent {
   }
 
   dragStartMovement(tile: Tile, $event: CdkDragStart, rowCount: number, colCount: number, levelCount: number) {
+    this.currentDraggedTile = tile;
     tile.isBeingDragged = true;
     this.tileIsDragged = true;
     this.isInTrash = false;
@@ -256,7 +263,8 @@ export class CreateEditComponent {
                   }
                 }
                 if (!this.isInTrash) {
-                  this.addEvacuationZoneUpright(rowCount + yMove, colCount + xMove);
+                  this.evacuation = this.getEvacuationDto(colCount + xMove, rowCount + yMove);
+                  this.addEvacuationZoneUpright(colCount + xMove, rowCount + yMove);
                 } else {
                   this.evacuation = this.getEvacuationDto(-1, -1);
                 }
@@ -282,7 +290,8 @@ export class CreateEditComponent {
                   }
                 }
                 if (!this.isInTrash) {
-                  this.addEvacuationZoneAcross(rowCount + yMove, colCount + xMove);
+                  this.evacuation = this.getEvacuationDto(colCount + xMove, rowCount + yMove,);
+                  this.addEvacuationZoneAcross(colCount + xMove, rowCount + yMove,);
                 } else {
                   this.evacuation = this.getEvacuationDto(-1, -1);
                 }
@@ -302,8 +311,16 @@ export class CreateEditComponent {
           this.grids[levelCount][rowCount + yMove][colCount + xMove] = {
             ...tile
           }
+          if(this.grids[levelCount][rowCount][colCount].name.includes('start')) {
+            this.startPosition = {x: rowCount + yMove, y: colCount + xMove};
+          }
+        } else {
+          if (this.grids[levelCount][rowCount][colCount].name.includes('start')) {
+            this.startPosition = {x: -1, y: -1};
+          }
         }
-        if(!this.altActive) {
+
+        if (!this.altActive) {
           this.grids[levelCount][rowCount][colCount] = {
             id: '0',
             name: '',
@@ -313,10 +330,11 @@ export class CreateEditComponent {
             rotation: 0,
           }
         }
-
-      } else {
+      }
+      else {
         setTimeout(() => {
           if (this.isInTrash) {
+
             this.grids[levelCount][rowCount][colCount] = {
               id: '0',
               name: '',
@@ -351,7 +369,7 @@ export class CreateEditComponent {
     };
   };
 
-  private addEvacuationZoneAcross(rowCount: number, colCount: number) {
+  private addEvacuationZoneAcross(colCount: number, rowCount: number) {
     this.grids[0][rowCount][colCount] = {name: 'evacuationZoneAcross_00', border: ['black', '', '', 'black']};
     this.grids[0][rowCount][colCount + 1] = {name: 'evacuationZoneAcross_01', border: ['black', '', '', '']};
     this.grids[0][rowCount][colCount + 2] = {name: 'evacuationZoneAcross_02', border: ['black', '', '', '']};
@@ -366,7 +384,7 @@ export class CreateEditComponent {
     this.grids[0][rowCount + 1][colCount + 2] = {name: 'evacuationZoneAcross_12', border: ['', '', '', '']};
   }
 
-  private addEvacuationZoneUpright(rowCount: number, colCount: number) {
+  private addEvacuationZoneUpright( colCount: number, rowCount: number) {
     this.grids[0][rowCount][colCount] = {name: 'evacuationZoneUpright_00', border: ['black', '', '', 'black']};
     this.grids[0][rowCount][colCount + 1] = {name: 'evacuationZoneUpright_01', border: ['black', '', '', '']};
     this.grids[0][rowCount][colCount + 2] = {name: 'evacuationZoneUpright_02', border: ['black', 'black', '', '']};
@@ -408,4 +426,3 @@ export class CreateEditComponent {
       }
   };
 }
-
