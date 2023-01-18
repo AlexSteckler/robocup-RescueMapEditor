@@ -3,8 +3,11 @@ import {Tile} from "./dto/tile.dto";
 import {trigger, state, style, animate, transition} from '@angular/animations';
 import { Transform } from 'panzoom';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { Evacuation } from './dto/evacuation.dto';
 
-const SPACING = 20;
+const SPACING = 30;
+const ENTRANCECOLOR: string = 'green';
+const EXITCOLOR: string = '#f0f0f0';
 
 @Component({
   selector: 'app-tile',
@@ -33,6 +36,12 @@ export class TileComponent implements OnInit{
   @Input() tile: Tile | undefined;
   @Input() canvasValues : Transform | undefined;
 
+  @Input() evacuationZone : Evacuation | undefined ;
+
+  @Input() position : {x: number, y: number} | undefined;
+
+  @Output() evacuationZoneChange : EventEmitter<Evacuation> = new EventEmitter<Evacuation>();
+
   state: string = '0';
 
   contextMenuPosition = { x: '0px', y: '0px' };
@@ -40,44 +49,62 @@ export class TileComponent implements OnInit{
   onRightClick(event: any) {
     event.preventDefault();
 
-    let x = event.layerX - 54 / this.canvasValues?.scale!; //(event.pageX + Math.abs(this.canvasValues?.x!)) * this.canvasValues?.scale! ;
-    let y = event.layerY + 83 / this.canvasValues?.scale!; //(event.pageY + Math.abs(this.canvasValues?.y!)) * this.canvasValues?.scale! ;
-    this.contextMenuPosition.x = x + 'px';
-    this.contextMenuPosition.y = y + 'px';
-
-    console.log(event.pageX + ' ' + event.pageY + ' | ' + this.contextMenuPosition.x + ' ' + this.contextMenuPosition.y );
-    console.log( ' ClientX: ' + event.clientX + ' ClientY: '+ event.clientY + ' CanvasX: ' + this.canvasValues?.x + ' CanvasY: ' + this.canvasValues?.y + ' CanvasScale: ' + this.canvasValues?.scale)
+    //console.log(event.pageX + ' ' + event.pageY + ' | ' + this.contextMenuPosition.x + ' ' + this.contextMenuPosition.y );
+    //console.log( ' ClientX: ' + event.clientX + ' ClientY: '+ event.clientY + ' CanvasX: ' + this.canvasValues?.x + ' CanvasY: ' + this.canvasValues?.y + ' CanvasScale: ' + this.canvasValues?.scale)
 
     let posX: number = event.layerX % 100;
     let posY: number = event.layerY % 100;
 
-    if (this.tile?.name.includes('evacuationZone')) {
-      this.contextMenu!.menu!.focusFirstItem('mouse');
-      this.contextMenu!.openMenu();
+
+    if (this.tile?.name.includes('evacuationZone') && this.evacuationZone && this.position) {
 
       if (posX > SPACING && posX < 100 - SPACING && posY < SPACING && this.tile?.border![0]) {
+        this.colorSwap(0);
         console.log('Top');
       }
       else if (posY > SPACING && posY < 100 - SPACING && posX > 100 - SPACING && this.tile?.border![1]) {
+        this.colorSwap(1);
         console.log('Right');
       }
       else if (posX > SPACING && posX < 100 - SPACING && posY > 100 - SPACING && this.tile?.border![2]) {
+        this.colorSwap(2);
         console.log('Bottom');
       }
       else if (posY > SPACING && posY < 100 - SPACING && posX < SPACING && this.tile?.border![3]) {
+        this.colorSwap(3);
+
         console.log('Left');
       }
-    } else {
-        this.tile!.rotation = (this.tile!.rotation! + 1) % 4;
-        this.state = this.tile?.rotation.toString()!;
+    }
+
+    else {
+      this.tile!.rotation = (this.tile!.rotation! + 1) % 4;
+      this.state = this.tile?.rotation.toString()!;
+    }
+  }
+
+  colorSwap(index: number) {
+    if (this.evacuationZone && this.position) {
+      if (this.tile!.border![index] == ENTRANCECOLOR) {
+        this.tile!.border![index] = 'black';
+        this.evacuationZone!.entrancePlaced = false;
+        this.evacuationZone.exitPosition = {x: this.position.x, y : this.position.y, borderPosition: index};
       }
-  }
-
-  onContextMenuAction1() {
-    console.log('Action1');
-  }
-
-  onContextMenuAction2() {
-    console.log('Action2');
+      else if (this.tile!.border![index] == EXITCOLOR) {
+        this.tile!.border![index] = 'black';
+        this.evacuationZone!.exitPlaced = false;
+      }
+      else {
+        if (this.evacuationZone!.exitPlaced == false) {
+          this.tile!.border![index] = EXITCOLOR;
+          this.evacuationZone!.exitPlaced = true;
+        }
+        else if (this.evacuationZone!.entrancePlaced == false) {
+          this.tile!.border![index] = ENTRANCECOLOR;
+          this.evacuationZone!.entrancePlaced = true;
+        }
+      }
+      this.evacuationZoneChange.emit(this.evacuationZone);
+    }
   }
 }

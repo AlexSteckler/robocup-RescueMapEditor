@@ -1,5 +1,5 @@
 <div class="d-flex row m-0 justify-content-between" cdkDropListGroup>
-  <div class="col-4" (mouseover)="enterTrash()" (mouseleave)="outTrash()" style="overflow-y: auto" [ngStyle]=" {'height.px' : innerHeight }"> <!--border-end border-dark border-4-->
+  <div class="col-4" (mouseover)="enterTrash()" (mouseleave)="outTrash()" style="overflow-y: auto" [ngStyle]=" {'height.px' : innerHeight }">
     <h2 class="p-3 fw-bold">Kacheln</h2>
     <div class="p-3 d-flex d-flex align-content-around flex-wrap"
         cdkDropList
@@ -27,7 +27,7 @@
     </div>
 
     <h3>Opferraum</h3>
-    <div *ngIf="evacuationEnabled" class="p-3" cdkDropList cdkDropListSortingDisabled [cdkDropListEnterPredicate]="falseEnter">
+    <div *ngIf="evacuation.position.x == -1" class="p-3" cdkDropList cdkDropListSortingDisabled [cdkDropListEnterPredicate]="falseEnter">
       <div class="evacuationZone" cdkDrag>
         <div  class="evacuationZone"
               *cdkDragPreview
@@ -42,7 +42,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="!evacuationEnabled">
+    <div *ngIf="evacuation.position.x != -1">
       -Ist gesetzt-
     </div>
 
@@ -62,9 +62,12 @@
       <div #canvas>
         <div *ngFor="let level of grids; let levelCount = index" class="level">
           <div *ngFor="let row of level; let rowCount = index" class="row d-flex flex-nowrap">
-            <app-tile [class.white]="tile.id"
+            <app-tile *ngFor="let tile of row; let colCount = index"
+                      (contextmenu)="disableContext($event)"
+                      [class.white]="tile.id"
                       [canvasValues]="canvasValues"
-                      *ngFor="let tile of row; let colCount = index"
+                      [(evacuationZone)]="evacuation"
+                      [position]="{x: colCount, y: rowCount}"
                       [tile]="tile"
                       cdkDropList
                       (cdkDropListDropped)="drop($event, rowCount, colCount)"

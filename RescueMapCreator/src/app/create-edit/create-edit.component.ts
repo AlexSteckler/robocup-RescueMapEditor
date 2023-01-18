@@ -4,6 +4,7 @@ import {Tile} from "./tile/dto/tile.dto";
 import panzoom, { Transform } from 'panzoom';
 import {TilesService} from './tile/tiles.service';
 import {DomSanitizer} from "@angular/platform-browser";
+import { Evacuation } from './tile/dto/evacuation.dto';
 
 
 const TileCount = 30;
@@ -21,10 +22,6 @@ export class CreateEditComponent {
   zoomScale = 1;
   canvasValues : Transform | undefined;
 
-  @Output() dragStart = new EventEmitter<any>();
-  @Output() dragEnd = new EventEmitter<any>();
-  @Input() tile: Tile | undefined;
-
   public innerHeight: any;
 
   altActive: Boolean = false;
@@ -38,12 +35,13 @@ export class CreateEditComponent {
   zoomFactor = 0.05;
   panzoomCanvas: any = null;
 
-  evacuationEnabled: boolean = true;
   tileIsDragged: boolean = false;
   isInTrash: boolean = false;
 
   tiles: Tile[] = [];
   greenTiles: Tile[] = [];
+
+  evacuation: Evacuation = this.getEvacuationDto(-1, -1);
 
   grids: Array<Array<Array<Tile>>> = [
     [],
@@ -162,14 +160,16 @@ export class CreateEditComponent {
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
     if ($event.previousContainer.data && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
       this.grids[0][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
-    } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4 && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
+    }
+    else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4 && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
       this.addEvacuationZoneAcross(rowCount, colCount);
-      this.evacuationEnabled = false;
+      this.evacuation = this.getEvacuationDto(colCount, rowCount);
     } else if ($event.previousIndex == 1) {
-      this.addEvacuationZoneUpright(rowCount, colCount)
-      this.evacuationEnabled = false;
+      this.addEvacuationZoneUpright(rowCount, colCount);
+      this.evacuation = this.getEvacuationDto(colCount, rowCount);
     }
   }
+
 
   pausePanzoom() {
     this.panzoomCanvas.pause();
@@ -230,9 +230,11 @@ export class CreateEditComponent {
 
       if (tile.name.includes('evacuationZone')) {
         //delay to allow the tile to be removed from the grid
+            this.evacuation!.position! = {x : colCount + xMove, y: rowCount + yMove};
 
             let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
             let y = +tile.name.substring(tile.name.length - 1)
+
             setTimeout(() => {
               if (((rowCount + yMove >= 0
                 && rowCount + yMove < TileCount - 3
@@ -256,7 +258,7 @@ export class CreateEditComponent {
                 if (!this.isInTrash) {
                   this.addEvacuationZoneUpright(rowCount + yMove, colCount + xMove);
                 } else {
-                  this.evacuationEnabled = true;
+                  this.evacuation = this.getEvacuationDto(-1, -1);
                 }
               }
 
@@ -282,7 +284,7 @@ export class CreateEditComponent {
                 if (!this.isInTrash) {
                   this.addEvacuationZoneAcross(rowCount + yMove, colCount + xMove);
                 } else {
-                  this.evacuationEnabled = true;
+                  this.evacuation = this.getEvacuationDto(-1, -1);
                 }
               }
             }, 10);
@@ -295,6 +297,7 @@ export class CreateEditComponent {
         && colCount + xMove < TileCount
         && !this.grids[levelCount][rowCount + yMove][colCount + xMove].name.includes('evacuationZone')
       ) {
+
         if (!this.isInTrash) {
           this.grids[levelCount][rowCount + yMove][colCount + xMove] = {
             ...tile
@@ -348,10 +351,6 @@ export class CreateEditComponent {
     };
   };
 
-  startDragging($event: any) {
-    this.dragStart.emit();
-  }
-
   private addEvacuationZoneAcross(rowCount: number, colCount: number) {
     this.grids[0][rowCount][colCount] = {name: 'evacuationZoneAcross_00', border: ['black', '', '', 'black']};
     this.grids[0][rowCount][colCount + 1] = {name: 'evacuationZoneAcross_01', border: ['black', '', '', '']};
@@ -393,4 +392,20 @@ export class CreateEditComponent {
   falseEnter() {
     return false;
   }
+
+  disableContext(event: MouseEvent) {
+    event.preventDefault();
+  }
+
+  getEvacuationDto(x: number, y: number) {
+    return this.evacuation = {
+      position : {x, y},
+      exitPlaced : false,
+      entrancePlaced : false,
+      alignment: 1,
+      exitPosition: { x: -1, y:-1, borderPosition: -1},
+      entrancePosition: { x: -1, y:-1, borderPosition: -1 }
+      }
+  };
 }
+
