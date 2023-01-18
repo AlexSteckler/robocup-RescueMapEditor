@@ -24,6 +24,7 @@ export const Tiles : Tile[] = [
     image : undefined,
     paths : [{from: 3, to: 1}, {from: 1, to: 3}],
     rotation: 0,
+    value: 10,
   },
   {
     id : '4',
@@ -32,6 +33,7 @@ export const Tiles : Tile[] = [
     image : undefined,
     paths : [{from: 3, to: 1}, {from: 1, to: 3}],
     rotation: 0,
+    value: 20,
   },
   {
     id : '5',

@@ -41,6 +41,7 @@ export class TileComponent implements OnInit{
   @Input() position : {x: number, y: number} | undefined;
 
   @Output() evacuationZoneChange : EventEmitter<Evacuation> = new EventEmitter<Evacuation>();
+  @Output() rotationChange : EventEmitter<Tile> = new EventEmitter<Tile>();
 
   state: string = '0';
 
@@ -81,6 +82,7 @@ export class TileComponent implements OnInit{
       this.tile!.rotation = (this.tile!.rotation! + 1) % 4;
       this.state = this.tile?.rotation.toString()!;
     }
+    this.rotationChange.emit(this.tile);
   }
 
   colorSwap(index: number) {

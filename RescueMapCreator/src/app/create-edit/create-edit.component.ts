@@ -51,6 +51,8 @@ export class CreateEditComponent {
 
   startPosition: { x: number, y: number }  = {x: -1, y: -1};
 
+  totalPoints : string = '';
+
   constructor(private tilesService: TilesService,
               private sanitizer: DomSanitizer) {
     for (let i = 0; i < TileCount; i++) {
@@ -87,6 +89,7 @@ export class CreateEditComponent {
   }
 
   ngOnInit(): void {
+    this.calcTotalPoints();
     this.innerHeight = window.innerHeight - 240;
 
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
@@ -174,6 +177,7 @@ export class CreateEditComponent {
       this.addEvacuationZoneUpright(colCount, rowCount);
       this.evacuation = this.getEvacuationDto(colCount, rowCount);
     }
+    this.calcTotalPoints();
   }
 
 
@@ -312,9 +316,10 @@ export class CreateEditComponent {
             ...tile
           }
           if(this.grids[levelCount][rowCount][colCount].name.includes('start')) {
-            this.startPosition = {x: rowCount + yMove, y: colCount + xMove};
+            this.startPosition = {x: colCount + xMove, y: rowCount + yMove};
           }
-        } else {
+        }
+        else {
           if (this.grids[levelCount][rowCount][colCount].name.includes('start')) {
             this.startPosition = {x: -1, y: -1};
           }
@@ -349,6 +354,7 @@ export class CreateEditComponent {
     }
     setTimeout(() => {
       this.tileIsDragged = false;
+      this.calcTotalPoints();
     }, 50);
     $event.source._dragRef.reset();
     this.resumePanzoom();
@@ -425,4 +431,52 @@ export class CreateEditComponent {
       entrancePosition: { x: -1, y:-1, borderPosition: -1 }
       }
   };
+
+  calcTotalPoints() {
+    if (this.startPosition.x == -1) {
+      this.totalPoints = 'Keine Startkachel gegeben';
+      return;
+    }
+
+    let currentPoints = 5;
+    let currentPosition = {...this.startPosition};
+
+    let orientation = (this.grids[0][currentPosition.y][currentPosition.x].rotation!
+                      + this.grids[0][currentPosition.y][currentPosition.x].paths!.find((path : {from: number, to: number}) => path.from === -1 )!.to)
+                      % 4;
+
+
+    while (orientation != -1) {
+
+      switch(orientation) {
+        case 0:
+          currentPosition.y -= 1;
+          break;
+
+        case 1:
+          currentPosition.x += 1;
+          break;
+
+        case 2:
+          currentPosition.y += 1;
+          break;
+
+        case 3:
+          currentPosition.x -= 1;
+          break;
+      }
+      return
+      let currentTile = this.grids[0][currentPosition.x][currentPosition.y]!;
+      if (currentTile!.name == 'null') {
+        return;
+      }
+
+      let tileRotation = currentTile.rotation!;
+      orientation = ( tileRotation
+                      + currentTile.paths!.find((path : {from: number, to: number}) =>
+                        path.from === (orientation + tileRotation) % 4 )!.to)
+                      % 4;
+                      console.log(orientation);
+    }
+  }
 }

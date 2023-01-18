@@ -1,4 +1,6 @@
 <div class="d-flex row m-0 justify-content-between" cdkDropListGroup>
+  <p>{{totalPoints}}</p>
+
   <div class="col-4" (mouseover)="enterTrash()" (mouseleave)="outTrash()" style="overflow-y: auto" [ngStyle]=" {'height.px' : innerHeight }">
     <h2 class="p-3 fw-bold">Kacheln</h2>
     <div class="p-3 d-flex d-flex align-content-around flex-wrap"
@@ -67,6 +69,7 @@
                       [class.white]="tile.id"
                       [canvasValues]="canvasValues"
                       [(evacuationZone)]="evacuation"
+                      (rotationChange)="calcTotalPoints()"
                       [position]="{x: colCount, y: rowCount}"
                       [tile]="tile"
                       cdkDropList
