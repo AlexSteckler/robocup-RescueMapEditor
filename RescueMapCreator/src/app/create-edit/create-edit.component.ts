@@ -469,6 +469,10 @@ export class CreateEditComponent {
       if (currentTile!.name == 'null') {
         return;
       }
+      if(!currentTile.paths){
+        console.log("No Paths");
+        return;
+      }
 
       let tileRotation = currentTile.rotation!;
       let tileWay = currentTile.paths!.find((path: { from: number, to: number }) => orientation === (path.from + tileRotation) % 4)
