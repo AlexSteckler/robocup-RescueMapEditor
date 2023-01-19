@@ -1,10 +1,10 @@
-import {Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
-import {CdkDrag, CdkDragDrop, CdkDragEnd, CdkDragStart} from "@angular/cdk/drag-drop";
+import {Component, ElementRef, HostListener, ViewChild} from '@angular/core';
+import {CdkDragDrop, CdkDragEnd, CdkDragStart} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
-import panzoom, { Transform } from 'panzoom';
+import panzoom, {Transform} from 'panzoom';
 import {TilesService} from './tile/tiles.service';
 import {DomSanitizer} from "@angular/platform-browser";
-import { Evacuation } from './tile/dto/evacuation.dto';
+import {Evacuation} from './tile/dto/evacuation.dto';
 
 
 const TileCount = 30;
@@ -20,7 +20,7 @@ export class CreateEditComponent {
   @ViewChild('canvas_wrapper') canvasWrapperElement: ElementRef | undefined;
 
   zoomScale = 1;
-  canvasValues : Transform | undefined;
+  canvasValues: Transform | undefined;
 
   public innerHeight: any;
 
@@ -49,9 +49,9 @@ export class CreateEditComponent {
 
   currentDraggedTile: Tile | undefined;
 
-  startPosition: { x: number, y: number }  = {x: -1, y: -1};
+  startPosition: { x: number, y: number } = {x: -1, y: -1};
 
-  totalPoints : string = '';
+  totalPoints: string = '';
 
   constructor(private tilesService: TilesService,
               private sanitizer: DomSanitizer) {
@@ -60,7 +60,7 @@ export class CreateEditComponent {
       for (let j = 0; j < TileCount; j++) {
         row.push({
           id: '0',
-          name: 'null',
+          name: '',
           source: '',
           image: undefined,
           paths: undefined,
@@ -71,18 +71,18 @@ export class CreateEditComponent {
     }
     //keypress event
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Control'){
+      if (event.key === 'Control') {
         this.altActive = true;
       }
-      if (event.key === 'Delete'){
+      if (event.key === 'Delete') {
         this.deleteActive = true;
       }
     });
     document.addEventListener('keyup', (event) => {
-      if (event.key === 'Control'){
+      if (event.key === 'Control') {
         this.altActive = false;
       }
-      if (event.key === 'Delete'){
+      if (event.key === 'Delete') {
         this.deleteActive = false;
       }
     });
@@ -166,11 +166,14 @@ export class CreateEditComponent {
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
     if ($event.previousContainer.data && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
       this.grids[0][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
-      if(this.grids[0][rowCount][colCount].name.includes('start')) {
-        this.startPosition = {x: rowCount, y: colCount};
+      if (this.grids[0][rowCount][colCount].name.includes('start')) {
+        if (this.startPosition.x != -1) {
+          this.grids[0][this.startPosition.y][this.startPosition.x] = this.newTile();
+        }
+        this.startPosition = {x: colCount, y: rowCount};
+
       }
-    }
-    else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4 && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
+    } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4 && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
       this.addEvacuationZoneAcross(colCount, rowCount);
       this.evacuation = this.getEvacuationDto(colCount, rowCount);
     } else if ($event.previousIndex == 1) {
@@ -241,66 +244,66 @@ export class CreateEditComponent {
 
       if (tile.name.includes('evacuationZone')) {
         //delay to allow the tile to be removed from the grid
-            this.evacuation!.position! = {x : colCount + xMove, y: rowCount + yMove};
+        this.evacuation!.position! = {x: colCount + xMove, y: rowCount + yMove};
 
-            let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
-            let y = +tile.name.substring(tile.name.length - 1)
+        let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
+        let y = +tile.name.substring(tile.name.length - 1)
 
-            setTimeout(() => {
-              if (((rowCount + yMove >= 0
+        setTimeout(() => {
+          if (((rowCount + yMove >= 0
                 && rowCount + yMove < TileCount - 3
                 && colCount + xMove >= 0
                 && colCount + xMove < TileCount - 4)
-                || this.isInTrash)
-                && tile.name.includes('Upright')
-              ) {
-                for (let i = 0; i < 3; i++) {
-                  for (let j = 0; j < 4; j++) {
-                    this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
-                      id: '0',
-                      name: '',
-                      source: '',
-                      image: undefined,
-                      paths: undefined,
-                      rotation: 0,
-                    }
-                  }
-                }
-                if (!this.isInTrash) {
-                  this.evacuation = this.getEvacuationDto(colCount + xMove, rowCount + yMove);
-                  this.addEvacuationZoneUpright(colCount + xMove, rowCount + yMove);
-                } else {
-                  this.evacuation = this.getEvacuationDto(-1, -1);
+              || this.isInTrash)
+            && tile.name.includes('Upright')
+          ) {
+            for (let i = 0; i < 3; i++) {
+              for (let j = 0; j < 4; j++) {
+                this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
+                  id: '0',
+                  name: '',
+                  source: '',
+                  image: undefined,
+                  paths: undefined,
+                  rotation: 0,
                 }
               }
+            }
+            if (!this.isInTrash) {
+              this.evacuation = this.getEvacuationDto(colCount + xMove, rowCount + yMove);
+              this.addEvacuationZoneUpright(colCount + xMove, rowCount + yMove);
+            } else {
+              this.evacuation = this.getEvacuationDto(-1, -1);
+            }
+          }
 
-              if (((rowCount + yMove >= 0
+          if (((rowCount + yMove >= 0
                 && rowCount + yMove < TileCount - 2
                 && colCount + xMove >= 0
                 && colCount + xMove < TileCount - 3)
-                || this.isInTrash)
-                && tile.name.includes('Across')
-              ) {
-                for (let i = 0; i < 4; i++) {
-                  for (let j = 0; j < 3; j++) {
-                    this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
-                      id: '0',
-                      name: '',
-                      source: '',
-                      image: undefined,
-                      paths: undefined,
-                      rotation: 0,
-                    }
-                  }
-                }
-                if (!this.isInTrash) {
-                  this.evacuation = this.getEvacuationDto(colCount + xMove, rowCount + yMove,);
-                  this.addEvacuationZoneAcross(colCount + xMove, rowCount + yMove,);
-                } else {
-                  this.evacuation = this.getEvacuationDto(-1, -1);
+              || this.isInTrash)
+            && tile.name.includes('Across')
+          ) {
+            for (let i = 0; i < 4; i++) {
+              for (let j = 0; j < 3; j++) {
+                this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
+                  id: '0',
+                  name: '',
+                  source: '',
+                  image: undefined,
+                  paths: undefined,
+                  rotation: 0,
                 }
               }
-            }, 10);
+            }
+            if (!this.isInTrash) {
+              this.evacuation = this.getEvacuationDto(colCount + xMove, rowCount + yMove,);
+              this.addEvacuationZoneAcross(colCount + xMove, rowCount + yMove,);
+            } else {
+              this.evacuation = this.getEvacuationDto(-1, -1);
+            }
+          }
+        }, 10);
 
 
       } else if (
@@ -315,39 +318,25 @@ export class CreateEditComponent {
           this.grids[levelCount][rowCount + yMove][colCount + xMove] = {
             ...tile
           }
-          if(this.grids[levelCount][rowCount][colCount].name.includes('start')) {
+          if (this.grids[levelCount][rowCount][colCount].name.includes('start')) {
             this.startPosition = {x: colCount + xMove, y: rowCount + yMove};
           }
-        }
-        else {
+        } else {
           if (this.grids[levelCount][rowCount][colCount].name.includes('start')) {
             this.startPosition = {x: -1, y: -1};
           }
         }
 
         if (!this.altActive) {
-          this.grids[levelCount][rowCount][colCount] = {
-            id: '0',
-            name: '',
-            source: '',
-            image: undefined,
-            paths: undefined,
-            rotation: 0,
-          }
+          this.grids[levelCount][rowCount][colCount] = this.newTile();
         }
-      }
-      else {
+      } else {
         setTimeout(() => {
           if (this.isInTrash) {
-
-            this.grids[levelCount][rowCount][colCount] = {
-              id: '0',
-              name: '',
-              source: '',
-              image: undefined,
-              paths: undefined,
-              rotation: 0,
+            if (this.grids[levelCount][rowCount][colCount].name.includes('start')) {
+              this.startPosition = {x: -1, y: -1};
             }
+            this.grids[levelCount][rowCount][colCount] = this.newTile();
           }
         }, 50);
       }
@@ -390,7 +379,7 @@ export class CreateEditComponent {
     this.grids[0][rowCount + 1][colCount + 2] = {name: 'evacuationZoneAcross_12', border: ['', '', '', '']};
   }
 
-  private addEvacuationZoneUpright( colCount: number, rowCount: number) {
+  private addEvacuationZoneUpright(colCount: number, rowCount: number) {
     this.grids[0][rowCount][colCount] = {name: 'evacuationZoneUpright_00', border: ['black', '', '', 'black']};
     this.grids[0][rowCount][colCount + 1] = {name: 'evacuationZoneUpright_01', border: ['black', '', '', '']};
     this.grids[0][rowCount][colCount + 2] = {name: 'evacuationZoneUpright_02', border: ['black', 'black', '', '']};
@@ -422,17 +411,30 @@ export class CreateEditComponent {
   }
 
   getEvacuationDto(x: number, y: number) {
-    return this.evacuation = {
-      position : {x, y},
-      exitPlaced : false,
-      entrancePlaced : false,
+    return {
+      position: {x, y},
+      exitPlaced: false,
+      entrancePlaced: false,
       alignment: 1,
-      exitPosition: { x: -1, y:-1, borderPosition: -1},
-      entrancePosition: { x: -1, y:-1, borderPosition: -1 }
-      }
-  };
+      exitPosition: {x: -1, y: -1, borderPosition: -1},
+      entrancePosition: {x: -1, y: -1, borderPosition: -1}
+    }
+  }
+
+  newTile() {
+    return {
+      id: '0',
+      name: '',
+      source: '',
+      image: undefined,
+      paths: undefined,
+      rotation: 0,
+    }
+  }
 
   calcTotalPoints() {
+    let loopCount = 0;
+
     if (this.startPosition.x == -1) {
       this.totalPoints = 'Keine Startkachel gegeben';
       return;
@@ -440,43 +442,70 @@ export class CreateEditComponent {
 
     let currentPoints = 5;
     let currentPosition = {...this.startPosition};
-
     let orientation = (this.grids[0][currentPosition.y][currentPosition.x].rotation!
-                      + this.grids[0][currentPosition.y][currentPosition.x].paths!.find((path : {from: number, to: number}) => path.from === -1 )!.to)
-                      % 4;
+        + this.grids[0][currentPosition.y][currentPosition.x].paths!.find((path: { from: number, to: number }) => path.from === -1)!.to + 2)
+      % 4;
+    this.totalPoints = currentPoints.toString();
 
+    let multiplier : number = 1;
 
-    while (orientation != -1) {
-
-      switch(orientation) {
+    while (orientation != -1 && loopCount++ <= 1000) {
+      switch (orientation) {
         case 0:
-          currentPosition.y -= 1;
+          currentPosition.y += 1;
           break;
-
         case 1:
-          currentPosition.x += 1;
+          currentPosition.x -= 1;
           break;
 
         case 2:
-          currentPosition.y += 1;
+          currentPosition.y -= 1;
           break;
 
         case 3:
-          currentPosition.x -= 1;
+          currentPosition.x += 1;
           break;
       }
-      return
-      let currentTile = this.grids[0][currentPosition.x][currentPosition.y]!;
-      if (currentTile!.name == 'null') {
+
+      if (currentPosition.x < 0 || currentPosition.y < 0 ) {
+        this.totalPoints = 'Pacours führt aus dem Spielfeld';
+        return;
+      }
+      let currentTile = this.grids[0][currentPosition.y][currentPosition.x]!;
+      if (!currentTile!.name) {
         return;
       }
 
-      let tileRotation = currentTile.rotation!;
-      orientation = ( tileRotation
-                      + currentTile.paths!.find((path : {from: number, to: number}) =>
-                        path.from === (orientation + tileRotation) % 4 )!.to)
-                      % 4;
-                      console.log(orientation);
+      if (currentTile.name.includes('evacuationZone')) {
+        if (this.evacuation.entrancePosition.x != currentPosition.x ||  this.evacuation.entrancePosition.y != currentPosition.y || this.evacuation.entrancePosition.borderPosition != orientation) {
+          console.log('no entrance');
+          return;
+        }
+        if (this.evacuation.exitPosition.x == -1) {
+          console.log('no exit');
+          return;
+        }
+
+        currentPosition = {x: this.evacuation.exitPosition.x, y: this.evacuation.exitPosition.y };
+        orientation = (this.evacuation.exitPosition.borderPosition + 2) % 4;
+
+        multiplier = 4.3904;
+
+      } else {
+        let tileRotation = currentTile.rotation!;
+        let tileWay = currentTile.paths!.find((path: { from: number, to: number }) => orientation === (path.from + tileRotation) % 4)
+        if (tileWay !== undefined) {
+          orientation = (tileRotation + tileWay.to + 2) % 4;
+          currentPoints += currentTile.value ? currentTile.value + 5 : 5;
+          this.totalPoints = Math.round(currentPoints * multiplier).toString();
+        } else {
+          return;
+        }
+      }
+    }
+
+    if (loopCount >= 1000) {
+      this.totalPoints = 'Ihre Bahn erzeugt eine Schleife. Parkour nicht zugelassen!'
     }
   }
 }
