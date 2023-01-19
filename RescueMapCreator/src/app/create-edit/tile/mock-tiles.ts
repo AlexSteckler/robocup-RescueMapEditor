@@ -96,7 +96,7 @@ export const Tiles : Tile[] = [
     name: 'cross',
     source : 'assets/tiles/Tile_18-2.svg',
     image : undefined,
-    paths : [{from: 0, to: 3}],
+    paths : [{from: 2, to: 3},{from: 3, to: 2},{from: 0, to: 2},{from: 1, to: 3}],
     rotation: 0,
     value: 10,
   },

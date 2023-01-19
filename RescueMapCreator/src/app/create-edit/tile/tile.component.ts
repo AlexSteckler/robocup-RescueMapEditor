@@ -6,8 +6,8 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import { Evacuation } from './dto/evacuation.dto';
 
 const SPACING = 30;
-const ENTRANCECOLOR: string = 'green';
-const EXITCOLOR: string = '#f0f0f0';
+const EXITCOLOR: string = 'green';
+const ENTRANCECOLOR: string = '#f0f0f0';
 
 @Component({
   selector: 'app-tile',
@@ -98,15 +98,15 @@ export class TileComponent implements OnInit{
         this.evacuationZone.exitPosition = {x: -1, y : -1, borderPosition: -1};
       }
       else {
-        if (this.evacuationZone!.exitPlaced == false) {
-          this.tile!.border![index] = EXITCOLOR;
+        if (this.evacuationZone!.entrancePlaced == false) {
+        this.tile!.border![index] = ENTRANCECOLOR;
+        this.evacuationZone!.entrancePlaced = true;
+        this.evacuationZone.entrancePosition = {x: this.position.x, y : this.position.y, borderPosition: index};
+        }
+        else if (this.evacuationZone!.exitPlaced == false) {
+          this.tile!.border![index] =  EXITCOLOR;
           this.evacuationZone!.exitPlaced = true;
           this.evacuationZone.exitPosition = {x: this.position.x, y : this.position.y, borderPosition: index};
-        }
-        else if (this.evacuationZone!.entrancePlaced == false) {
-          this.tile!.border![index] = ENTRANCECOLOR;
-          this.evacuationZone!.entrancePlaced = true;
-          this.evacuationZone.entrancePosition = {x: this.position.x, y : this.position.y, borderPosition: index};
         }
       }
       this.evacuationZoneChange.emit(this.evacuationZone);

@@ -167,7 +167,11 @@ export class CreateEditComponent {
     if ($event.previousContainer.data && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
       this.grids[0][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
       if (this.grids[0][rowCount][colCount].name.includes('start')) {
+        if (this.startPosition.x != -1) {
+          this.grids[0][this.startPosition.y][this.startPosition.x] = this.newTile();
+        }
         this.startPosition = {x: colCount, y: rowCount};
+
       }
     } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4 && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
       this.addEvacuationZoneAcross(colCount, rowCount);
@@ -324,27 +328,15 @@ export class CreateEditComponent {
         }
 
         if (!this.altActive) {
-          this.grids[levelCount][rowCount][colCount] = {
-            id: '0',
-            name: '',
-            source: '',
-            image: undefined,
-            paths: undefined,
-            rotation: 0,
-          }
+          this.grids[levelCount][rowCount][colCount] = this.newTile();
         }
       } else {
         setTimeout(() => {
           if (this.isInTrash) {
-
-            this.grids[levelCount][rowCount][colCount] = {
-              id: '0',
-              name: '',
-              source: '',
-              image: undefined,
-              paths: undefined,
-              rotation: 0,
+            if (this.grids[levelCount][rowCount][colCount].name.includes('start')) {
+              this.startPosition = {x: -1, y: -1};
             }
+            this.grids[levelCount][rowCount][colCount] = this.newTile();
           }
         }, 50);
       }
@@ -419,7 +411,7 @@ export class CreateEditComponent {
   }
 
   getEvacuationDto(x: number, y: number) {
-    return this.evacuation = {
+    return {
       position: {x, y},
       exitPlaced: false,
       entrancePlaced: false,
@@ -427,10 +419,22 @@ export class CreateEditComponent {
       exitPosition: {x: -1, y: -1, borderPosition: -1},
       entrancePosition: {x: -1, y: -1, borderPosition: -1}
     }
-  };
+  }
+
+  newTile() {
+    return {
+      id: '0',
+      name: '',
+      source: '',
+      image: undefined,
+      paths: undefined,
+      rotation: 0,
+    }
+  }
 
   calcTotalPoints() {
-    console.log('calcTotalPoints');
+    let loopCount = 0;
+
     if (this.startPosition.x == -1) {
       this.totalPoints = 'Keine Startkachel gegeben';
       return;
@@ -443,8 +447,9 @@ export class CreateEditComponent {
       % 4;
     this.totalPoints = currentPoints.toString();
 
-    while (orientation != -1) {
-      console.log("Orientation Input: " + orientation);
+    let multiplier : number = 1;
+
+    while (orientation != -1 && loopCount++ <= 1000) {
       switch (orientation) {
         case 0:
           currentPosition.y += 1;
@@ -461,7 +466,8 @@ export class CreateEditComponent {
           currentPosition.x += 1;
           break;
       }
-      if(currentPosition.x < 0 || currentPosition.y < 0 ) {
+
+      if (currentPosition.x < 0 || currentPosition.y < 0 ) {
         this.totalPoints = 'Pacours führt aus dem Spielfeld';
         return;
       }
@@ -470,13 +476,36 @@ export class CreateEditComponent {
         return;
       }
 
-      let tileRotation = currentTile.rotation!;
-      let tileWay = currentTile.paths!.find((path: { from: number, to: number }) => orientation === (path.from + tileRotation) % 4)
-      if (tileWay !== undefined) {
-        orientation = (tileRotation + tileWay.to + 2) % 4;
-        currentPoints += currentTile.value ? currentTile.value + 5 : 5;
-        this.totalPoints = currentPoints.toString();
+      if (currentTile.name.includes('evacuationZone')) {
+        if (this.evacuation.entrancePosition.x != currentPosition.x ||  this.evacuation.entrancePosition.y != currentPosition.y || this.evacuation.entrancePosition.borderPosition != orientation) {
+          console.log('no entrance');
+          return;
+        }
+        if (this.evacuation.exitPosition.x == -1) {
+          console.log('no exit');
+          return;
+        }
+
+        currentPosition = {x: this.evacuation.exitPosition.x, y: this.evacuation.exitPosition.y };
+        orientation = (this.evacuation.exitPosition.borderPosition + 2) % 4;
+
+        multiplier = 4.3904;
+
+      } else {
+        let tileRotation = currentTile.rotation!;
+        let tileWay = currentTile.paths!.find((path: { from: number, to: number }) => orientation === (path.from + tileRotation) % 4)
+        if (tileWay !== undefined) {
+          orientation = (tileRotation + tileWay.to + 2) % 4;
+          currentPoints += currentTile.value ? currentTile.value + 5 : 5;
+          this.totalPoints = Math.round(currentPoints * multiplier).toString();
+        } else {
+          return;
+        }
       }
+    }
+
+    if (loopCount >= 1000) {
+      this.totalPoints = 'Ihre Bahn erzeugt eine Schleife. Parkour nicht zugelassen!'
     }
   }
 }
