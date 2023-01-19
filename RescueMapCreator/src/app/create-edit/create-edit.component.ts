@@ -53,19 +53,14 @@ export class CreateEditComponent {
 
   totalPoints: string = '';
 
+  layer: number = 0;
+
   constructor(private tilesService: TilesService,
               private sanitizer: DomSanitizer) {
     for (let i = 0; i < TileCount; i++) {
       let row: Array<Tile> = [];
       for (let j = 0; j < TileCount; j++) {
-        row.push({
-          id: '0',
-          name: '',
-          source: '',
-          image: undefined,
-          paths: undefined,
-          rotation: 0,
-        });
+        row.push(this.newTile());
       }
       this.grids[0].push(row);
     }
@@ -508,4 +503,27 @@ export class CreateEditComponent {
       this.totalPoints = 'Ihre Bahn erzeugt eine Schleife. Parkour nicht zugelassen!'
     }
   }
+
+  changeLevel(direction : string) {
+    if(direction == 'up' && this.layer < 5) {
+      this.layer++;
+
+      if (this.grids.length == this.layer) {
+        let tempgrid :  Array<Array<Tile>> = [];
+
+        for (let i = 0; i < TileCount; i++) {
+          let row: Array<Tile> = [];
+          for (let j = 0; j < TileCount; j++) {
+            row.push(this.newTile());
+          }
+          tempgrid.push(row);
+        }
+
+        this.grids.push(tempgrid);
+      }
+    } else if (direction == 'down' && this.layer > 0) {
+      this.layer--;
+    }
+  }
+
 }

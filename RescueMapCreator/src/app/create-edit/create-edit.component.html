@@ -59,28 +59,34 @@
   </div>
 
   <div class="col-7 position-relative p-0 m-3">
-
+    <div class="p-2">
+      <button class="me-1" (click)="changeLevel('up')">Ebene höher</button>
+      <button (click)="changeLevel('down')">Ebene tiefer</button>
+      <span class="ps-1">{{layer}}</span>
+    </div>
     <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
       <div #canvas>
         <div *ngFor="let level of grids; let levelCount = index" class="level">
-          <div *ngFor="let row of level; let rowCount = index" class="row d-flex flex-nowrap">
-            <app-tile *ngFor="let tile of row; let colCount = index"
-                      (contextmenu)="disableContext($event)"
-                      [class.white]="tile.id"
-                      [canvasValues]="canvasValues"
-                      [(evacuationZone)]="evacuation"
-                      (rotationChange)="calcTotalPoints()"
-                      [position]="{x: colCount, y: rowCount}"
-                      [tile]="tile"
-                      cdkDropList
-                      (cdkDropListDropped)="drop($event, rowCount, colCount)"
-                      cdkDrag
-                      [cdkDragConstrainPosition]="dragConstrainPoint"
-                      [cdkDragDisabled]="tile.id == '0'"
-                      (cdkDragStarted)="dragStartMovement(tile, $event, rowCount, colCount, levelCount)"
-                      (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)"
-                      >
-            </app-tile>
+          <div *ngIf="levelCount == layer">
+            <div *ngFor="let row of level; let rowCount = index" class="row d-flex flex-nowrap">
+              <app-tile *ngFor="let tile of row; let colCount = index"
+                        (contextmenu)="disableContext($event)"
+                        [class.white]="tile.id"
+                        [canvasValues]="canvasValues"
+                        [(evacuationZone)]="evacuation"
+                        (rotationChange)="calcTotalPoints()"
+                        [position]="{x: colCount, y: rowCount}"
+                        [tile]="tile"
+                        cdkDropList
+                        (cdkDropListDropped)="drop($event, rowCount, colCount)"
+                        cdkDrag
+                        [cdkDragConstrainPosition]="dragConstrainPoint"
+                        [cdkDragDisabled]="tile.id == '0'"
+                        (cdkDragStarted)="dragStartMovement(tile, $event, rowCount, colCount, levelCount)"
+                        (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)"
+                        >
+              </app-tile>
+            </div>
           </div>
         </div>
       </div>
