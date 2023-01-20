@@ -29,7 +29,7 @@ export class CreateEditComponent {
 
   @HostListener('window:resize', ['$event'])
   onResize() {
-    this.innerHeight = window.innerHeight - 240;
+    this.innerHeight = window.innerHeight -300;
   }
 
   zoomFactor = 0.05;
@@ -159,7 +159,7 @@ export class CreateEditComponent {
   }
 
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
-    if ($event.previousContainer.data && !this.grids[this.layer][rowCount][colCount].name.includes('evacuationZone')) {
+    if ($event.previousContainer.data && !this.grids[this.layer][rowCount][colCount].name.includes('evacuationZone') && !this.grids[this.layer][rowCount][colCount].isPlaceholder) {
       this.grids[this.layer][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
       this.layerChange(this.layer,rowCount,colCount, {...$event.previousContainer.data[$event.previousIndex]});
 
@@ -295,12 +295,13 @@ export class CreateEditComponent {
         && colCount + xMove >= 0
         && colCount + xMove < TileCount
         && !this.grids[levelCount][rowCount + yMove][colCount + xMove].name.includes('evacuationZone')
+        && !this.grids[this.layer][rowCount + yMove][colCount + xMove].isPlaceholder
       ) {
 
         if (!this.isInTrash) {
-          this.grids[levelCount][rowCount + yMove][colCount + xMove] = {
-            ...tile
-          }
+          this.grids[levelCount][rowCount + yMove][colCount + xMove] = {...tile};
+          this.layerChange(levelCount, rowCount + yMove, colCount + xMove, {...tile});
+
           if (this.grids[levelCount][rowCount][colCount].name.includes('start')) {
             this.startPosition = {x: colCount + xMove, y: rowCount + yMove};
           }
@@ -312,6 +313,10 @@ export class CreateEditComponent {
 
         if (!this.altActive) {
           this.grids[levelCount][rowCount][colCount] = this.newTile();
+          this.grids[levelCount + 1][rowCount][colCount] = this.newTile();
+          if (levelCount > 0) {
+            this.grids[levelCount - 1][rowCount][colCount] = this.newTile();
+          }
         }
       } else {
         setTimeout(() => {
@@ -520,7 +525,7 @@ export class CreateEditComponent {
     this.grids.push(tempgrid);
   }
 
-  layerChange(layer: number, rowCount: number, colCount: number, tile: Tile) : boolean {
+  layerChange(layer: number, rowCount: number, colCount: number, tile: Tile) {
 
     let newTile = {...tile};
     newTile.isPlaceholder = true;
@@ -529,27 +534,12 @@ export class CreateEditComponent {
       this.addLevel()
     }
 
-    if (layer == 0) {
-      console.log(this.grids[layer+1][rowCount][colCount]);
-      if (this.grids[layer + 1][rowCount][colCount].name == '') {
-        this.grids[layer + 1][rowCount][colCount] = newTile;
-      }
-      if (this.grids[layer][rowCount][colCount].rotation != this.grids[layer+1][rowCount][colCount].rotation) {
-        this.grids[layer + 1][rowCount][colCount] = newTile;
-      }
+    if (this.grids[layer + 1][rowCount][colCount].name == '') {
+      this.grids[layer + 1][rowCount][colCount] = newTile;
     }
 
-    else if (this.grids[layer + 1 ][rowCount][colCount].name == '' && this.grids[layer - 1][rowCount][colCount].name == '') {
-      console.log('3');
-      this.grids[this.layer - 1][rowCount][colCount] = newTile;
-      this.grids[this.layer + 1][rowCount][colCount] = newTile;
+    if (this.grids[layer][rowCount][colCount].rotation != this.grids[layer+1][rowCount][colCount].rotation) {
+      this.grids[layer + 1][rowCount][colCount] = newTile;
     }
-    else if (tile.rotation == this.grids[layer][rowCount][colCount].rotation) {
-      console.log('4');
-      this.grids[this.layer - 1][rowCount][colCount] = newTile;
-      this.grids[this.layer + 1][rowCount][colCount] = newTile;
-    }
-
-    return false;
   }
 }
