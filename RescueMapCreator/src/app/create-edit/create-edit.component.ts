@@ -526,20 +526,9 @@ export class CreateEditComponent {
   }
 
   layerChange(layer: number, rowCount: number, colCount: number, tile: Tile) {
-
-    let newTile = {...tile};
-    newTile.isPlaceholder = true;
-
     if (this.grids[this.grids.length + this.layer] == undefined) {
       this.addLevel()
     }
-
-    if (this.grids[layer + 1][rowCount][colCount].name == '') {
-      this.grids[layer + 1][rowCount][colCount] = newTile;
-    }
-
-    if (this.grids[layer][rowCount][colCount].rotation != this.grids[layer+1][rowCount][colCount].rotation) {
-      this.grids[layer + 1][rowCount][colCount] = newTile;
-    }
+      this.grids[layer + 1][rowCount][colCount] = {...tile , isPlaceholder: true};
   }
 }
