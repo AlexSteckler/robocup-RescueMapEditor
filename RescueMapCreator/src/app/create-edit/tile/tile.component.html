@@ -14,6 +14,7 @@
 
 <div  class="tile-size"
       #evacuationTile
+      [ngClass]="{'isPlaceholder': tile?.isPlaceholder}"
       [ngStyle]="{'border-top': this.tile!.border![0]? ((this.tile!.border![0] != 'black' ? '8px solid ' : 'solid ') + this.tile!.border![0] ) : 'none',
                   'border-right': this.tile!.border![1]? ((this.tile!.border![1] != 'black' ? '8px solid ' :'solid ') + this.tile!.border![1]) : 'none',
                   'border-bottom': this.tile!.border![2]? ((this.tile!.border![2] != 'black' ? '8px solid ' :'solid ') + this.tile!.border![2]) : 'none',
