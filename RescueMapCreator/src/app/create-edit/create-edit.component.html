@@ -7,7 +7,7 @@
         cdkDropListSortingDisabled
         [cdkDropListEnterPredicate]="falseEnter"
         #tileList
-        (cdkDropListExited)="exited($event)"
+        (cdkDropListExited)="exited()"
         (cdkDropListEntered)="entered()">
       <app-tile
         [class.white]="tile.id"
@@ -21,7 +21,7 @@
         >
         <app-tile *cdkDragPreview [tile]="tile"
                   [canvasValues]="canvasValues"
-                  [ngStyle]="{'width.px': 100 * zoomScale, 'height.px': 100 * zoomScale}"
+                  [ngStyle]="{'width.px': 100 * canvasValues!.scale, 'height.px': 100 * canvasValues!.scale}"
         ></app-tile>
       </app-tile>
     </div>
@@ -32,13 +32,13 @@
         <div  class="evacuationZone"
               *cdkDragPreview
               style="width: 500px; background-color: red;"
-              [ngStyle]="{'width.px': 400 * zoomScale, 'height.px': 300 * zoomScale}">
+              [ngStyle]="{'width.px': 400 * canvasValues!.scale, 'height.px': 300 * canvasValues!.scale}">
         </div>
       </div>
       <div class="evacuationZoneUpright" cdkDrag>
         <div  class="evacuationZoneUpright"
               *cdkDragPreview style="width: 300px; background-color: red;"
-              [ngStyle]="{'width.px': 300 * zoomScale, 'height.px': 400 * zoomScale}">
+              [ngStyle]="{'width.px': 300 * canvasValues!.scale, 'height.px': 400 * canvasValues!.scale}">
         </div>
       </div>
     </div>
@@ -58,23 +58,22 @@
 
   <div class="col-7 position-relative p-0 m-3">
     <div class="p-2 d-flex w-100 justify-content-end">
-      <button class="me-1" (click)="changeLevel('down')">Ebene tiefer</button>
-      <button (click)="changeLevel('up')">Ebene höher</button>
+      <button class="me-1" (click)="changeLayer('down')">Ebene tiefer</button>
+      <button (click)="changeLayer('up')">Ebene höher</button>
     </div>
     <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
       <div #canvas>
-        <div *ngFor="let level of grids; let levelCount = index" class="level">
-          <div *ngIf="levelCount == layer">
+        <div *ngFor="let layerOfGrids of grids; let layerCount = index" class="layer">
+          <div *ngIf="layerCount == layer">
 
-            <div *ngFor="let row of level; let rowCount = index" class="row d-flex flex-nowrap">
+            <div *ngFor="let row of layerOfGrids; let rowCount = index" class="row d-flex flex-nowrap">
 
               <app-tile *ngFor="let tile of row; let colCount = index"
                         (contextmenu)="disableContext($event)"
                         [class.white]="tile.id"
                         [canvasValues]="canvasValues"
                         [(evacuationZone)]="evacuation"
-                        (rotationChange)="calcTotalPoints()"
-                        (rotationChange)="layerChange(levelCount, rowCount, colCount, tile)"
+                        (tileChange)="calcTotalPoints(); layerChange(layerCount, rowCount, colCount, tile)"
                         [position]="{x: colCount, y: rowCount}"
                         [tile]="tile"
                         cdkDropList
@@ -82,8 +81,8 @@
                         cdkDrag
                         [cdkDragConstrainPosition]="dragConstrainPoint"
                         [cdkDragDisabled]="tile.id == '0' || tile.isPlaceholder"
-                        (cdkDragStarted)="dragStartMovement(tile, $event, rowCount, colCount, levelCount)"
-                        (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)"
+                        (cdkDragStarted)="dragStartMovement(tile)"
+                        (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, layerCount)"
                         >
               </app-tile>
             </div>
