@@ -5,7 +5,6 @@ import { Transform } from 'panzoom';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Evacuation } from './dto/evacuation.dto';
 
-const SPACING = 30;
 const EXITCOLOR: string = 'green';
 const ENTRANCECOLOR: string = '#f0f0f0';
 
@@ -47,38 +46,12 @@ export class TileComponent implements OnInit{
 
   contextMenuPosition = { x: '0px', y: '0px' };
 
-  onRightClick(event: any) {
-    event.preventDefault();
+  onRightClick(position:number = -1) {
 
-    //console.log(event.pageX + ' ' + event.pageY + ' | ' + this.contextMenuPosition.x + ' ' + this.contextMenuPosition.y );
-    //console.log( ' ClientX: ' + event.clientX + ' ClientY: '+ event.clientY + ' CanvasX: ' + this.canvasValues?.x + ' CanvasY: ' + this.canvasValues?.y + ' CanvasScale: ' + this.canvasValues?.scale)
-
-    let posX: number = event.layerX % 100;
-    let posY: number = event.layerY % 100;
-
-
-    if (this.tile?.name.includes('evacuationZone') && this.evacuationZone && this.position) {
-
-      if (posX > SPACING && posX < 100 - SPACING && posY < SPACING && this.tile?.border![0]) {
-        this.colorSwap(0);
-        console.log('Top');
-      }
-      else if (posY > SPACING && posY < 100 - SPACING && posX > 100 - SPACING && this.tile?.border![1]) {
-        this.colorSwap(1);
-        console.log('Right');
-      }
-      else if (posX > SPACING && posX < 100 - SPACING && posY > 100 - SPACING && this.tile?.border![2]) {
-        this.colorSwap(2);
-        console.log('Bottom');
-      }
-      else if (posY > SPACING && posY < 100 - SPACING && posX < SPACING && this.tile?.border![3]) {
-        this.colorSwap(3);
-
-        console.log('Left');
-      }
+    if (this.tile?.name.includes('evacuationZone') && position != -1) {
+      this.colorSwap(position);
     }
-
-    else {
+    else if (!this.tile?.isPlaceholder) {
       this.tile!.rotation = (this.tile!.rotation! + 1) % 4;
       this.state = this.tile?.rotation.toString()!;
     }

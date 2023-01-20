@@ -1,6 +1,4 @@
 <div class="d-flex row m-0 justify-content-between" cdkDropListGroup>
-  <p>{{totalPoints}}</p>
-
   <div class="col-4" (mouseover)="enterTrash()" (mouseleave)="outTrash()" style="overflow-y: auto" [ngStyle]=" {'height.px' : innerHeight }">
     <h2 class="p-3 fw-bold">Kacheln</h2>
     <div class="p-3 d-flex d-flex align-content-around flex-wrap"
@@ -59,36 +57,54 @@
   </div>
 
   <div class="col-7 position-relative p-0 m-3">
-
+    <div class="p-2 d-flex w-100 justify-content-end">
+      <button class="me-1" (click)="changeLevel('down')">Ebene tiefer</button>
+      <button (click)="changeLevel('up')">Ebene höher</button>
+    </div>
     <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
       <div #canvas>
         <div *ngFor="let level of grids; let levelCount = index" class="level">
-          <div *ngFor="let row of level; let rowCount = index" class="row d-flex flex-nowrap">
-            <app-tile *ngFor="let tile of row; let colCount = index"
-                      (contextmenu)="disableContext($event)"
-                      [class.white]="tile.id"
-                      [canvasValues]="canvasValues"
-                      [(evacuationZone)]="evacuation"
-                      (rotationChange)="calcTotalPoints()"
-                      [position]="{x: colCount, y: rowCount}"
-                      [tile]="tile"
-                      cdkDropList
-                      (cdkDropListDropped)="drop($event, rowCount, colCount)"
-                      cdkDrag
-                      [cdkDragConstrainPosition]="dragConstrainPoint"
-                      [cdkDragDisabled]="tile.id == '0'"
-                      (cdkDragStarted)="dragStartMovement(tile, $event, rowCount, colCount, levelCount)"
-                      (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)"
-                      >
-            </app-tile>
+          <div *ngIf="levelCount == layer">
+
+            <div *ngFor="let row of level; let rowCount = index" class="row d-flex flex-nowrap">
+
+              <app-tile *ngFor="let tile of row; let colCount = index"
+                        (contextmenu)="disableContext($event)"
+                        [class.white]="tile.id"
+                        [canvasValues]="canvasValues"
+                        [(evacuationZone)]="evacuation"
+                        (rotationChange)="calcTotalPoints()"
+                        (rotationChange)="layerChange(levelCount, rowCount, colCount, tile)"
+                        [position]="{x: colCount, y: rowCount}"
+                        [tile]="tile"
+                        cdkDropList
+                        (cdkDropListDropped)="drop($event, rowCount, colCount)"
+                        cdkDrag
+                        [cdkDragConstrainPosition]="dragConstrainPoint"
+                        [cdkDragDisabled]="tile.id == '0' || tile.isPlaceholder"
+                        (cdkDragStarted)="dragStartMovement(tile, $event, rowCount, colCount, levelCount)"
+                        (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, levelCount)"
+                        >
+              </app-tile>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div *ngIf="tileIsDragged" id="trashbin" class="d-flex align-items-center justify-content-center">
-      <div class="rounded border border-3 p-2 base-bg" (mouseover)="enterTrash()" (mouseleave)="outTrash()">
+    <div *ngIf="tileIsDragged" (mouseover)="enterTrash()" (mouseleave)="outTrash()" class="position-absolute p-2" style="bottom: 50%;">
+      <div class="rounded border border-3 p-2 base-bg" >
         <i class="bi bi-trash-fill"></i>
+      </div>
+    </div>
+
+    <div class="position-absolute p-2" style="bottom: 0px; background-color: rgba(177, 103, 12, 0.252);">
+      Gesamtpunktzahl: {{totalPoints}}
+    </div>
+
+    <div class="w-100 d-flex justify-content-end position-absolute">
+      <div class="p-3 base-color fs-5 ">
+        Ebene: {{layer}}
       </div>
     </div>
 

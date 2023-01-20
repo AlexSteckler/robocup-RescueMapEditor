@@ -29,7 +29,7 @@ export class CreateEditComponent {
 
   @HostListener('window:resize', ['$event'])
   onResize() {
-    this.innerHeight = window.innerHeight - 240;
+    this.innerHeight = window.innerHeight -300;
   }
 
   zoomFactor = 0.05;
@@ -53,19 +53,14 @@ export class CreateEditComponent {
 
   totalPoints: string = '';
 
+  layer: number = 0;
+
   constructor(private tilesService: TilesService,
               private sanitizer: DomSanitizer) {
     for (let i = 0; i < TileCount; i++) {
       let row: Array<Tile> = [];
       for (let j = 0; j < TileCount; j++) {
-        row.push({
-          id: '0',
-          name: '',
-          source: '',
-          image: undefined,
-          paths: undefined,
-          rotation: 0,
-        });
+        row.push(this.newTile());
       }
       this.grids[0].push(row);
     }
@@ -164,20 +159,23 @@ export class CreateEditComponent {
   }
 
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
-    if ($event.previousContainer.data && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
-      this.grids[0][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
-      if (this.grids[0][rowCount][colCount].name.includes('start')) {
+    if ($event.previousContainer.data && !this.grids[this.layer][rowCount][colCount].name.includes('evacuationZone') && !this.grids[this.layer][rowCount][colCount].isPlaceholder) {
+      this.grids[this.layer][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
+      this.layerChange(this.layer,rowCount,colCount, {...$event.previousContainer.data[$event.previousIndex]});
+
+      if (this.grids[this.layer][rowCount][colCount].name.includes('start')) {
         if (this.startPosition.x != -1) {
-          this.grids[0][this.startPosition.y][this.startPosition.x] = this.newTile();
+          this.grids[this.layer][this.startPosition.y][this.startPosition.x] = this.newTile();
         }
         this.startPosition = {x: colCount, y: rowCount};
 
       }
-    } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4 && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
-      this.addEvacuationZoneAcross(colCount, rowCount);
+    } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4 && !this.grids[this.layer][rowCount][colCount].name.includes('evacuationZone')) {
+      this.addEvacuationZoneAcross(this.layer,colCount, rowCount);
+
       this.evacuation = this.getEvacuationDto(colCount, rowCount);
     } else if ($event.previousIndex == 1) {
-      this.addEvacuationZoneUpright(colCount, rowCount);
+      this.addEvacuationZoneUpright(this.layer, colCount, rowCount);
       this.evacuation = this.getEvacuationDto(colCount, rowCount);
     }
     this.calcTotalPoints();
@@ -259,19 +257,13 @@ export class CreateEditComponent {
           ) {
             for (let i = 0; i < 3; i++) {
               for (let j = 0; j < 4; j++) {
-                this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
-                  id: '0',
-                  name: '',
-                  source: '',
-                  image: undefined,
-                  paths: undefined,
-                  rotation: 0,
-                }
+                this.grids[levelCount][rowCount + j - x][colCount + i - y] = this.newTile();
+                this.grids[levelCount + 1][rowCount + j - x][colCount + i - y] = this.newTile();
               }
             }
             if (!this.isInTrash) {
               this.evacuation = this.getEvacuationDto(colCount + xMove, rowCount + yMove);
-              this.addEvacuationZoneUpright(colCount + xMove, rowCount + yMove);
+              this.addEvacuationZoneUpright(this.layer,colCount + xMove, rowCount + yMove);
             } else {
               this.evacuation = this.getEvacuationDto(-1, -1);
             }
@@ -286,19 +278,13 @@ export class CreateEditComponent {
           ) {
             for (let i = 0; i < 4; i++) {
               for (let j = 0; j < 3; j++) {
-                this.grids[levelCount][rowCount + j - x][colCount + i - y] = {
-                  id: '0',
-                  name: '',
-                  source: '',
-                  image: undefined,
-                  paths: undefined,
-                  rotation: 0,
-                }
+                this.grids[levelCount][rowCount + j - x][colCount + i - y] = this.newTile();
+                this.grids[levelCount + 1][rowCount + j - x][colCount + i - y] = this.newTile();
               }
             }
             if (!this.isInTrash) {
               this.evacuation = this.getEvacuationDto(colCount + xMove, rowCount + yMove,);
-              this.addEvacuationZoneAcross(colCount + xMove, rowCount + yMove,);
+              this.addEvacuationZoneAcross(this.layer, colCount + xMove, rowCount + yMove,);
             } else {
               this.evacuation = this.getEvacuationDto(-1, -1);
             }
@@ -312,12 +298,13 @@ export class CreateEditComponent {
         && colCount + xMove >= 0
         && colCount + xMove < TileCount
         && !this.grids[levelCount][rowCount + yMove][colCount + xMove].name.includes('evacuationZone')
+        && !this.grids[this.layer][rowCount + yMove][colCount + xMove].isPlaceholder
       ) {
 
         if (!this.isInTrash) {
-          this.grids[levelCount][rowCount + yMove][colCount + xMove] = {
-            ...tile
-          }
+          this.grids[levelCount][rowCount + yMove][colCount + xMove] = {...tile};
+          this.layerChange(levelCount, rowCount + yMove, colCount + xMove, {...tile});
+
           if (this.grids[levelCount][rowCount][colCount].name.includes('start')) {
             this.startPosition = {x: colCount + xMove, y: rowCount + yMove};
           }
@@ -329,6 +316,7 @@ export class CreateEditComponent {
 
         if (!this.altActive) {
           this.grids[levelCount][rowCount][colCount] = this.newTile();
+          this.grids[levelCount + 1][rowCount][colCount] = this.newTile();
         }
       } else {
         setTimeout(() => {
@@ -364,34 +352,41 @@ export class CreateEditComponent {
     };
   };
 
-  private addEvacuationZoneAcross(colCount: number, rowCount: number) {
-    this.grids[0][rowCount][colCount] = {name: 'evacuationZoneAcross_00', border: ['black', '', '', 'black']};
-    this.grids[0][rowCount][colCount + 1] = {name: 'evacuationZoneAcross_01', border: ['black', '', '', '']};
-    this.grids[0][rowCount][colCount + 2] = {name: 'evacuationZoneAcross_02', border: ['black', '', '', '']};
-    this.grids[0][rowCount][colCount + 3] = {name: 'evacuationZoneAcross_03', border: ['black', 'black', '', '']};
-    this.grids[0][rowCount + 1][colCount + 3] = {name: 'evacuationZoneAcross_13', border: ['', 'black', '', '']};
-    this.grids[0][rowCount + 2][colCount + 3] = {name: 'evacuationZoneAcross_23', border: ['', 'black', 'black', '']};
-    this.grids[0][rowCount + 2][colCount + 2] = {name: 'evacuationZoneAcross_22', border: ['', '', 'black', '']};
-    this.grids[0][rowCount + 2][colCount + 1] = {name: 'evacuationZoneAcross_21', border: ['', '', 'black', '']};
-    this.grids[0][rowCount + 2][colCount] = {name: 'evacuationZoneAcross_20', border: ['', '', 'black', 'black']};
-    this.grids[0][rowCount + 1][colCount] = {name: 'evacuationZoneAcross_10', border: ['', '', '', 'black']};
-    this.grids[0][rowCount + 1][colCount + 1] = {name: 'evacuationZoneAcross_11', border: ['', '', '', '']};
-    this.grids[0][rowCount + 1][colCount + 2] = {name: 'evacuationZoneAcross_12', border: ['', '', '', '']};
+  private addEvacuationZoneAcross(layer: number, colCount: number, rowCount: number, isPlaceholder: boolean = false) {
+    this.grids[layer][rowCount][colCount] = {name: 'evacuationZoneAcross_00', border: ['black', '', '', 'black'], isPlaceholder};
+    this.grids[layer][rowCount][colCount + 1] = {name: 'evacuationZoneAcross_01', border: ['black', '', '', ''], isPlaceholder};
+    this.grids[layer][rowCount][colCount + 2] = {name: 'evacuationZoneAcross_02', border: ['black', '', '', ''], isPlaceholder};
+    this.grids[layer][rowCount][colCount + 3] = {name: 'evacuationZoneAcross_03', border: ['black', 'black', '', ''], isPlaceholder};
+    this.grids[layer][rowCount + 1][colCount + 3] = {name: 'evacuationZoneAcross_13', border: ['', 'black', '', ''], isPlaceholder};
+    this.grids[layer][rowCount + 2][colCount + 3] = {name: 'evacuationZoneAcross_23', border: ['', 'black', 'black', ''], isPlaceholder};
+    this.grids[layer][rowCount + 2][colCount + 2] = {name: 'evacuationZoneAcross_22', border: ['', '', 'black', ''], isPlaceholder};
+    this.grids[layer][rowCount + 2][colCount + 1] = {name: 'evacuationZoneAcross_21', border: ['', '', 'black', ''], isPlaceholder};
+    this.grids[layer][rowCount + 2][colCount] = {name: 'evacuationZoneAcross_20', border: ['', '', 'black', 'black'], isPlaceholder};
+    this.grids[layer][rowCount + 1][colCount] = {name: 'evacuationZoneAcross_10', border: ['', '', '', 'black'], isPlaceholder};
+    this.grids[layer][rowCount + 1][colCount + 1] = {name: 'evacuationZoneAcross_11', border: ['', '', '', ''], isPlaceholder};
+    this.grids[layer][rowCount + 1][colCount + 2] = {name: 'evacuationZoneAcross_12', border: ['', '', '', ''], isPlaceholder};
+
+    if(isPlaceholder == false) {
+      if (this.grids[this.grids.length + layer] == undefined) {
+        this.addLevel();
+      }
+      this.addEvacuationZoneAcross(layer + 1, colCount, rowCount, true);
+    }
   }
 
-  private addEvacuationZoneUpright(colCount: number, rowCount: number) {
-    this.grids[0][rowCount][colCount] = {name: 'evacuationZoneUpright_00', border: ['black', '', '', 'black']};
-    this.grids[0][rowCount][colCount + 1] = {name: 'evacuationZoneUpright_01', border: ['black', '', '', '']};
-    this.grids[0][rowCount][colCount + 2] = {name: 'evacuationZoneUpright_02', border: ['black', 'black', '', '']};
-    this.grids[0][rowCount + 1][colCount + 2] = {name: 'evacuationZoneUpright_12', border: ['', 'black', '', '']};
-    this.grids[0][rowCount + 2][colCount + 2] = {name: 'evacuationZoneUpright_22', border: ['', 'black', '', '']};
-    this.grids[0][rowCount + 3][colCount + 2] = {name: 'evacuationZoneUpright_32', border: ['', 'black', 'black', '']};
-    this.grids[0][rowCount + 3][colCount + 1] = {name: 'evacuationZoneUpright_31', border: ['', '', 'black', '']};
-    this.grids[0][rowCount + 3][colCount] = {name: 'evacuationZoneUpright_30', border: ['', '', 'black', 'black']};
-    this.grids[0][rowCount + 2][colCount] = {name: 'evacuationZoneUpright_20', border: ['', '', '', 'black']};
-    this.grids[0][rowCount + 1][colCount] = {name: 'evacuationZoneUpright_10', border: ['', '', '', 'black']};
-    this.grids[0][rowCount + 1][colCount + 1] = {name: 'evacuationZoneUpright_11', border: ['', '', '', '']};
-    this.grids[0][rowCount + 2][colCount + 1] = {name: 'evacuationZoneUpright_21', border: ['', '', '', '']};
+  private addEvacuationZoneUpright(layer: number, colCount: number, rowCount: number, isPlaceholder: boolean = false) {
+    this.grids[layer][rowCount][colCount] = {name: 'evacuationZoneUpright_00', border: ['black', '', '', 'black'], isPlaceholder};
+    this.grids[layer][rowCount][colCount + 1] = {name: 'evacuationZoneUpright_01', border: ['black', '', '', ''], isPlaceholder};
+    this.grids[layer][rowCount][colCount + 2] = {name: 'evacuationZoneUpright_02', border: ['black', 'black', '', ''], isPlaceholder};
+    this.grids[layer][rowCount + 1][colCount + 2] = {name: 'evacuationZoneUpright_12', border: ['', 'black', '', ''], isPlaceholder};
+    this.grids[layer][rowCount + 2][colCount + 2] = {name: 'evacuationZoneUpright_22', border: ['', 'black', '', ''], isPlaceholder};
+    this.grids[layer][rowCount + 3][colCount + 2] = {name: 'evacuationZoneUpright_32', border: ['', 'black', 'black', ''], isPlaceholder};
+    this.grids[layer][rowCount + 3][colCount + 1] = {name: 'evacuationZoneUpright_31', border: ['', '', 'black', ''], isPlaceholder};
+    this.grids[layer][rowCount + 3][colCount] = {name: 'evacuationZoneUpright_30', border: ['', '', 'black', 'black'], isPlaceholder};
+    this.grids[layer][rowCount + 2][colCount] = {name: 'evacuationZoneUpright_20', border: ['', '', '', 'black'], isPlaceholder};
+    this.grids[layer][rowCount + 1][colCount] = {name: 'evacuationZoneUpright_10', border: ['', '', '', 'black'], isPlaceholder};
+    this.grids[layer][rowCount + 1][colCount + 1] = {name: 'evacuationZoneUpright_11', border: ['', '', '', ''], isPlaceholder};
+    this.grids[layer][rowCount + 2][colCount + 1] = {name: 'evacuationZoneUpright_21', border: ['', '', '', ''], isPlaceholder};
   }
 
   enterTrash() {
@@ -429,6 +424,7 @@ export class CreateEditComponent {
       image: undefined,
       paths: undefined,
       rotation: 0,
+      isPlaceholder: false,
     }
   }
 
@@ -492,6 +488,10 @@ export class CreateEditComponent {
         multiplier = 4.3904;
 
       } else {
+        if (!currentTile.paths) {
+          return;
+        }
+
         let tileRotation = currentTile.rotation!;
         let tileWay = currentTile.paths!.find((path: { from: number, to: number }) => orientation === (path.from + tileRotation) % 4)
         if (tileWay !== undefined) {
@@ -507,5 +507,35 @@ export class CreateEditComponent {
     if (loopCount >= 1000) {
       this.totalPoints = 'Ihre Bahn erzeugt eine Schleife. Parkour nicht zugelassen!'
     }
+  }
+
+  changeLevel(direction : string) {
+    if(direction == 'up' && this.layer < 5) {
+      this.layer++;
+      this.addLevel();
+
+    } else if (direction == 'down' && this.layer > 0) {
+      this.layer--;
+    }
+  }
+
+  addLevel() {
+    let tempgrid :  Array<Array<Tile>> = [];
+
+    for (let i = 0; i < TileCount; i++) {
+      let row: Array<Tile> = [];
+      for (let j = 0; j < TileCount; j++) {
+        row.push(this.newTile());
+      }
+      tempgrid.push(row);
+    }
+    this.grids.push(tempgrid);
+  }
+
+  layerChange(layer: number, rowCount: number, colCount: number, tile: Tile) {
+    if (this.grids[this.grids.length + this.layer] == undefined) {
+      this.addLevel()
+    }
+      this.grids[layer + 1][rowCount][colCount] = {...tile , isPlaceholder: true};
   }
 }
