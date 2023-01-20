@@ -7,7 +7,7 @@
   <div (contextmenu)="onRightClick(1)" *ngIf="this.tile!.border[1]" class="h-100" style="width: 20px;"></div>
 </div>
 
-<img *ngIf="tile?.image" [@rotatedState]='state' [src]="tile?.image" class="w-100" (contextmenu)="onRightClick()">
+<img [ngClass]="{'isPlaceholder': tile?.isPlaceholder}" *ngIf="tile?.image" [@rotatedState]='state' [src]="tile?.image" class="w-100" (contextmenu)="onRightClick()">
 
 <div *ngIf="tile?.name!.includes('evacuationZoneAcross') && tile?.isBeingDragged" class="draggedTileAcross"></div>
 <div *ngIf="tile?.name!.includes('evacuationZoneUpright') && tile?.isBeingDragged" class="draggedTileUpright"></div>

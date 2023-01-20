@@ -159,8 +159,10 @@ export class CreateEditComponent {
   }
 
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
-    if ($event.previousContainer.data && !this.grids[0][rowCount][colCount].name.includes('evacuationZone')) {
+    if ($event.previousContainer.data && !this.grids[this.layer][rowCount][colCount].name.includes('evacuationZone')) {
       this.grids[this.layer][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
+      this.layerChange(this.layer,rowCount,colCount, {...$event.previousContainer.data[$event.previousIndex]});
+
       if (this.grids[this.layer][rowCount][colCount].name.includes('start')) {
         if (this.startPosition.x != -1) {
           this.grids[this.layer][this.startPosition.y][this.startPosition.x] = this.newTile();
@@ -473,6 +475,10 @@ export class CreateEditComponent {
         multiplier = 4.3904;
 
       } else {
+        if (!currentTile.paths) {
+          return;
+        }
+
         let tileRotation = currentTile.rotation!;
         let tileWay = currentTile.paths!.find((path: { from: number, to: number }) => orientation === (path.from + tileRotation) % 4)
         if (tileWay !== undefined) {
@@ -493,23 +499,44 @@ export class CreateEditComponent {
   changeLevel(direction : string) {
     if(direction == 'up' && this.layer < 5) {
       this.layer++;
+      this.addLevel();
 
-      if (this.grids.length == this.layer) {
-        let tempgrid :  Array<Array<Tile>> = [];
-
-        for (let i = 0; i < TileCount; i++) {
-          let row: Array<Tile> = [];
-          for (let j = 0; j < TileCount; j++) {
-            row.push(this.newTile());
-          }
-          tempgrid.push(row);
-        }
-
-        this.grids.push(tempgrid);
-      }
     } else if (direction == 'down' && this.layer > 0) {
       this.layer--;
     }
   }
 
+  addLevel() {
+    let tempgrid :  Array<Array<Tile>> = [];
+
+    for (let i = 0; i < TileCount; i++) {
+      let row: Array<Tile> = [];
+      for (let j = 0; j < TileCount; j++) {
+        row.push(this.newTile());
+      }
+      tempgrid.push(row);
+    }
+    this.grids.push(tempgrid);
+  }
+
+  layerChange(layer: number, rowCount: number, colCount: number, tile: Tile) : boolean {
+
+    tile.isPlaceholder = true;
+
+    if (this.grids[this.grids.length + this.layer] == undefined) {
+      this.addLevel()
+    }
+
+    if ( layer == 0 && this.grids[layer + 1][rowCount][colCount].name == '') {
+      this.grids[layer + 1][rowCount][colCount] = tile;
+      return true;
+    }
+    else if ( this.grids[1] != undefined && this.grids[layer + 1 ][rowCount][colCount].name == '' && this.grids[layer - 1][rowCount][colCount].name == '') {
+      this.grids[layer - 1][rowCount][colCount] = tile;
+      this.grids[layer + 1][rowCount][colCount] = tile;
+      return true;
+    }
+
+    return false;
+  }
 }
