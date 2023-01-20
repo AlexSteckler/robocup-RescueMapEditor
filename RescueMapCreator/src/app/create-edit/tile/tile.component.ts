@@ -51,7 +51,7 @@ export class TileComponent implements OnInit{
     if (this.tile?.name.includes('evacuationZone') && position != -1) {
       this.colorSwap(position);
     }
-    else {
+    else if (!this.tile?.isPlaceholder) {
       this.tile!.rotation = (this.tile!.rotation! + 1) % 4;
       this.state = this.tile?.rotation.toString()!;
     }

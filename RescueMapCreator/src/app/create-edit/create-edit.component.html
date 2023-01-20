@@ -59,22 +59,24 @@
   </div>
 
   <div class="col-7 position-relative p-0 m-3">
-    <div class="p-2">
-      <button class="me-1" (click)="changeLevel('up')">Ebene höher</button>
-      <button (click)="changeLevel('down')">Ebene tiefer</button>
-      <span class="ps-1">{{layer}}</span>
+    <div class="p-2 d-flex w-100 justify-content-end">
+      <button class="me-1" (click)="changeLevel('down')">Ebene tiefer</button>
+      <button (click)="changeLevel('up')">Ebene höher</button>
     </div>
     <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
       <div #canvas>
         <div *ngFor="let level of grids; let levelCount = index" class="level">
           <div *ngIf="levelCount == layer">
+
             <div *ngFor="let row of level; let rowCount = index" class="row d-flex flex-nowrap">
+
               <app-tile *ngFor="let tile of row; let colCount = index"
                         (contextmenu)="disableContext($event)"
                         [class.white]="tile.id"
                         [canvasValues]="canvasValues"
                         [(evacuationZone)]="evacuation"
                         (rotationChange)="calcTotalPoints()"
+                        (rotationChange)="layerChange(levelCount, rowCount, colCount, tile)"
                         [position]="{x: colCount, y: rowCount}"
                         [tile]="tile"
                         cdkDropList
@@ -95,6 +97,12 @@
     <div *ngIf="tileIsDragged" id="trashbin" class="d-flex align-items-center justify-content-center">
       <div class="rounded border border-3 p-2 base-bg" (mouseover)="enterTrash()" (mouseleave)="outTrash()">
         <i class="bi bi-trash-fill"></i>
+      </div>
+    </div>
+
+    <div class="w-100 d-flex justify-content-end position-absolute">
+      <div class="p-3 base-color fs-5 ">
+        Ebene: {{layer}}
       </div>
     </div>
 

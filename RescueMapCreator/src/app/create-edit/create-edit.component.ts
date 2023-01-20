@@ -412,6 +412,7 @@ export class CreateEditComponent {
       image: undefined,
       paths: undefined,
       rotation: 0,
+      isPlaceholder: false,
     }
   }
 
@@ -521,20 +522,32 @@ export class CreateEditComponent {
 
   layerChange(layer: number, rowCount: number, colCount: number, tile: Tile) : boolean {
 
-    tile.isPlaceholder = true;
+    let newTile = {...tile};
+    newTile.isPlaceholder = true;
 
     if (this.grids[this.grids.length + this.layer] == undefined) {
       this.addLevel()
     }
 
-    if ( layer == 0 && this.grids[layer + 1][rowCount][colCount].name == '') {
-      this.grids[layer + 1][rowCount][colCount] = tile;
-      return true;
+    if (layer == 0) {
+      console.log(this.grids[layer+1][rowCount][colCount]);
+      if (this.grids[layer + 1][rowCount][colCount].name == '') {
+        this.grids[layer + 1][rowCount][colCount] = newTile;
+      }
+      if (this.grids[layer][rowCount][colCount].rotation != this.grids[layer+1][rowCount][colCount].rotation) {
+        this.grids[layer + 1][rowCount][colCount] = newTile;
+      }
     }
-    else if ( this.grids[1] != undefined && this.grids[layer + 1 ][rowCount][colCount].name == '' && this.grids[layer - 1][rowCount][colCount].name == '') {
-      this.grids[layer - 1][rowCount][colCount] = tile;
-      this.grids[layer + 1][rowCount][colCount] = tile;
-      return true;
+
+    else if (this.grids[layer + 1 ][rowCount][colCount].name == '' && this.grids[layer - 1][rowCount][colCount].name == '') {
+      console.log('3');
+      this.grids[this.layer - 1][rowCount][colCount] = newTile;
+      this.grids[this.layer + 1][rowCount][colCount] = newTile;
+    }
+    else if (tile.rotation == this.grids[layer][rowCount][colCount].rotation) {
+      console.log('4');
+      this.grids[this.layer - 1][rowCount][colCount] = newTile;
+      this.grids[this.layer + 1][rowCount][colCount] = newTile;
     }
 
     return false;
