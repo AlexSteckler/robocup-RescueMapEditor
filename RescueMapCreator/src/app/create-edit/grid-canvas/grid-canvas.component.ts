@@ -160,9 +160,9 @@ export class GridCanvasComponent {
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
 
     let tile = this.grids[this.layer][rowCount][colCount];
-    this.toastr.warning(`Teilnehmer wurde nicht hinzugefügt`, 'Hinzufügen abgebrochen');
-    if (this.grids[this.layer + 1] != undefined && this.grids[this.layer + 1][rowCount][colCount].name != '')  {
 
+    if (this.grids[this.layer + 1] != undefined && this.grids[this.layer + 1][rowCount][colCount].name != '' && !this.grids[this.layer + 1][rowCount][colCount].isPlaceholder)  {
+      this.toastr.warning(`Es existiert eine Kachel eine Ebene darüber`, 'Darf nicht platziert werden');
     } else if ($event.previousContainer.data && !tile.name.includes('evacuationZone') && !tile.isPlaceholder) {
       this.grids[this.layer][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
       this.addPlaceholder(this.layer,rowCount,colCount, {...$event.previousContainer.data[$event.previousIndex]});
