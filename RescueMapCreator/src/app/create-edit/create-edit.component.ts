@@ -1,7 +1,7 @@
 import {Component, ElementRef, HostListener, ViewChild} from '@angular/core';
 import {CdkDragDrop, CdkDragEnd, CdkDragStart} from "@angular/cdk/drag-drop";
 import {Tile} from "./tile/dto/tile.dto";
-import panzoom, {Transform} from 'panzoom';
+import panzoom, {PanZoom, Transform} from 'panzoom';
 import {TilesService} from './tile/tiles.service';
 import {DomSanitizer} from "@angular/platform-browser";
 import {Evacuation} from './tile/dto/evacuation.dto';
@@ -19,51 +19,35 @@ export class CreateEditComponent {
   @ViewChild('canvas') canvasElement: ElementRef | undefined;
   @ViewChild('canvas_wrapper') canvasWrapperElement: ElementRef | undefined;
 
-  zoomScale = 1;
-  canvasValues: Transform | undefined;
-
-  public innerHeight: any;
-
-  altActive: Boolean = false;
-  deleteActive: Boolean = false;
-
   @HostListener('window:resize', ['$event'])
   onResize() {
     this.innerHeight = window.innerHeight -300;
   }
 
-  zoomFactor = 0.05;
+  innerHeight: number = 0;
+
+  canvasValues: Transform | undefined;
   panzoomCanvas: any = null;
 
+  altActive: Boolean = false;
+  deleteActive: Boolean = false;
   tileIsDragged: boolean = false;
   isInTrash: boolean = false;
+  currentDraggedTile: Tile | undefined;
 
   tiles: Tile[] = [];
   greenTiles: Tile[] = [];
+  grids: Array<Array<Array<Tile>>> = [];
 
   evacuation: Evacuation = this.getEvacuationDto(-1, -1);
-
-  grids: Array<Array<Array<Tile>>> = [
-    [],
-  ];
-
-  currentDraggedTile: Tile | undefined;
-
   startPosition: { x: number, y: number } = {x: -1, y: -1};
 
   totalPoints: string = '';
-
   layer: number = 0;
 
-  constructor(private tilesService: TilesService,
-              private sanitizer: DomSanitizer) {
-    for (let i = 0; i < TileCount; i++) {
-      let row: Array<Tile> = [];
-      for (let j = 0; j < TileCount; j++) {
-        row.push(this.newTile());
-      }
-      this.grids[0].push(row);
-    }
+  constructor(private tilesService: TilesService, private sanitizer: DomSanitizer) {
+    this.addLayer();
+
     //keypress event
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Control') {
@@ -109,99 +93,97 @@ export class CreateEditComponent {
       minZoom: 0.5,
     });
 
-    if (this.panzoomCanvas != null) {
       this.panzoomCanvas.on('transform', (e: any) => {
 
-        this.canvasValues = this.panzoomCanvas.getTransform();
-        if (this.canvasValues != undefined) {
-          if (this.canvasValues.scale >= 1) {
-            if (this.canvasValues.x > OutsideDrag) {
-              this.panzoomCanvas.moveTo(OutsideDrag, this.canvasValues.y);
-            }
+      this.canvasValues = this.panzoomCanvas.getTransform();
 
-            if (this.canvasValues.y > OutsideDrag) {
-              this.panzoomCanvas.moveTo(this.canvasValues.x, OutsideDrag);
-            }
+      const nativeElement = this.canvasWrapperElement!.nativeElement;
+      const scale = this.canvasValues!.scale;
+      const x = this.canvasValues!.x;
+      const y = this.canvasValues!.y;
 
-            if (this.canvasValues.x < this.canvasWrapperElement?.nativeElement.offsetWidth - (TileCount * 100 * this.canvasValues.scale) - OutsideDrag) {
-              this.panzoomCanvas.moveTo(this.canvasWrapperElement?.nativeElement.offsetWidth - (TileCount * 100 * this.canvasValues.scale) - OutsideDrag, this.canvasValues.y);
-            }
-
-            if (this.canvasValues.y < this.canvasWrapperElement?.nativeElement.offsetHeight - (TileCount * 100 * this.canvasValues.scale) - OutsideDrag) {
-              this.panzoomCanvas.moveTo(this.canvasValues.x, this.canvasWrapperElement?.nativeElement.offsetHeight - (TileCount * 100 * this.canvasValues.scale) - OutsideDrag);
-            }
-          } else {
-            const reference = 500 * this.canvasValues.scale;
-
-            if (this.canvasValues.x < TileCount * 100 * -this.canvasValues.scale + 500 * this.canvasValues.scale) {
-              this.panzoomCanvas.moveTo(TileCount * 100 * -this.canvasValues.scale + 500 * this.canvasValues.scale, this.canvasValues.y);
-            }
-
-            if (this.canvasValues.y < TileCount * 100 * -this.canvasValues.scale + 500 * this.canvasValues.scale) {
-              this.panzoomCanvas.moveTo(this.canvasValues.x, TileCount * 100 * -this.canvasValues.scale + 500 * this.canvasValues.scale);
-            }
-
-            if (this.canvasValues.x > this.canvasWrapperElement?.nativeElement.offsetWidth - reference) {
-              this.panzoomCanvas.moveTo(this.canvasWrapperElement?.nativeElement.offsetWidth - reference, this.canvasValues.y);
-            }
-
-            if (this.canvasValues.y > this.canvasWrapperElement?.nativeElement.offsetHeight - reference) {
-              this.panzoomCanvas.moveTo(this.canvasValues.x, this.canvasWrapperElement?.nativeElement.offsetHeight - reference);
-            }
+      if (this.canvasValues != undefined) {
+        if (this.canvasValues.scale >= 1) {
+          if (x > OutsideDrag) {
+            this.panzoomCanvas.moveTo(OutsideDrag, y);
           }
 
-          this.zoomScale = this.canvasValues.scale;
+          if (y > OutsideDrag) {
+            this.panzoomCanvas.moveTo(x, OutsideDrag);
+          }
+
+          if (x < nativeElement.offsetWidth - (TileCount * 100 * scale) - OutsideDrag) {
+            this.panzoomCanvas.moveTo(nativeElement.offsetWidth - (TileCount * 100 * scale) - OutsideDrag, y);
+          }
+
+          if (y < nativeElement.offsetHeight - (TileCount * 100 * scale) - OutsideDrag) {
+            this.panzoomCanvas.moveTo(x, nativeElement.offsetHeight - (TileCount * 100 * scale) - OutsideDrag);
+          }
+        } else {
+          const reference = 500 * scale;
+
+          if (x < TileCount * 100 * - scale + 500 * scale) {
+            this.panzoomCanvas.moveTo(TileCount * 100 * - scale + 500 * scale, y);
+          }
+
+          if (y < TileCount * 100 * - scale + 500 * scale) {
+            this.panzoomCanvas.moveTo(x, TileCount * 100 * - scale + 500 * scale);
+          }
+
+          if (x > nativeElement.offsetWidth - reference) {
+            this.panzoomCanvas.moveTo(nativeElement.offsetWidth - reference, y);
+          }
+
+          if (y > nativeElement.offsetHeight - reference) {
+            this.panzoomCanvas.moveTo(x, nativeElement.offsetHeight - reference);
+          }
         }
-      });
-    }
+      }
+    });
 
     this.panzoomCanvas.setZoomSpeed(0.05);
   }
 
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
-    if ($event.previousContainer.data && !this.grids[this.layer][rowCount][colCount].name.includes('evacuationZone') && !this.grids[this.layer][rowCount][colCount].isPlaceholder) {
+
+    let tile = this.grids[this.layer][rowCount][colCount];
+
+    if ($event.previousContainer.data && !tile.name.includes('evacuationZone') && !tile.isPlaceholder) {
       this.grids[this.layer][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
-      this.layerChange(this.layer,rowCount,colCount, {...$event.previousContainer.data[$event.previousIndex]});
+      this.addPlaceholder(this.layer,rowCount,colCount, {...$event.previousContainer.data[$event.previousIndex]});
 
       if (this.grids[this.layer][rowCount][colCount].name.includes('start')) {
         if (this.startPosition.x != -1) {
           this.grids[this.layer][this.startPosition.y][this.startPosition.x] = this.newTile();
         }
+
         this.startPosition = {x: colCount, y: rowCount};
-
       }
-    } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4 && !this.grids[this.layer][rowCount][colCount].name.includes('evacuationZone')) {
-      this.addEvacuationZoneAcross(this.layer,colCount, rowCount);
 
+    } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4 && !tile.name.includes('evacuationZone')) {
+      this.addEvacuationZoneAcross(this.layer,colCount, rowCount);
       this.evacuation = this.getEvacuationDto(colCount, rowCount);
+
     } else if ($event.previousIndex == 1) {
       this.addEvacuationZoneUpright(this.layer, colCount, rowCount);
       this.evacuation = this.getEvacuationDto(colCount, rowCount);
     }
+
     this.calcTotalPoints();
   }
 
-
-  pausePanzoom() {
-    this.panzoomCanvas.pause();
-  }
-
-  resumePanzoom() {
-    this.panzoomCanvas.resume();
-  }
-
-  exited(event: any) {
-    const currentIdx = this.tiles.findIndex(
+  exited() {
+    const currentIndex = this.tiles.findIndex(
       (tile: Tile) => tile.id === this.currentDraggedTile?.id
     );
-    this.tiles.splice(currentIdx + 1, 0, ({
+    this.tiles.splice(currentIndex + 1, 0, ({
       ...this.currentDraggedTile,
       temp: true
     }) as Tile);
   }
 
   entered() {
-    this.tiles = this.tiles.filter((f: any) => !f.temp);
+    this.tiles = this.tiles.filter((tile: Tile) => !tile.temp);
   }
 
   draggedStart(tile: Tile) {
@@ -210,10 +192,10 @@ export class CreateEditComponent {
 
   draggedEnd(tile: Tile) {
     tile.temp = false;
-    this.tiles = this.tiles.filter((f: any) => !f.temp);
+    this.tiles = this.tiles.filter((tile: Tile) => !tile.temp);
   }
 
-  dragStartMovement(tile: Tile, $event: CdkDragStart, rowCount: number, colCount: number, levelCount: number) {
+  dragStartMovement(tile: Tile) {
     this.currentDraggedTile = tile;
     tile.isBeingDragged = true;
     this.tileIsDragged = true;
@@ -223,10 +205,9 @@ export class CreateEditComponent {
     }
   }
 
-  dragEndMovement(tile: Tile, $event: CdkDragEnd, rowCount: number, colCount: number, levelCount: number) {
-
+  dragEndMovement(tile: Tile, $event: CdkDragEnd, rowCount: number, colCount: number, layerCount: number) {
     tile.isBeingDragged = false;
-    let zoomFactor = this.panzoomCanvas.getTransform().scale;
+
     let x = $event.distance.x;
     let y = $event.distance.y;
 
@@ -235,98 +216,60 @@ export class CreateEditComponent {
       const yDirection = y > 0 ? 1 : -1;
       x *= xDirection;
       y *= yDirection;
-      x /= zoomFactor;
-      y /= zoomFactor;
-      let xMove = (Math.floor((x - 50) / 100) + 1) * xDirection
-      let yMove = (Math.floor((y - 50) / 100) + 1) * yDirection
+      x /= this.canvasValues!.scale;
+      y /= this.canvasValues!.scale;
+
+      let newX = (Math.floor((x - 50) / 100) + 1) * xDirection + colCount;
+      let newY = (Math.floor((y - 50) / 100) + 1) * yDirection + rowCount;
 
       if (tile.name.includes('evacuationZone')) {
-        //delay to allow the tile to be removed from the grid
-        this.evacuation!.position! = {x: colCount + xMove, y: rowCount + yMove};
+        this.evacuation!.position! = {x: newX, y: newY};
 
         let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
         let y = +tile.name.substring(tile.name.length - 1)
 
         setTimeout(() => {
-          if (((rowCount + yMove >= 0
-                && rowCount + yMove < TileCount - 3
-                && colCount + xMove >= 0
-                && colCount + xMove < TileCount - 4)
-              || this.isInTrash)
-            && tile.name.includes('Upright')
-          ) {
-            for (let i = 0; i < 3; i++) {
-              for (let j = 0; j < 4; j++) {
-                this.grids[levelCount][rowCount + j - x][colCount + i - y] = this.newTile();
-                this.grids[levelCount + 1][rowCount + j - x][colCount + i - y] = this.newTile();
-              }
-            }
-            if (!this.isInTrash) {
-              this.evacuation = this.getEvacuationDto(colCount + xMove, rowCount + yMove);
-              this.addEvacuationZoneUpright(this.layer,colCount + xMove, rowCount + yMove);
-            } else {
-              this.evacuation = this.getEvacuationDto(-1, -1);
-            }
-          }
+          const evacuationX = tile.name.includes('Upright') ? 2 : 3;
+          const evacuationY = tile.name.includes('Upright') ? 3 : 2;
 
-          if (((rowCount + yMove >= 0
-                && rowCount + yMove < TileCount - 2
-                && colCount + xMove >= 0
-                && colCount + xMove < TileCount - 3)
-              || this.isInTrash)
-            && tile.name.includes('Across')
-          ) {
-            for (let i = 0; i < 4; i++) {
-              for (let j = 0; j < 3; j++) {
-                this.grids[levelCount][rowCount + j - x][colCount + i - y] = this.newTile();
-                this.grids[levelCount + 1][rowCount + j - x][colCount + i - y] = this.newTile();
-              }
-            }
+          if ((newY >= 0 && newY < TileCount - evacuationY && newX >= 0 && newX < TileCount - evacuationX) || this.isInTrash) {
+            this.deleteEvacuationZone(layerCount, rowCount - x, colCount - y);
             if (!this.isInTrash) {
-              this.evacuation = this.getEvacuationDto(colCount + xMove, rowCount + yMove,);
-              this.addEvacuationZoneAcross(this.layer, colCount + xMove, rowCount + yMove,);
-            } else {
-              this.evacuation = this.getEvacuationDto(-1, -1);
+              this.addEvacuationZoneUpright(this.layer,newX, newY);
             }
           }
         }, 10);
 
-
       } else if (
-        rowCount + yMove >= 0
-        && rowCount + yMove < TileCount
-        && colCount + xMove >= 0
-        && colCount + xMove < TileCount
-        && !this.grids[levelCount][rowCount + yMove][colCount + xMove].name.includes('evacuationZone')
-        && !this.grids[this.layer][rowCount + yMove][colCount + xMove].isPlaceholder
-      ) {
+        newY >= 0 && newY < TileCount && newX >= 0 && newX < TileCount
+        && !this.grids[layerCount][newY][newX].name.includes('evacuationZone')
+        && !this.grids[this.layer][newY][newX].isPlaceholder) {
 
         if (!this.isInTrash) {
-          this.grids[levelCount][rowCount + yMove][colCount + xMove] = {...tile};
-          this.layerChange(levelCount, rowCount + yMove, colCount + xMove, {...tile});
+          this.grids[layerCount][newY][newX] = {...tile};
+          this.addPlaceholder(layerCount, newY, newX, {...tile});
 
-          if (this.grids[levelCount][rowCount][colCount].name.includes('start')) {
-            this.startPosition = {x: colCount + xMove, y: rowCount + yMove};
+          if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
+            this.startPosition = {x: newX, y: newY};
           }
-        } else {
-          if (this.grids[levelCount][rowCount][colCount].name.includes('start')) {
+        } else if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
             this.startPosition = {x: -1, y: -1};
-          }
         }
 
         if (!this.altActive) {
-          this.grids[levelCount][rowCount][colCount] = this.newTile();
-          this.grids[levelCount + 1][rowCount][colCount] = this.newTile();
+          this.grids[layerCount][rowCount][colCount] = this.newTile();
+          this.addPlaceholder(layerCount, rowCount, colCount, this.newTile());
         }
       } else {
         setTimeout(() => {
           if (this.isInTrash) {
-            if (this.grids[levelCount][rowCount][colCount].name.includes('start')) {
+            if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
               this.startPosition = {x: -1, y: -1};
             }
-            this.grids[levelCount][rowCount][colCount] = this.newTile();
+            this.grids[layerCount][rowCount][colCount] = this.newTile();
+            this.addPlaceholder(layerCount, rowCount, colCount, this.newTile());
           }
-        }, 50);
+        }, 30);
       }
     }
     setTimeout(() => {
@@ -338,21 +281,23 @@ export class CreateEditComponent {
   }
 
   dragConstrainPoint = (point: any, dragRef: any) => {
-
     let zoomMoveXDifference = 0;
     let zoomMoveYDifference = 0;
+    let scale = this.canvasValues!.scale;
 
-    if (this.zoomScale != 1) {
-      zoomMoveXDifference = (1 - this.zoomScale) * dragRef.getFreeDragPosition().x;
-      zoomMoveYDifference = (1 - this.zoomScale) * dragRef.getFreeDragPosition().y;
+    if (scale != 1) {
+      zoomMoveXDifference = (1 - scale) * dragRef.getFreeDragPosition().x;
+      zoomMoveYDifference = (1 - scale) * dragRef.getFreeDragPosition().y;
     }
     return {
-      x: point.x + zoomMoveXDifference - this.zoomScale * 50,
-      y: point.y + zoomMoveYDifference - this.zoomScale * 50
+      x: point.x + zoomMoveXDifference - scale * 50,
+      y: point.y + zoomMoveYDifference - scale * 50
     };
-  };
+  }
 
   private addEvacuationZoneAcross(layer: number, colCount: number, rowCount: number, isPlaceholder: boolean = false) {
+    this.evacuation = this.getEvacuationDto(colCount, rowCount);
+
     this.grids[layer][rowCount][colCount] = {name: 'evacuationZoneAcross_00', border: ['black', '', '', 'black'], isPlaceholder};
     this.grids[layer][rowCount][colCount + 1] = {name: 'evacuationZoneAcross_01', border: ['black', '', '', ''], isPlaceholder};
     this.grids[layer][rowCount][colCount + 2] = {name: 'evacuationZoneAcross_02', border: ['black', '', '', ''], isPlaceholder};
@@ -368,13 +313,15 @@ export class CreateEditComponent {
 
     if(isPlaceholder == false) {
       if (this.grids[this.grids.length + layer] == undefined) {
-        this.addLevel();
+        this.addLayer();
       }
       this.addEvacuationZoneAcross(layer + 1, colCount, rowCount, true);
     }
   }
 
   private addEvacuationZoneUpright(layer: number, colCount: number, rowCount: number, isPlaceholder: boolean = false) {
+    this.evacuation = this.getEvacuationDto(colCount, rowCount);
+
     this.grids[layer][rowCount][colCount] = {name: 'evacuationZoneUpright_00', border: ['black', '', '', 'black'], isPlaceholder};
     this.grids[layer][rowCount][colCount + 1] = {name: 'evacuationZoneUpright_01', border: ['black', '', '', ''], isPlaceholder};
     this.grids[layer][rowCount][colCount + 2] = {name: 'evacuationZoneUpright_02', border: ['black', 'black', '', ''], isPlaceholder};
@@ -387,22 +334,25 @@ export class CreateEditComponent {
     this.grids[layer][rowCount + 1][colCount] = {name: 'evacuationZoneUpright_10', border: ['', '', '', 'black'], isPlaceholder};
     this.grids[layer][rowCount + 1][colCount + 1] = {name: 'evacuationZoneUpright_11', border: ['', '', '', ''], isPlaceholder};
     this.grids[layer][rowCount + 2][colCount + 1] = {name: 'evacuationZoneUpright_21', border: ['', '', '', ''], isPlaceholder};
+
+    if(isPlaceholder == false) {
+      if (this.grids[this.grids.length + layer] == undefined) {
+        this.addLayer();
+      }
+      this.addEvacuationZoneUpright(layer + 1, colCount, rowCount, true);
+    }
   }
 
-  enterTrash() {
-    this.isInTrash = true;
-  }
+  deleteEvacuationZone(layerCount: number, rowCount: number, colCount: number) {
+    this.evacuation = this.getEvacuationDto(-1, -1);
+    const upright: boolean = this.grids[layerCount][rowCount][colCount].name.includes('Upright');
 
-  outTrash() {
-    this.isInTrash = false;
-  }
-
-  falseEnter() {
-    return false;
-  }
-
-  disableContext(event: MouseEvent) {
-    event.preventDefault();
+    for (let i = 0; i < (upright ? 3 : 4); i++) {
+      for (let j = 0; j < (upright ? 4 : 3); j++) {
+        this.grids[layerCount][rowCount + j][colCount + i] = this.newTile();
+        this.grids[layerCount + 1][rowCount + j][colCount + i] = this.newTile();
+      }
+    }
   }
 
   getEvacuationDto(x: number, y: number) {
@@ -440,7 +390,7 @@ export class CreateEditComponent {
     let currentPosition = {...this.startPosition};
     let orientation = (this.grids[0][currentPosition.y][currentPosition.x].rotation!
         + this.grids[0][currentPosition.y][currentPosition.x].paths!.find((path: { from: number, to: number }) => path.from === -1)!.to + 2)
-      % 4;
+        % 4;
     this.totalPoints = currentPoints.toString();
 
     let multiplier : number = 1;
@@ -509,17 +459,17 @@ export class CreateEditComponent {
     }
   }
 
-  changeLevel(direction : string) {
+  buttonLayerChange(direction : string) {
     if(direction == 'up' && this.layer < 5) {
       this.layer++;
-      this.addLevel();
+      this.addLayer();
 
     } else if (direction == 'down' && this.layer > 0) {
       this.layer--;
     }
   }
 
-  addLevel() {
+  addLayer() {
     let tempgrid :  Array<Array<Tile>> = [];
 
     for (let i = 0; i < TileCount; i++) {
@@ -532,10 +482,22 @@ export class CreateEditComponent {
     this.grids.push(tempgrid);
   }
 
-  layerChange(layer: number, rowCount: number, colCount: number, tile: Tile) {
+  addPlaceholder(layer: number, rowCount: number, colCount: number, tile: Tile) {
     if (this.grids[this.grids.length + this.layer] == undefined) {
-      this.addLevel()
+      this.addLayer()
     }
       this.grids[layer + 1][rowCount][colCount] = {...tile , isPlaceholder: true};
+  }
+
+  pausePanzoom() {
+    this.panzoomCanvas.pause();
+  }
+
+  resumePanzoom() {
+    this.panzoomCanvas.resume();
+  }
+
+  falseEnter() {
+    return false;
   }
 }
