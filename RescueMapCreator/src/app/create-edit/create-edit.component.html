@@ -1,58 +1,11 @@
 <div class="d-flex row m-0 justify-content-between" cdkDropListGroup>
   <div class="col-4" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false" style="overflow-y: auto" [ngStyle]=" {'height.px' : innerHeight }">
-    <h2 class="p-3 fw-bold">Kacheln</h2>
-    <div class="p-3 d-flex d-flex align-content-around flex-wrap"
-        cdkDropList
-        [cdkDropListData]="tiles"
-        cdkDropListSortingDisabled
-        [cdkDropListEnterPredicate]="falseEnter"
-        #tileList
-        (cdkDropListExited)="exited()"
-        (cdkDropListEntered)="entered()">
-      <app-tile
-        [class.white]="tile.id"
-        *ngFor="let tile of tiles"
-        [tile]="tile"
-        cdkDrag
-        (cdkDragStarted)="draggedStart(tile)"
-        (cdkDragEnded)="draggedEnd(tile)"
-        [canvasValues]="canvasValues"
-        >
-        <app-tile *cdkDragPreview [tile]="tile"
-                  [canvasValues]="canvasValues"
-                  [ngStyle]="{'width.px': 100 * canvasValues!.scale, 'height.px': 100 * canvasValues!.scale}"
-        ></app-tile>
-      </app-tile>
-    </div>
-
-    <h3>Opferraum</h3>
-    <div *ngIf="!evacuationExists" class="p-3" cdkDropList cdkDropListSortingDisabled [cdkDropListEnterPredicate]="falseEnter">
-      <div class="evacuationZone" cdkDrag>
-        <div  class="evacuationZone"
-              *cdkDragPreview
-              style="width: 500px; background-color: red;"
-              [ngStyle]="{'width.px': 400 * canvasValues!.scale, 'height.px': 300 * canvasValues!.scale}">
-        </div>
-      </div>
-      <div class="evacuationZoneUpright" cdkDrag>
-        <div  class="evacuationZoneUpright"
-              *cdkDragPreview style="width: 300px; background-color: red;"
-              [ngStyle]="{'width.px': 300 * canvasValues!.scale, 'height.px': 400 * canvasValues!.scale}">
-        </div>
-      </div>
-    </div>
-    <div *ngIf="evacuationExists">
-      -Ist gesetzt-
-    </div>
-
-    <div  class="p-3 d-flex d-flex align-content-around flex-wrap"
-          cdkDropList
-          cdkDropListSortingDisabled
-          [cdkDropListData]="greenTiles">
-      <div class="d-flex align-items-center flex-column">
-        <app-tile [canvasValues]="canvasValues" [class.white]="tile.id" *ngFor="let tile of greenTiles" class="mb-2 me-2" [tile]="tile" cdkDrag></app-tile>
-      </div>
-    </div>
+    <app-tile-selection
+      [innerHeight]="innerHeight"
+      [canvasValues]="canvasValues"
+      [currentDraggedTile]="currentDraggedTile"
+      [evacuationExists]="evacuationExists"
+    ></app-tile-selection>
   </div>
 
   <div class="col-7 position-relative p-0 m-3">

@@ -7,6 +7,7 @@ import {SettingsComponent} from './settings/settings.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {HttpClientModule} from '@angular/common/http';
 import {CreateEditModule} from './create-edit/create-edit.module';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 
 @NgModule({
@@ -21,6 +22,7 @@ import {CreateEditModule} from './create-edit/create-edit.module';
     BrowserAnimationsModule,
     HttpClientModule,
     CreateEditModule,
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -226,7 +226,7 @@ export class GridCanvasComponent {
           if ((newY >= 0 && newY < TileCount - evacuationY && newX >= 0 && newX < TileCount - evacuationX) || this.isInTrash) {
             this.deleteEvacuationZone(layerCount, rowCount - x, colCount - y);
             if (!this.isInTrash) {
-              this.addEvacuationZoneUpright(this.layer,newX, newY);
+              tile.name.includes('Upright')? this.addEvacuationZoneUpright(this.layer,newX, newY) : this.addEvacuationZoneAcross(this.layer,newX, newY)
             }
           }
         }, 10);

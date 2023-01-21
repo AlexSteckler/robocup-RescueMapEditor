@@ -5,6 +5,7 @@ import { TileComponent } from './tile/tile.component';
 import { CreateEditComponent } from './create-edit.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { GridCanvasComponent } from './grid-canvas/grid-canvas.component';
+import { TileSelectionComponent } from './tile-selection/tile-selection.component';
 
 
 @NgModule({
@@ -12,6 +13,7 @@ import { GridCanvasComponent } from './grid-canvas/grid-canvas.component';
     TileComponent,
     CreateEditComponent,
     GridCanvasComponent,
+    TileSelectionComponent,
   ],
   imports: [
     CommonModule,

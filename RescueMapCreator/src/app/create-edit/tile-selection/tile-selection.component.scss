@@ -1,0 +1,34 @@
+app-tile {
+  width: 100px;
+  height:100px;
+  padding: 0;
+  border: solid 0.1px grey;
+}
+
+#canvas-wrapper {
+  background: lightgrey;
+  overflow: hidden;
+  max-width: 100%;
+  border: solid 3px black;
+  float: right;
+}
+
+.white {
+  background-color: white;
+}
+
+.evacuationZone {
+  width: 300px;
+  height: 200px;
+  background-color: rgb(197, 197, 197);
+  padding: 0;
+  border: solid 0.1px grey;
+}
+
+.evacuationZoneUpright {
+  width: 200px;
+  height: 300px;
+  background-color: rgb(197, 197, 197);
+  padding: 0;
+  border: solid 0.1px grey;
+}
