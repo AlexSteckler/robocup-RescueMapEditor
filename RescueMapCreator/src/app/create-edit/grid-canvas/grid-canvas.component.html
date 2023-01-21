@@ -1,0 +1,61 @@
+<div class="p-2 d-flex w-100 justify-content-end">
+  <button class="me-1" (click)="buttonLayerChange('down')">Ebene tiefer</button>
+  <button (click)="buttonLayerChange('up')">Ebene höher</button>
+</div>
+<div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
+  <div #canvas>
+    <div *ngFor="let layerOfGrids of grids; let layerCount = index" class="layer">
+      <div *ngIf="layerCount == layer">
+        <div *ngFor="let row of layerOfGrids; let rowCount = index" class="row d-flex flex-nowrap">
+          <app-tile *ngFor="let tile of row; let colCount = index"
+                    (contextmenu)="$event.preventDefault();"
+                    [class.white]="tile.id"
+                    [canvasValues]="canvasValues"
+                    [(evacuationZone)]="evacuation"
+                    (tileChange)="calcTotalPoints(); addPlaceholder(layerCount, rowCount, colCount, tile)"
+                    [position]="{x: colCount, y: rowCount}"
+                    [tile]="tile"
+                    cdkDropList
+                    (cdkDropListDropped)="drop($event, rowCount, colCount)"
+                    cdkDrag
+                    [cdkDragConstrainPosition]="dragConstrainPoint"
+                    [cdkDragDisabled]="tile.id == '0' || tile.isPlaceholder"
+                    (cdkDragStarted)="dragStartMovement(tile)"
+                    (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, layerCount)"
+                    >
+          </app-tile>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="tileIsDragged" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false" class="position-absolute p-2" style="bottom: 50%;">
+  <div class="rounded border border-3 p-2 base-bg" >
+    <i class="bi bi-trash-fill"></i>
+  </div>
+</div>
+
+<div class="position-absolute p-2" style="bottom: 0px; background-color: rgba(177, 103, 12, 0.252);">
+  Gesamtpunktzahl: {{totalPoints}}
+</div>
+
+<div class="w-100 d-flex justify-content-end position-absolute">
+  <div class="p-3 base-color fs-5 ">
+    Ebene: {{layer}}
+  </div>
+</div>
+
+<div class="position-absolute float-left d-flex align-items-center justify-content-start">
+  <div class="info p-3 base-color fs-3" mat-button [matMenuTriggerFor]="afterMenu">
+    <i class="bi bi-info-circle-fill"></i>
+  </div>
+  <mat-menu #afterMenu="matMenu" xPosition="after">
+    <div class="p-2 d-flex flex-column"><span>Kachel verschieben</span><span class="base-color">'Linke Maustaste' auf Kachel halten</span></div>
+    <div class="p-2 d-flex flex-column"><span>Raster verschieben</span><span class="base-color">'Linke Maustaste' oder 'Mausrad drücken'</span></div>
+    <div class="p-2 d-flex flex-column"><span>Im Raster zoomen</span><span class="base-color">'Mausrad drehen'</span></div>
+    <div class="p-2 d-flex flex-column"><span>Kachel drehen</span><span class="base-color">'Rechtsklick' auf Kachel / Doppel-Tippen</span></div>
+    <div class="p-2 d-flex flex-column"><span>Kachel im Raster kopieren</span><span class="base-color">'STRG' beim absetzen halten</span></div>
+    <div class="p-2 d-flex flex-column"><span>Kachel löschen</span><span class="base-color">Kachel halten und in den Papierkorb schieben</span></div>
+  </mat-menu>
+</div>
