@@ -1,4 +1,3 @@
-{{canvasValues?.scale}}
 <div class="d-flex row m-0 justify-content-between" cdkDropListGroup>
   <div class="col-4" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false" style="overflow-y: auto" [ngStyle]=" {'height.px' : innerHeight }">
     <h2 class="p-3 fw-bold">Kacheln</h2>
@@ -27,7 +26,7 @@
     </div>
 
     <h3>Opferraum</h3>
-    <div *ngIf="evacuation.position.x == -1" class="p-3" cdkDropList cdkDropListSortingDisabled [cdkDropListEnterPredicate]="falseEnter">
+    <div *ngIf="!evacuationExists" class="p-3" cdkDropList cdkDropListSortingDisabled [cdkDropListEnterPredicate]="falseEnter">
       <div class="evacuationZone" cdkDrag>
         <div  class="evacuationZone"
               *cdkDragPreview
@@ -42,7 +41,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="evacuation.position.x != -1">
+    <div *ngIf="evacuationExists">
       -Ist gesetzt-
     </div>
 
@@ -59,7 +58,10 @@
   <div class="col-7 position-relative p-0 m-3">
     <app-grid-canvas
       [innerHeight]="innerHeight"
-      (canvasValuesChange)="canvasValues = $event">
+      (canvasValuesChange)="canvasValues = $event"
+      (currentDraggedTileChange)="currentDraggedTile = $event"
+      [(isInTrash)]="isInTrash"
+      (evacuationExists)="evacuationExists = $event">
 
     </app-grid-canvas>
   </div>

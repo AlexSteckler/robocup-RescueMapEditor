@@ -17,11 +17,15 @@ export class GridCanvasComponent {
   @ViewChild('canvas_wrapper') canvasWrapperElement: ElementRef | undefined;
 
   @Output() canvasValuesChange = new EventEmitter<Transform>;
+  @Output() currentDraggedTileChange = new EventEmitter<Tile>;
+  @Output() isInTrashChange = new EventEmitter<boolean>;
+  @Output() evacuationExists = new EventEmitter<boolean>;
+
+  @Input() isInTrash: boolean = false;
 
   canvasValues: Transform | undefined;
   panzoomCanvas: any = null;
   tileIsDragged: boolean = false;
-  isInTrash: boolean = false;
   currentDraggedTile: Tile | undefined;
 
   layer: number = 0;
@@ -182,9 +186,11 @@ export class GridCanvasComponent {
 
   dragStartMovement(tile: Tile) {
     this.currentDraggedTile = tile;
+    this.currentDraggedTileChange.emit(this.currentDraggedTile);
     tile.isBeingDragged = true;
     this.tileIsDragged = true;
     this.isInTrash = false;
+    this.isInTrashChange.emit(this.isInTrash);
     if (tile.id != '0') {
       this.pausePanzoom();
     }
@@ -422,6 +428,7 @@ export class GridCanvasComponent {
   }
 
   getEvacuationDto(x: number, y: number) {
+    this.evacuationExists.emit(x == -1 ? false : true)
     return {
       position: {x, y},
       exitPlaced: false,

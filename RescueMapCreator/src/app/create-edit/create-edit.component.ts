@@ -17,25 +17,16 @@ export class CreateEditComponent {
     this.innerHeight = window.innerHeight - 300;
   }
 
-  // Variable is used in both TS
-  currentDraggedTile: Tile | undefined;
-  evacuation: Evacuation = {
-    position: {x: -1, y: -1},
-    exitPlaced: false,
-    entrancePlaced: false,
-    alignment: 1,
-    exitPosition: {x: -1, y: -1, borderPosition: -1},
-    entrancePosition: {x: -1, y: -1, borderPosition: -1}
-  } as Evacuation;
-  isInTrash: boolean = false;
-
+  evacuationExists: boolean = false;
 
   tiles: Tile[] = [];
   greenTiles: Tile[] = [];
 
-  innerHeight: number = 0;
-
+  currentDraggedTile: Tile | undefined;
   canvasValues: Transform | undefined;
+
+  innerHeight: number = 0;
+  isInTrash: boolean = false;
 
   constructor(private tilesService: TilesService, private sanitizer: DomSanitizer) {
   }
@@ -85,7 +76,6 @@ export class CreateEditComponent {
   falseEnter() {
     return false;
   }
-
 }
 
 
