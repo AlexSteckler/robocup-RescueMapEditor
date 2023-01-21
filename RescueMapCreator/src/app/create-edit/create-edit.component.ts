@@ -150,7 +150,7 @@ export class CreateEditComponent {
 
     if ($event.previousContainer.data && !tile.name.includes('evacuationZone') && !tile.isPlaceholder) {
       this.grids[this.layer][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
-      this.layerChange(this.layer,rowCount,colCount, {...$event.previousContainer.data[$event.previousIndex]});
+      this.addPlaceholder(this.layer,rowCount,colCount, {...$event.previousContainer.data[$event.previousIndex]});
 
       if (this.grids[this.layer][rowCount][colCount].name.includes('start')) {
         if (this.startPosition.x != -1) {
@@ -206,9 +206,8 @@ export class CreateEditComponent {
   }
 
   dragEndMovement(tile: Tile, $event: CdkDragEnd, rowCount: number, colCount: number, layerCount: number) {
-
     tile.isBeingDragged = false;
-    let zoomFactor = this.panzoomCanvas.getTransform().scale;
+
     let x = $event.distance.x;
     let y = $event.distance.y;
 
@@ -217,88 +216,49 @@ export class CreateEditComponent {
       const yDirection = y > 0 ? 1 : -1;
       x *= xDirection;
       y *= yDirection;
-      x /= zoomFactor;
-      y /= zoomFactor;
-      let xMove = (Math.floor((x - 50) / 100) + 1) * xDirection
-      let yMove = (Math.floor((y - 50) / 100) + 1) * yDirection
+      x /= this.canvasValues!.scale;
+      y /= this.canvasValues!.scale;
+
+      let newX = (Math.floor((x - 50) / 100) + 1) * xDirection + colCount;
+      let newY = (Math.floor((y - 50) / 100) + 1) * yDirection + rowCount;
 
       if (tile.name.includes('evacuationZone')) {
-        //delay to allow the tile to be removed from the grid
-        this.evacuation!.position! = {x: colCount + xMove, y: rowCount + yMove};
+        this.evacuation!.position! = {x: newX, y: newY};
 
         let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
         let y = +tile.name.substring(tile.name.length - 1)
 
         setTimeout(() => {
-          if (((rowCount + yMove >= 0
-                && rowCount + yMove < TileCount - 3
-                && colCount + xMove >= 0
-                && colCount + xMove < TileCount - 4)
-              || this.isInTrash)
-            && tile.name.includes('Upright')
-          ) {
-            for (let i = 0; i < 3; i++) {
-              for (let j = 0; j < 4; j++) {
-                this.grids[layerCount][rowCount + j - x][colCount + i - y] = this.newTile();
-                this.grids[layerCount + 1][rowCount + j - x][colCount + i - y] = this.newTile();
-              }
-            }
-            if (!this.isInTrash) {
-              this.evacuation = this.getEvacuationDto(colCount + xMove, rowCount + yMove);
-              this.addEvacuationZoneUpright(this.layer,colCount + xMove, rowCount + yMove);
-            } else {
-              this.evacuation = this.getEvacuationDto(-1, -1);
-            }
-          }
+          const evacuationX = tile.name.includes('Upright') ? 2 : 3;
+          const evacuationY = tile.name.includes('Upright') ? 3 : 2;
 
-          if (((rowCount + yMove >= 0
-                && rowCount + yMove < TileCount - 2
-                && colCount + xMove >= 0
-                && colCount + xMove < TileCount - 3)
-              || this.isInTrash)
-            && tile.name.includes('Across')
-          ) {
-            for (let i = 0; i < 4; i++) {
-              for (let j = 0; j < 3; j++) {
-                this.grids[layerCount][rowCount + j - x][colCount + i - y] = this.newTile();
-                this.grids[layerCount + 1][rowCount + j - x][colCount + i - y] = this.newTile();
-              }
-            }
+          if ((newY >= 0 && newY < TileCount - evacuationY && newX >= 0 && newX < TileCount - evacuationX) || this.isInTrash) {
+            this.deleteEvacuationZone(layerCount, rowCount - x, colCount - y);
             if (!this.isInTrash) {
-              this.evacuation = this.getEvacuationDto(colCount + xMove, rowCount + yMove,);
-              this.addEvacuationZoneAcross(this.layer, colCount + xMove, rowCount + yMove,);
-            } else {
-              this.evacuation = this.getEvacuationDto(-1, -1);
+              this.addEvacuationZoneUpright(this.layer,newX, newY);
             }
           }
         }, 10);
 
-
       } else if (
-        rowCount + yMove >= 0
-        && rowCount + yMove < TileCount
-        && colCount + xMove >= 0
-        && colCount + xMove < TileCount
-        && !this.grids[layerCount][rowCount + yMove][colCount + xMove].name.includes('evacuationZone')
-        && !this.grids[this.layer][rowCount + yMove][colCount + xMove].isPlaceholder
-      ) {
+        newY >= 0 && newY < TileCount && newX >= 0 && newX < TileCount
+        && !this.grids[layerCount][newY][newX].name.includes('evacuationZone')
+        && !this.grids[this.layer][newY][newX].isPlaceholder) {
 
         if (!this.isInTrash) {
-          this.grids[layerCount][rowCount + yMove][colCount + xMove] = {...tile};
-          this.layerChange(layerCount, rowCount + yMove, colCount + xMove, {...tile});
+          this.grids[layerCount][newY][newX] = {...tile};
+          this.addPlaceholder(layerCount, newY, newX, {...tile});
 
           if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
-            this.startPosition = {x: colCount + xMove, y: rowCount + yMove};
+            this.startPosition = {x: newX, y: newY};
           }
-        } else {
-          if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
+        } else if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
             this.startPosition = {x: -1, y: -1};
-          }
         }
 
         if (!this.altActive) {
           this.grids[layerCount][rowCount][colCount] = this.newTile();
-          this.grids[layerCount + 1][rowCount][colCount] = this.newTile();
+          this.addPlaceholder(layerCount, rowCount, colCount, this.newTile());
         }
       } else {
         setTimeout(() => {
@@ -307,8 +267,9 @@ export class CreateEditComponent {
               this.startPosition = {x: -1, y: -1};
             }
             this.grids[layerCount][rowCount][colCount] = this.newTile();
+            this.addPlaceholder(layerCount, rowCount, colCount, this.newTile());
           }
-        }, 50);
+        }, 30);
       }
     }
     setTimeout(() => {
@@ -320,7 +281,6 @@ export class CreateEditComponent {
   }
 
   dragConstrainPoint = (point: any, dragRef: any) => {
-
     let zoomMoveXDifference = 0;
     let zoomMoveYDifference = 0;
     let scale = this.canvasValues!.scale;
@@ -333,9 +293,11 @@ export class CreateEditComponent {
       x: point.x + zoomMoveXDifference - scale * 50,
       y: point.y + zoomMoveYDifference - scale * 50
     };
-  };
+  }
 
   private addEvacuationZoneAcross(layer: number, colCount: number, rowCount: number, isPlaceholder: boolean = false) {
+    this.evacuation = this.getEvacuationDto(colCount, rowCount);
+
     this.grids[layer][rowCount][colCount] = {name: 'evacuationZoneAcross_00', border: ['black', '', '', 'black'], isPlaceholder};
     this.grids[layer][rowCount][colCount + 1] = {name: 'evacuationZoneAcross_01', border: ['black', '', '', ''], isPlaceholder};
     this.grids[layer][rowCount][colCount + 2] = {name: 'evacuationZoneAcross_02', border: ['black', '', '', ''], isPlaceholder};
@@ -358,6 +320,8 @@ export class CreateEditComponent {
   }
 
   private addEvacuationZoneUpright(layer: number, colCount: number, rowCount: number, isPlaceholder: boolean = false) {
+    this.evacuation = this.getEvacuationDto(colCount, rowCount);
+
     this.grids[layer][rowCount][colCount] = {name: 'evacuationZoneUpright_00', border: ['black', '', '', 'black'], isPlaceholder};
     this.grids[layer][rowCount][colCount + 1] = {name: 'evacuationZoneUpright_01', border: ['black', '', '', ''], isPlaceholder};
     this.grids[layer][rowCount][colCount + 2] = {name: 'evacuationZoneUpright_02', border: ['black', 'black', '', ''], isPlaceholder};
@@ -370,22 +334,25 @@ export class CreateEditComponent {
     this.grids[layer][rowCount + 1][colCount] = {name: 'evacuationZoneUpright_10', border: ['', '', '', 'black'], isPlaceholder};
     this.grids[layer][rowCount + 1][colCount + 1] = {name: 'evacuationZoneUpright_11', border: ['', '', '', ''], isPlaceholder};
     this.grids[layer][rowCount + 2][colCount + 1] = {name: 'evacuationZoneUpright_21', border: ['', '', '', ''], isPlaceholder};
+
+    if(isPlaceholder == false) {
+      if (this.grids[this.grids.length + layer] == undefined) {
+        this.addLayer();
+      }
+      this.addEvacuationZoneUpright(layer + 1, colCount, rowCount, true);
+    }
   }
 
-  enterTrash() {
-    this.isInTrash = true;
-  }
+  deleteEvacuationZone(layerCount: number, rowCount: number, colCount: number) {
+    this.evacuation = this.getEvacuationDto(-1, -1);
+    const upright: boolean = this.grids[layerCount][rowCount][colCount].name.includes('Upright');
 
-  outTrash() {
-    this.isInTrash = false;
-  }
-
-  falseEnter() {
-    return false;
-  }
-
-  disableContext(event: MouseEvent) {
-    event.preventDefault();
+    for (let i = 0; i < (upright ? 3 : 4); i++) {
+      for (let j = 0; j < (upright ? 4 : 3); j++) {
+        this.grids[layerCount][rowCount + j][colCount + i] = this.newTile();
+        this.grids[layerCount + 1][rowCount + j][colCount + i] = this.newTile();
+      }
+    }
   }
 
   getEvacuationDto(x: number, y: number) {
@@ -423,7 +390,7 @@ export class CreateEditComponent {
     let currentPosition = {...this.startPosition};
     let orientation = (this.grids[0][currentPosition.y][currentPosition.x].rotation!
         + this.grids[0][currentPosition.y][currentPosition.x].paths!.find((path: { from: number, to: number }) => path.from === -1)!.to + 2)
-      % 4;
+        % 4;
     this.totalPoints = currentPoints.toString();
 
     let multiplier : number = 1;
@@ -492,7 +459,7 @@ export class CreateEditComponent {
     }
   }
 
-  changeLayer(direction : string) {
+  buttonLayerChange(direction : string) {
     if(direction == 'up' && this.layer < 5) {
       this.layer++;
       this.addLayer();
@@ -515,7 +482,7 @@ export class CreateEditComponent {
     this.grids.push(tempgrid);
   }
 
-  layerChange(layer: number, rowCount: number, colCount: number, tile: Tile) {
+  addPlaceholder(layer: number, rowCount: number, colCount: number, tile: Tile) {
     if (this.grids[this.grids.length + this.layer] == undefined) {
       this.addLayer()
     }
@@ -528,5 +495,9 @@ export class CreateEditComponent {
 
   resumePanzoom() {
     this.panzoomCanvas.resume();
+  }
+
+  falseEnter() {
+    return false;
   }
 }

@@ -1,5 +1,5 @@
 <div class="d-flex row m-0 justify-content-between" cdkDropListGroup>
-  <div class="col-4" (mouseover)="enterTrash()" (mouseleave)="outTrash()" style="overflow-y: auto" [ngStyle]=" {'height.px' : innerHeight }">
+  <div class="col-4" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false" style="overflow-y: auto" [ngStyle]=" {'height.px' : innerHeight }">
     <h2 class="p-3 fw-bold">Kacheln</h2>
     <div class="p-3 d-flex d-flex align-content-around flex-wrap"
         cdkDropList
@@ -58,22 +58,20 @@
 
   <div class="col-7 position-relative p-0 m-3">
     <div class="p-2 d-flex w-100 justify-content-end">
-      <button class="me-1" (click)="changeLayer('down')">Ebene tiefer</button>
-      <button (click)="changeLayer('up')">Ebene höher</button>
+      <button class="me-1" (click)="buttonLayerChange('down')">Ebene tiefer</button>
+      <button (click)="buttonLayerChange('up')">Ebene höher</button>
     </div>
     <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
       <div #canvas>
         <div *ngFor="let layerOfGrids of grids; let layerCount = index" class="layer">
           <div *ngIf="layerCount == layer">
-
             <div *ngFor="let row of layerOfGrids; let rowCount = index" class="row d-flex flex-nowrap">
-
               <app-tile *ngFor="let tile of row; let colCount = index"
-                        (contextmenu)="disableContext($event)"
+                        (contextmenu)="$event.preventDefault();"
                         [class.white]="tile.id"
                         [canvasValues]="canvasValues"
                         [(evacuationZone)]="evacuation"
-                        (tileChange)="calcTotalPoints(); layerChange(layerCount, rowCount, colCount, tile)"
+                        (tileChange)="calcTotalPoints(); addPlaceholder(layerCount, rowCount, colCount, tile)"
                         [position]="{x: colCount, y: rowCount}"
                         [tile]="tile"
                         cdkDropList
@@ -91,7 +89,7 @@
       </div>
     </div>
 
-    <div *ngIf="tileIsDragged" (mouseover)="enterTrash()" (mouseleave)="outTrash()" class="position-absolute p-2" style="bottom: 50%;">
+    <div *ngIf="tileIsDragged" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false" class="position-absolute p-2" style="bottom: 50%;">
       <div class="rounded border border-3 p-2 base-bg" >
         <i class="bi bi-trash-fill"></i>
       </div>
