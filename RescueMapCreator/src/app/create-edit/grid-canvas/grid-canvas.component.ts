@@ -1,5 +1,6 @@
 import { CdkDragDrop, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import panzoom, { Transform } from 'panzoom';
 import { Evacuation } from '../tile/dto/evacuation.dto';
 import { Tile } from '../tile/dto/tile.dto';
@@ -40,7 +41,7 @@ export class GridCanvasComponent {
 
   totalPoints: string = '';
 
-  constructor() {
+  constructor(private toastr: ToastrService) {
     this.addLayer();
 
     //keypress event
@@ -160,7 +161,9 @@ export class GridCanvasComponent {
 
     let tile = this.grids[this.layer][rowCount][colCount];
 
-    if ($event.previousContainer.data && !tile.name.includes('evacuationZone') && !tile.isPlaceholder) {
+    if (this.grids[this.layer + 1] != undefined && this.grids[this.layer + 1][rowCount][colCount].name != '' && !this.grids[this.layer + 1][rowCount][colCount].isPlaceholder)  {
+      this.toastr.warning(`Es existiert eine Kachel eine Ebene darüber`, 'Darf nicht platziert werden');
+    } else if ($event.previousContainer.data && !tile.name.includes('evacuationZone') && !tile.isPlaceholder) {
       this.grids[this.layer][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
       this.addPlaceholder(this.layer,rowCount,colCount, {...$event.previousContainer.data[$event.previousIndex]});
 

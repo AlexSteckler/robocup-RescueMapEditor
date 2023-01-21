@@ -8,6 +8,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {HttpClientModule} from '@angular/common/http';
 import {CreateEditModule} from './create-edit/create-edit.module';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import {ToastrModule, ToastrService} from 'ngx-toastr';
 
 
 @NgModule({
@@ -22,9 +23,10 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     BrowserAnimationsModule,
     HttpClientModule,
     CreateEditModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    ToastrModule.forRoot()
   ],
-  providers: [],
+  providers: [ToastrService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
