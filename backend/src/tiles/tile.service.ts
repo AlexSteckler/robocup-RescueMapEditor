@@ -8,8 +8,8 @@ import { Tile, TileDocument } from './tile.schema';
 export class TileService {
   constructor(@InjectModel(Tile.name) private tileModel: Model<TileDocument>) {}
 
-  async getAll() {
-    return this.tileModel.find();
+  async findAll() {
+    return this.tileModel.find().exec();
   }
 
   async create(createTileDto: CreateTileDto) {

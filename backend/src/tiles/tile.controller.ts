@@ -2,6 +2,7 @@
 import { Controller } from '@nestjs/common';
 import { Body, Get } from '@nestjs/common/decorators';
 import { Post } from '@nestjs/common/decorators/http/request-mapping.decorator';
+import { NotFound } from 'src/util/not-found.decorator';
 import { CreateTileDto } from './dto/create-tile.dto';
 import { TileService } from './tile.service';
 
@@ -11,8 +12,9 @@ export class TilesController {
     constructor(private readonly tileService: TileService) {}
     
     @Get()
-    async get() {
-        return this.tileService.getAll();
+    @NotFound()
+    async getAll() {
+        return this.tileService.findAll();
     }
 
     @Post()
