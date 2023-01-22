@@ -18,7 +18,7 @@ import { Response } from 'express';
 import { AuthenticatedUser, Public, Roles } from 'nest-keycloak-connect';
 import { FindImagesParams } from './dto/find-images-params.dto';
 import { FindImageParamsDto } from './dto/find-image-params.dto';
-import { NotFound } from 'src/util/not-found.decorator';
+import { NotFound } from '../../util/not-found.decorator';
 @Controller({
   version: '1',
   path: 'tile/image',

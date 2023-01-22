@@ -32,6 +32,7 @@ export class TileSelectionComponent {
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           tile.image = img;
           tile.rotation = 0;
+
         });
           this.tiles.push(tile);
       });

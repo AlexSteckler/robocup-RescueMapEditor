@@ -12,7 +12,7 @@
                     [class.white]="tile.id"
                     [canvasValues]="canvasValues"
                     [(evacuationZone)]="evacuation"
-                    (tileChange)="calcTotalPoints(); addPlaceholder(layerCount, rowCount, colCount, tile)"
+                    (tileChange)="tileChange(tile, rowCount, colCount)"
                     [position]="{x: colCount, y: rowCount, layer: layerCount}"
                     [tile]="tile"
                     cdkDropList

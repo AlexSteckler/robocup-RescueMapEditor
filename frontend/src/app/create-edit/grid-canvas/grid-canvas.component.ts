@@ -4,6 +4,8 @@ import { ToastrService } from 'ngx-toastr';
 import panzoom, { Transform } from 'panzoom';
 import { Evacuation } from '../tile/dto/evacuation.dto';
 import { Tile } from '../tile/dto/tile.dto';
+import { Map } from '../dto/map.dto';
+import { GridCanvasService } from './grid-canvas.service';
 
 const TileCount = 30;
 const OutsideDrag = 100;
@@ -24,6 +26,8 @@ export class GridCanvasComponent {
 
   @Input() isInTrash: boolean = false;
 
+  map : Map | undefined;
+
   canvasValues: Transform | undefined;
   panzoomCanvas: any = null;
   tileIsDragged: boolean = false;
@@ -41,7 +45,7 @@ export class GridCanvasComponent {
 
   totalPoints: string = '';
 
-  constructor(private toastr: ToastrService) {
+  constructor(private toastr: ToastrService, private gridCanvasService: GridCanvasService) {
     this.addLayer();
 
     //keypress event
@@ -65,6 +69,11 @@ export class GridCanvasComponent {
 
   ngOnInit(): void {
     this.calcTotalPoints();
+
+    this.gridCanvasService.createMap('test').subscribe((map) => {
+      this.map = map;
+      console.log(map);
+    });
   }
 
   ngAfterViewInit() {
@@ -158,6 +167,15 @@ export class GridCanvasComponent {
       }
   }
 
+  tileChange(tile: Tile, rowCount: number, colCount: number) {
+    this.gridCanvasService.updateTile(this.map!.id, this.layer, rowCount, colCount, tile).subscribe((map: Map) => {
+      this.map = map;
+    });
+
+    this.calcTotalPoints();
+    this.addPlaceholder(this.layer, rowCount, colCount, tile);
+  }
+
   //---------- Drag & Drop -----------//
 
   drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
@@ -169,6 +187,10 @@ export class GridCanvasComponent {
     } else if ($event.previousContainer.data && !tile.name.includes('evacuationZone') && !tile.isPlaceholder) {
       this.grids[this.layer][rowCount][colCount] = {...$event.previousContainer.data[$event.previousIndex]}
       this.addPlaceholder(this.layer,rowCount,colCount, {...$event.previousContainer.data[$event.previousIndex]});
+
+      this.gridCanvasService.updateTile(this.map!.id, this.layer, rowCount, colCount, this.grids[this.layer][rowCount][colCount]).subscribe((map: Map) => {
+        this.map = map;
+      });
 
       if (this.grids[this.layer][rowCount][colCount].name.includes('start')) {
         if (this.startPosition.x != -1) {
@@ -246,6 +268,10 @@ export class GridCanvasComponent {
           this.grids[layerCount][newY][newX] = {...tile};
           this.addPlaceholder(layerCount, newY, newX, {...tile});
 
+          this.gridCanvasService.updateTile(this.map!.id, this.layer, newY, newX, tile).subscribe((map: Map) => {
+            this.map = map;
+          });
+
           if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
             this.startPosition = {layer: this.layer, x: newX, y: newY};
           }
@@ -256,6 +282,10 @@ export class GridCanvasComponent {
         if (!this.altActive) {
           this.grids[layerCount][rowCount][colCount] = this.newTile();
           this.addPlaceholder(layerCount, rowCount, colCount, this.newTile());
+
+          this.gridCanvasService.deleteTile(this.map!.id, this.layer, rowCount, colCount, this.newTile()).subscribe((map: Map) => {
+            this.map = map;
+          });
         }
       } else {
         setTimeout(() => {
@@ -265,6 +295,10 @@ export class GridCanvasComponent {
             }
             this.grids[layerCount][rowCount][colCount] = this.newTile();
             this.grids[layerCount + 1][rowCount][colCount] = this.newTile();
+
+            this.gridCanvasService.deleteTile(this.map!.id, this.layer, rowCount, colCount, this.newTile()).subscribe((map: Map) => {
+              this.map = map;
+            });
           }
         }, 30);
       }

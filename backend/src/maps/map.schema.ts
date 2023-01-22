@@ -1,5 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
+class Evacuation {
+  layer: number;
+  row: number;
+  column: number;
+  entry: { x: number; y: number; rotation: number };
+  exit: { x: number; y: number; rotation: number };
+}
+
 @Schema({ timestamps: true })
 export class Map {
   @Prop()
@@ -17,14 +25,8 @@ export class Map {
     rotation: number;
   }[];
 
-  @Prop()
-  evacuation: {
-    layer: number;
-    row: number;
-    column: number;
-    entry: { x: number; y: number; rotation: number };
-    exit: { x: number; y: number; rotation: number };
-  };
+  @Prop(Evacuation)
+  evacuation: Evacuation;
 
   @Prop()
   createdBy: string;
