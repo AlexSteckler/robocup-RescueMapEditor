@@ -30,7 +30,7 @@ export class TileSelectionComponent {
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           tile.image = img;
         });
-        if (tile.name.includes('default') || tile.name.includes('start')) {
+        if (tile.name.includes('default') || tile.name.includes('start') || tile.name.includes('ramp')) {
           this.tiles.push(tile);
         } else if (tile.name.includes('cross')) {
           this.greenTiles.push(tile);

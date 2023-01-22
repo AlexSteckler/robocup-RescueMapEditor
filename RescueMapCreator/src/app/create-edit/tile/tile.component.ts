@@ -28,7 +28,7 @@ export class TileComponent implements OnInit{
   @Input() tile: Tile | undefined;
   @Input() canvasValues : Transform | undefined;
   @Input() evacuationZone : Evacuation | undefined ;
-  @Input() position : {x: number, y: number} | undefined;
+  @Input() position : {x: number, y: number, layer: number} | undefined;
 
   @Output() evacuationZoneChange : EventEmitter<Evacuation> = new EventEmitter<Evacuation>();
   @Output() tileChange : EventEmitter<Tile> = new EventEmitter<Tile>();

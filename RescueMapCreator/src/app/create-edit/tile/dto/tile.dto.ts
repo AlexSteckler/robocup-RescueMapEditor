@@ -6,7 +6,7 @@ export interface Tile {
 
    value?: number;
    image?: SafeUrl | undefined;
-   paths?: {from: number, to: number}[];
+   paths?: {from: number, to: number, layer: number}[];
 
    source?: string;
    rotation?: number;

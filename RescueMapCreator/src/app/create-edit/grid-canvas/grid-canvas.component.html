@@ -13,7 +13,7 @@
                     [canvasValues]="canvasValues"
                     [(evacuationZone)]="evacuation"
                     (tileChange)="calcTotalPoints(); addPlaceholder(layerCount, rowCount, colCount, tile)"
-                    [position]="{x: colCount, y: rowCount}"
+                    [position]="{x: colCount, y: rowCount, layer: layerCount}"
                     [tile]="tile"
                     cdkDropList
                     (cdkDropListDropped)="drop($event, rowCount, colCount)"

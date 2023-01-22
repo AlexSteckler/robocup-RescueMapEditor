@@ -37,7 +37,7 @@ export class GridCanvasComponent {
 
   @Input() innerHeight: number = 0;
   evacuation: Evacuation = this.getEvacuationDto(-1, -1);
-  startPosition: { x: number, y: number } = {x: -1, y: -1};
+  startPosition: {layer: number, x: number, y: number } = {layer: -1, x: -1, y: -1};
 
   totalPoints: string = '';
 
@@ -153,6 +153,9 @@ export class GridCanvasComponent {
       this.addLayer()
     }
       this.grids[layer + 1][rowCount][colCount] = {...tile , isPlaceholder: true};
+      if(this.layer == 1) {
+        this.grids[layer -1][rowCount][colCount] = {...tile , isPlaceholder: true};
+      }
   }
 
   //---------- Drag & Drop -----------//
@@ -169,10 +172,10 @@ export class GridCanvasComponent {
 
       if (this.grids[this.layer][rowCount][colCount].name.includes('start')) {
         if (this.startPosition.x != -1) {
-          this.grids[this.layer][this.startPosition.y][this.startPosition.x] = this.newTile();
+          this.grids[this.startPosition.layer][this.startPosition.y][this.startPosition.x] = this.newTile();
+          this.grids[this.startPosition.layer + 1][this.startPosition.y][this.startPosition.x] = this.newTile();
         }
-
-        this.startPosition = {x: colCount, y: rowCount};
+        this.startPosition = {layer: this.layer, x: colCount, y: rowCount};
       }
 
     } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4 && !tile.name.includes('evacuationZone')) {
@@ -244,10 +247,10 @@ export class GridCanvasComponent {
           this.addPlaceholder(layerCount, newY, newX, {...tile});
 
           if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
-            this.startPosition = {x: newX, y: newY};
+            this.startPosition = {layer: this.layer, x: newX, y: newY};
           }
         } else if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
-            this.startPosition = {x: -1, y: -1};
+            this.startPosition = {layer: this.layer, x: -1, y: -1};
         }
 
         if (!this.altActive) {
@@ -258,10 +261,10 @@ export class GridCanvasComponent {
         setTimeout(() => {
           if (this.isInTrash) {
             if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
-              this.startPosition = {x: -1, y: -1};
+              this.startPosition = {layer: -1, x: -1, y: -1};
             }
             this.grids[layerCount][rowCount][colCount] = this.newTile();
-            this.addPlaceholder(layerCount, rowCount, colCount, this.newTile());
+            this.grids[layerCount + 1][rowCount][colCount] = this.newTile();
           }
         }, 30);
       }
@@ -299,9 +302,9 @@ export class GridCanvasComponent {
 
     let currentPoints = 5;
     let currentPosition = {...this.startPosition};
-    let orientation = (this.grids[0][currentPosition.y][currentPosition.x].rotation!
-        + this.grids[0][currentPosition.y][currentPosition.x].paths!.find((path: { from: number, to: number }) => path.from === -1)!.to + 2)
-        % 4;
+    let orientation = (this.grids[currentPosition.layer][currentPosition.y][currentPosition.x].rotation!
+                      + this.grids[currentPosition.layer][currentPosition.y][currentPosition.x].paths!.find((path: { from: number, to: number }) => path.from === -1)!.to + 2)
+                      % 4;
     this.totalPoints = currentPoints.toString();
 
     let multiplier : number = 1;
@@ -326,10 +329,11 @@ export class GridCanvasComponent {
 
       if (currentPosition.x < 0 || currentPosition.y < 0 ) {
         this.totalPoints = 'Pacours führt aus dem Spielfeld';
+        this.toastr.warning('Pacours führt aus dem Spielfeld');
         return;
       }
-      let currentTile = this.grids[0][currentPosition.y][currentPosition.x]!;
-      if (!currentTile!.name) {
+      let currentTile = this.grids[currentPosition.layer][currentPosition.y][currentPosition.x]!;
+      if (!currentTile!.name || currentTile.isPlaceholder) {
         return;
       }
 
@@ -343,7 +347,7 @@ export class GridCanvasComponent {
           return;
         }
 
-        currentPosition = {x: this.evacuation.exitPosition.x, y: this.evacuation.exitPosition.y };
+        currentPosition = {layer: this.layer, x: this.evacuation.exitPosition.x, y: this.evacuation.exitPosition.y };
         orientation = (this.evacuation.exitPosition.borderPosition + 2) % 4;
 
         multiplier = 4.3904;
@@ -354,8 +358,14 @@ export class GridCanvasComponent {
         }
 
         let tileRotation = currentTile.rotation!;
-        let tileWay = currentTile.paths!.find((path: { from: number, to: number }) => orientation === (path.from + tileRotation) % 4)
+        let tileWay = currentTile.paths!.find((path: { from: number, to: number, layer: number }) => orientation === (path.from + tileRotation) % 4)
         if (tileWay !== undefined) {
+          currentPosition.layer += tileWay.layer;
+          if (currentPosition.layer < 0) {
+            this.toastr.warning('Rampe führt ins nichts!');
+            return;
+          }
+
           orientation = (tileRotation + tileWay.to + 2) % 4;
           currentPoints += currentTile.value ? currentTile.value + 5 : 5;
           this.totalPoints = Math.round(currentPoints * multiplier).toString();

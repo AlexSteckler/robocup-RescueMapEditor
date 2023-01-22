@@ -6,7 +6,7 @@ export const Tiles : Tile[] = [
     name: 'start',
     source : 'assets/tiles/Tile_01.png',
     image : undefined,
-    paths : [{from: -1, to: 2}, {from: 2, to: -1}],
+    paths : [{from: -1, to: 2, layer: 0}, {from: 2, to: -1, layer: 0}],
     rotation: 0,
   },
   {
@@ -14,15 +14,24 @@ export const Tiles : Tile[] = [
     name: 'default',
     source : 'assets/tiles/Tile_02.png',
     image : undefined,
-    paths : [{from: 3, to: 1}, {from: 1, to: 3}],
+    paths : [{from: 3, to: 1, layer: 0}, {from: 1, to: 3, layer: 0}],
     rotation: 0,
+  },
+  {
+    id : '27',
+    name: 'ramp',
+    source : 'assets/tiles/Tile-Ramp_27.svg',
+    image : undefined,
+    paths : [{from: 3, to: 1, layer: 1}, {from: 1, to: 3, layer: -1}],
+    rotation: 0,
+    value: 10,
   },
   {
     id : '3',
     name: 'default',
     source : 'assets/tiles/Tile_03.png',
     image : undefined,
-    paths : [{from: 3, to: 1}, {from: 1, to: 3}],
+    paths : [{from: 3, to: 1, layer: 0}, {from: 1, to: 3, layer: 0}],
     rotation: 0,
     value: 10,
   },
@@ -31,7 +40,7 @@ export const Tiles : Tile[] = [
     name: 'default',
     source : 'assets/tiles/Tile_04.png',
     image : undefined,
-    paths : [{from: 3, to: 1}, {from: 1, to: 3}],
+    paths : [{from: 3, to: 1, layer: 0}, {from: 1, to: 3, layer: 0}],
     rotation: 0,
     value: 20,
   },
@@ -40,7 +49,7 @@ export const Tiles : Tile[] = [
     name: 'default',
     source : 'assets/tiles/Tile_05.png',
     image : undefined,
-    paths : [{from: 2, to: 1}, {from: 1, to: 2}],
+    paths : [{from: 2, to: 1, layer: 0}, {from: 1, to: 2, layer: 0}],
     rotation: 0,
   },
   {
@@ -48,7 +57,7 @@ export const Tiles : Tile[] = [
     name: 'default',
     source : 'assets/tiles/Tile_06.png',
     image : undefined,
-    paths : [{from: 2, to: 1}, {from: 1, to: 2}],
+    paths : [{from: 2, to: 1, layer: 0}, {from: 1, to: 2, layer: 0}],
     rotation: 0,
   },
   {
@@ -56,7 +65,7 @@ export const Tiles : Tile[] = [
     name: 'default',
     source : 'assets/tiles/Tile_07.png',
     image : undefined,
-    paths : [{from: 3, to: 1}, {from: 1, to: 3}],
+    paths : [{from: 3, to: 1, layer: 0}, {from: 1, to: 3, layer: 0}],
     rotation: 0,
   },
   {
@@ -64,7 +73,7 @@ export const Tiles : Tile[] = [
     name: 'default',
     source : 'assets/tiles/Tile_08.png',
     image : undefined,
-    paths : [{from: 0, to: 1}, {from: 1, to: 0}, {from: 3, to: 2}, {from: 2, to: 3}],
+    paths : [{from: 0, to: 1, layer: 0}, {from: 1, to: 0, layer: 0}, {from: 3, to: 2, layer: 0}, {from: 2, to: 3, layer: 0}],
     rotation: 0,
   },
   {
@@ -72,7 +81,7 @@ export const Tiles : Tile[] = [
     name: 'default',
     source : 'assets/tiles/Tile_09.png',
     image : undefined,
-    paths : [{from: 2, to: 1}, {from: 1, to: 2}],
+    paths : [{from: 2, to: 1, layer: 0}, {from: 1, to: 2, layer: 0}],
     rotation: 0,
   },
   {
@@ -80,7 +89,7 @@ export const Tiles : Tile[] = [
     name: 'default',
     source : 'assets/tiles/Tile_10.png',
     image : undefined,
-    paths : [{from: 2, to: 1}, {from: 1, to: 2}],
+    paths : [{from: 2, to: 1, layer: 0}, {from: 1, to: 2, layer: 0}],
     rotation: 0,
   },
   {
@@ -88,7 +97,7 @@ export const Tiles : Tile[] = [
     name: 'cross',
     source : 'assets/tiles/Tile_18-1.svg',
     image : undefined,
-    paths : [{from: 0, to: 3}],
+    paths : [{from: 0, to: 3, layer: 0}],
     rotation: 0,
   },
   {
@@ -96,7 +105,7 @@ export const Tiles : Tile[] = [
     name: 'cross',
     source : 'assets/tiles/Tile_18-2.svg',
     image : undefined,
-    paths : [{from: 2, to: 3},{from: 3, to: 2},{from: 0, to: 2},{from: 1, to: 3}],
+    paths : [{from: 2, to: 3, layer: 0},{from: 3, to: 2, layer: 0},{from: 0, to: 2, layer: 0},{from: 1, to: 3, layer: 0}],
     rotation: 0,
     value: 10,
   },
@@ -105,7 +114,7 @@ export const Tiles : Tile[] = [
     name: 'cross',
     source : 'assets/tiles/Tile_18-3.svg',
     image : undefined,
-    paths : [{from: 0, to: 3}],
+    paths : [{from: 0, to: 3, layer: 0}],
     rotation: 0,
   },
   {
@@ -113,7 +122,7 @@ export const Tiles : Tile[] = [
     name: 'cross',
     source : 'assets/tiles/Tile_18-4.svg',
     image : undefined,
-    paths : [{from: 0, to: 3}],
+    paths : [{from: 0, to: 3, layer: 0}],
     rotation: 0,
   },
   {
@@ -121,7 +130,7 @@ export const Tiles : Tile[] = [
     name: 'cross',
     source : 'assets/tiles/Tile_18-5.svg',
     image : undefined,
-    paths : [{from: 0, to: 3}],
+    paths : [{from: 0, to: 3, layer: 0}],
     rotation: 0,
   },
   {
@@ -129,7 +138,7 @@ export const Tiles : Tile[] = [
     name: 'cross',
     source : 'assets/tiles/Tile_18-6.svg',
     image : undefined,
-    paths : [{from: 0, to: 3}],
+    paths : [{from: 0, to: 3, layer: 0}],
     rotation: 0,
   }
 ]
