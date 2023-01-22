@@ -37,6 +37,7 @@ export class TileComponent implements OnInit{
 
   ngOnInit(): void {
     this.state = this.tile?.rotation?.toString()!;
+    
   }
 
   onRightClick(position:number = -1) {

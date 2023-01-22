@@ -2,12 +2,12 @@ import { Component, HostListener, Input } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Transform } from 'panzoom';
 import { Tile } from '../tile/dto/tile.dto';
-import { TilesService } from '../tile/tiles.service';
+import { TilesService } from './tiles.service';
 
 @Component({
   selector: 'app-tile-selection',
   templateUrl: './tile-selection.component.html',
-  styleUrls: ['./tile-selection.component.scss']
+  styleUrls: ['./tile-selection.component.scss'],
 })
 export class TileSelectionComponent {
   tiles: Tile[] = [];
@@ -19,8 +19,10 @@ export class TileSelectionComponent {
   @Input() currentDraggedTile: Tile | undefined;
   @Input() evacuationExists: boolean = false;
 
-  constructor(private tilesService: TilesService, private sanitizer: DomSanitizer) {
-  }
+  constructor(
+    private tilesService: TilesService,
+    private sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit(): void {
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
@@ -30,7 +32,11 @@ export class TileSelectionComponent {
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           tile.image = img;
         });
-        if (tile.name.includes('default') || tile.name.includes('start') || tile.name.includes('ramp')) {
+        if (
+          tile.name.includes('default') ||
+          tile.name.includes('start') ||
+          tile.name.includes('ramp')
+        ) {
           this.tiles.push(tile);
         } else if (tile.name.includes('cross')) {
           this.greenTiles.push(tile);
@@ -43,10 +49,10 @@ export class TileSelectionComponent {
     const currentIndex = this.tiles.findIndex(
       (tile: Tile) => tile.id === this.currentDraggedTile?.id
     );
-    this.tiles.splice(currentIndex + 1, 0, ({
+    this.tiles.splice(currentIndex + 1, 0, {
       ...this.currentDraggedTile,
-      temp: true
-    }) as Tile);
+      temp: true,
+    } as Tile);
   }
 
   entered() {

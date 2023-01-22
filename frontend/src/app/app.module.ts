@@ -11,6 +11,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {ToastrModule, ToastrService} from 'ngx-toastr';
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { environment } from 'src/environments/environment';
+import { CreateTileComponent } from './settings/create-tile/create-tile.component';
+import { FormsModule } from '@angular/forms';
 
 function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -33,6 +35,7 @@ function initializeKeycloak(keycloak: KeycloakService) {
     AppComponent,
     HomeComponent,
     SettingsComponent,
+    CreateTileComponent,
   ],
   imports: [
     BrowserModule,
@@ -42,7 +45,8 @@ function initializeKeycloak(keycloak: KeycloakService) {
     CreateEditModule,
     MatSnackBarModule,
     KeycloakAngularModule,
-    ToastrModule.forRoot()
+    ToastrModule.forRoot(),
+    FormsModule
   ],
   providers: [
     {

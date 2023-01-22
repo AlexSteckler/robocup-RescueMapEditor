@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { validationSchema } from './config';
@@ -10,7 +11,7 @@ import {
 import { Connection } from 'mongoose';
 import * as toJson from '@meanie/mongoose-to-json';
 import { APP_GUARD } from '@nestjs/core';
-import { TilesModule } from './tiles/tiles.module';
+import { TileModule } from './tiles/tile.module';
 
 @Module({
   imports: [
@@ -40,7 +41,7 @@ import { TilesModule } from './tiles/tiles.module';
       }),
       inject: [ConfigService],
     }),
-    TilesModule,
+    TileModule,
   ],
   providers: [
     {

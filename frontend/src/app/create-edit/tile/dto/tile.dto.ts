@@ -12,7 +12,7 @@ export interface Tile {
    rotation?: number;
    border?: string[];
    temp?: boolean;
-   isBeingDragged?: boolean;
 
+   isBeingDragged?: boolean;
    isPlaceholder?: boolean;
 }
