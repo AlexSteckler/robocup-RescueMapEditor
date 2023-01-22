@@ -10,6 +10,7 @@ import {
 import { Connection } from 'mongoose';
 import * as toJson from '@meanie/mongoose-to-json';
 import { APP_GUARD } from '@nestjs/core';
+import { TilesModule } from './tiles/tiles.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { APP_GUARD } from '@nestjs/core';
       }),
       inject: [ConfigService],
     }),
+    TilesModule,
   ],
   providers: [
     {
