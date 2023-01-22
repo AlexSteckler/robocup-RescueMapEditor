@@ -1,0 +1,78 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top bg-dark text-light p-0">
+  <div class="container-fluid navbar-brand p-0">
+    <a routerLink="home">
+      <img src="../assets/resources/rc_logo.png" style="height: 60px; padding-left: 20px; padding-right: 20px">
+    </a>
+    <button class="navbar-toggler second-button navbar-dark" type="button" data-bs-toggle="collapse"
+            data-bs-target=".navbar-collapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse fs-6">
+      <div class="d-flex flex-column flex-lg-row justify-content-between w-100">
+        <div *ngIf="authenticated === true" class="d-flex link-base flex-column flex-lg-row justify-content-center justify-content-md-start align-items-center text-center">
+          <!--Übersicht-->
+          <a routerLink="home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light p-3 d-none d-lg-block">Home
+          </a>
+          <a routerLink="home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light p-3 d-block d-lg-none" data-bs-toggle="collapse"
+             data-bs-target=".navbar-collapse">Home
+          </a>
+
+          <!--Neue Karte-->
+          <a routerLink="createEdit" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light p-3 d-none d-lg-block">Neue Karte erstellen
+          </a>
+          <a routerLink="createEdit" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light d-block d-lg-none" data-bs-toggle="collapse"
+             data-bs-target=".navbar-collapse">Neue Karte erstellen
+          </a>
+
+          <!--Einstellungen-->
+          <a routerLink="settings" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light p-3 d-none d-lg-block">Einstellungen
+          </a>
+          <a routerLink="settings" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+             class="link-base link-light p-3 d-block d-lg-none" data-bs-toggle="collapse"
+             data-bs-target=".navbar-collapse">Einstellungen
+          </a>
+        </div>
+
+        <!--Abmelden-->
+        <div class="d-flex flex-row justify-content-center align-items-center base-color">
+          <a *ngIf="authenticated === false"
+             class="nav-link p-3 text-center text-lg-end text-uppercase fw-bold link-base-reverse"
+             style="cursor: pointer" (click)="login()">Anmelden
+          </a>
+          <span *ngIf="authenticated" class="p-3 ps-0 pe-0 text-white">|</span>
+          <a *ngIf="authenticated" class="nav-link p-3 text-uppercase text-center text-lg-end fw-bold link-base-reverse"
+             style="cursor: pointer" (click)="logout()">Abmelden
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+<router-outlet></router-outlet>
+
+
+<!--Footer-->
+<footer class="dark-bg mt-auto">
+
+  <div class="d-flex flex-sm-row flex-column justify-content-center align-items-center">
+    <a class="nav-link link-light p-2 p-sm-3 link-base" href="https://robocupjunior.de/impressum">Impressum</a>
+    <a class="nav-link link-light p-2 p-sm-3 link-base"
+       href="https://robocupjunior.de/datenschutz">Datenschutz</a>
+    <a class="nav-link link-light p-2 p-sm-3 link-base" href="mailto:support@robocupjunior.de">Support</a>
+  </div>
+
+
+  <div class="mx-auto m-2 d-sm-flex justify-content-center">
+    <div class="d-flex flex-column flex-sm-row align-items-center">
+      <span class="text-muted mx-auto d-block" style="font-size: 13px;text-align: center">&copy; 2022 RoboCup</span>
+      <span class="p-3 text-white d-sm-block d-none pt-0 pb-0">|</span>
+      <a class="nav-link link-light p-1 p-sm-0 base-color white-color-hover" href="https://robocupjunior.de/">robocupjunior.de</a>
+    </div>
+  </div>
+</footer>
