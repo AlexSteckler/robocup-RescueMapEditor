@@ -7,4 +7,14 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'RescueMapCreator';
+
+  authenticated : boolean = false;
+
+  login() {
+
+  }
+
+  logout() {
+    
+  }
 }
