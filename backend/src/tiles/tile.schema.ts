@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Schema as SchemaMongoose } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Tile {
@@ -14,7 +13,6 @@ export class Tile {
 
   @Prop()
   imageId: string;
-
 }
 
 export const TileSchema = SchemaFactory.createForClass(Tile);

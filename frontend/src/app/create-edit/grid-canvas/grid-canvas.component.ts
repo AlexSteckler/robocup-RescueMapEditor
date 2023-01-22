@@ -339,11 +339,9 @@ export class GridCanvasComponent {
 
       if (currentTile.name.includes('evacuationZone')) {
         if (this.evacuation.entrancePosition.x != currentPosition.x ||  this.evacuation.entrancePosition.y != currentPosition.y || this.evacuation.entrancePosition.borderPosition != orientation) {
-          console.log('no entrance');
           return;
         }
         if (this.evacuation.exitPosition.x == -1) {
-          console.log('no exit');
           return;
         }
 
@@ -456,7 +454,7 @@ export class GridCanvasComponent {
     return {
       id: '0',
       name: '',
-      source: '',
+      imageId: '',
       image: undefined,
       paths: undefined,
       rotation: 0,

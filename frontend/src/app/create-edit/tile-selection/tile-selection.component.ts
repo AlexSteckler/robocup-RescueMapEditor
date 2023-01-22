@@ -27,20 +27,13 @@ export class TileSelectionComponent {
   ngOnInit(): void {
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
       tiles.forEach((tile: Tile) => {
-        this.tilesService.getTileImg(tile.source!).subscribe((blob: Blob) => {
+        this.tilesService.getTileImg(tile.imageId!).subscribe((blob: Blob) => {
           let objectURL = URL.createObjectURL(blob);
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           tile.image = img;
+          tile.rotation = 0;
         });
-        if (
-          tile.name.includes('default') ||
-          tile.name.includes('start') ||
-          tile.name.includes('ramp')
-        ) {
           this.tiles.push(tile);
-        } else if (tile.name.includes('cross')) {
-          this.greenTiles.push(tile);
-        }
       });
     });
   }
