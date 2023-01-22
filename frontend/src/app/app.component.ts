@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { KeycloakService } from 'keycloak-angular';
 
 @Component({
   selector: 'app-root',
@@ -10,11 +11,20 @@ export class AppComponent {
 
   authenticated : boolean = false;
 
-  login() {
+  constructor(
+    private keycloakService: KeycloakService,
+    private window: Window,
+    ) {}
 
+  async ngOnInit() {
+    this.authenticated = await this.keycloakService.isLoggedIn();
+  }
+
+  login() {
+    this.keycloakService.login();
   }
 
   logout() {
-    
+    this.keycloakService.logout(this.window.location.origin);
   }
 }

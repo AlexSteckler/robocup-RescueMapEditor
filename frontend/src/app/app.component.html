@@ -10,7 +10,7 @@
     </button>
     <div class="collapse navbar-collapse fs-6">
       <div class="d-flex flex-column flex-lg-row justify-content-between w-100">
-        <div class="d-flex link-base flex-column flex-lg-row justify-content-center justify-content-md-start align-items-center text-center">
+        <div *ngIf="authenticated === true" class="d-flex link-base flex-column flex-lg-row justify-content-center justify-content-md-start align-items-center text-center">
           <!--Übersicht-->
           <a routerLink="home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
              class="link-base link-light p-3 d-none d-lg-block">Home
@@ -47,13 +47,13 @@
           </a>
           <span *ngIf="authenticated" class="p-3 ps-0 pe-0 text-white">|</span>
           <a *ngIf="authenticated" class="nav-link p-3 text-uppercase text-center text-lg-end fw-bold link-base-reverse"
-             style="cursor: pointer" (click)="logout()">Abmelden</a>
+             style="cursor: pointer" (click)="logout()">Abmelden
+          </a>
         </div>
       </div>
     </div>
   </div>
 </nav>
-
 <router-outlet></router-outlet>
 
 
