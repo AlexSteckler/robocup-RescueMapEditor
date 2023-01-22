@@ -23,9 +23,9 @@ export class MapService {
 
   findOne(user: any, id: string) {
     if (user.realm_access.roles.includes('admin')) {
-      return this.mapModel.find({ _id: id }).exec();
+      return this.mapModel.findOne({ _id: id }).exec();
     } else {
-      return this.mapModel.find({ _id: id, createdBy: user.sub }).exec();
+      return this.mapModel.findOne({ _id: id, createdBy: user.sub }).exec();
     }
   }
 

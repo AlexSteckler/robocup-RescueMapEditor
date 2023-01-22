@@ -15,6 +15,14 @@ export class GridCanvasService {
     return this.httpClient.post<Map>(`${environment.baseUrlV1}/map`, { name });
   }
 
+  getMaps(): Observable<Map[]> {
+    return this.httpClient.get<Map[]>(`${environment.baseUrlV1}/map`);
+  }
+
+  getMap(id: string) {
+    return this.httpClient.get<Map>(`${environment.baseUrlV1}/map/${id}`);
+  }
+
   updateTile(
     id: string,
     layer: number,

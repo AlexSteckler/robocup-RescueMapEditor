@@ -1,6 +1,9 @@
-<div class="p-2 d-flex w-100 justify-content-end">
-  <button class="me-1" (click)="buttonLayerChange('down')">Ebene tiefer</button>
-  <button (click)="buttonLayerChange('up')">Ebene höher</button>
+<div class="pb-1 d-flex w-100 justify-content-between">
+  <div class="base-color fw-bold"> {{map?.name}}</div>
+  <div>
+    <button class="me-1" (click)="buttonLayerChange('down')">Ebene tiefer</button>
+    <button (click)="buttonLayerChange('up')">Ebene höher</button>
+  </div>
 </div>
 <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
   <div #canvas>

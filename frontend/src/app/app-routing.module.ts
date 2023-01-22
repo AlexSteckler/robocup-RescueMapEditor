@@ -7,37 +7,38 @@ import { HomeComponent } from './home/home.component';
 import { SettingsComponent } from './settings/settings.component';
 
 const routes: Routes = [
-{
-  path: 'createEdit', component:CreateEditComponent,
-  canActivate: [AuthGuard],
-  data: {
-    roles: ['quali', 'admin']
-  }
-},
-{
-  path: 'home', component:HomeComponent,
-  canActivate: [AuthGuard],
-  data: {
-    public: true
-  }
-},
-{
-  path: 'settings', component:SettingsComponent,
-  canActivate: [AuthGuard],
-  data: {
-    roles: ['quali', 'admin']
-  }
-},
-{
-  path: '**',
-  redirectTo: 'home',
-}
-
+  {
+    path: 'createEdit/:id',
+    component: CreateEditComponent,
+    canActivate: [AuthGuard],
+    data: {
+      roles: ['quali', 'admin'],
+    },
+  },
+  {
+    path: 'home',
+    component: HomeComponent,
+    canActivate: [AuthGuard],
+    data: {
+      public: true,
+    },
+  },
+  {
+    path: 'settings',
+    component: SettingsComponent,
+    canActivate: [AuthGuard],
+    data: {
+      roles: ['quali', 'admin'],
+    },
+  },
+  {
+    path: '**',
+    redirectTo: 'home',
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule {
-}
+export class AppRoutingModule {}
