@@ -5,9 +5,9 @@ import { AppModule } from './app/app.module';
 import {environment} from "./environments/environment";
 
 if (environment.production) {
+  console.log('enableProdMode');
   enableProdMode();
 }
-console.log(isDevMode());
 
 if (!isDevMode()) {
   window.console.log = () => {
