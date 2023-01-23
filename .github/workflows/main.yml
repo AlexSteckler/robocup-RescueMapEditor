@@ -25,6 +25,16 @@ jobs:
         run: |
           cd frontend
           docker login -u alexstecki -p ${{ secrets.DOCKERHUB_TOKEN }}
-          docker build -t alexstecki/robocup-rescuemapeditor .
-          docker push alexstecki/robocup-rescuemapeditor
+          docker build -t alexstecki/robocup-rescuemapeditor-frontend .
+          docker push alexstecki/robocup-rescuemapeditor-frontend
           echo "Finish building frontend"
+          
+          cd ../backend
+          docker build -t alexstecki/robocup-rescuemapeditor-backend .
+          docker push alexstecki/robocup-rescuemapeditor-backend
+          echo "Finish building backend"
+
+      - name: Deploy docker container webhook
+        uses: joelwmale/webhook-action@master
+        env:
+          WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL  }}
