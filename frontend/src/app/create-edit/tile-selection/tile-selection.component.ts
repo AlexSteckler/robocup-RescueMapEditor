@@ -1,8 +1,8 @@
-import { Component, HostListener, Input } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { Transform } from 'panzoom';
-import { Tile } from '../tile/dto/tile.dto';
-import { TilesService } from './tiles.service';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {DomSanitizer} from '@angular/platform-browser';
+import {Transform} from 'panzoom';
+import {Tile} from '../tile/dto/tile.dto';
+import {TilesService} from './tiles.service';
 
 @Component({
   selector: 'app-tile-selection',
@@ -13,6 +13,8 @@ export class TileSelectionComponent {
   tiles: Tile[] = [];
   greenTiles: Tile[] = [];
 
+  @Output() tileSelectionChange = new EventEmitter<Tile[]>();
+
   @Input() canvasValues: Transform | undefined;
   @Input() innerHeight: number = 0;
 
@@ -22,19 +24,25 @@ export class TileSelectionComponent {
   constructor(
     private tilesService: TilesService,
     private sanitizer: DomSanitizer
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
+      let loaded = 0;
       tiles.forEach((tile: Tile) => {
         this.tilesService.getTileImg(tile.imageId!).subscribe((blob: Blob) => {
           let objectURL = URL.createObjectURL(blob);
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           tile.image = img;
           tile.rotation = 0;
-
-        });
+          loaded++;
+          if (loaded === tiles.length) {
+            this.tileSelectionChange.emit(this.tiles);
+          }
           this.tiles.push(tile);
+        });
+
       });
     });
   }

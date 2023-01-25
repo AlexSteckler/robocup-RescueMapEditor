@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateMapDto } from './dto/create-map.dto';
+import { UpdateEvacuationZoneDto } from './dto/update-evacuationzone.dto';
 import { UpdateTileDto } from './dto/update-tile.dto';
 import { MapDocument } from './map.schema';
 
@@ -53,6 +54,32 @@ export class MapService {
           },
         },
         { $pull: { tilePosition: { layer: layer, row: row, column: column } } },
+        { new: true },
+      )
+      .exec();
+  }
+
+  addEvacuationZone(updateTileDto: UpdateEvacuationZoneDto, id: string) {
+    return this.mapModel
+      .findOneAndUpdate(
+        { _id: id },
+        {
+          evacuationZonePosition: updateTileDto,
+        },
+        { new: true },
+      )
+      .exec();
+  }
+
+  deleteEvacuationZone(id: string) {
+    return this.mapModel
+      .findOneAndUpdate(
+        {
+          _id: id,
+        },
+        {
+          $unset: { evacuationZonePosition: 1 },
+        },
         { new: true },
       )
       .exec();

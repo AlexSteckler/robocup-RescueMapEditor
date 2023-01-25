@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Map } from '../dto/map.dto';
 import { Tile } from '../tile/dto/tile.dto';
-import {environment} from "../../../environments/environment";
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -49,19 +49,43 @@ export class GridCanvasService {
     layer: number,
     rowCount: number,
     colCount: number,
-    tile: Tile
   ) {
     return this.httpClient.patch<Map>(
       `${environment.baseUrlV1}/map/tile/${id}/delete`,
       {
-        tilePosition: {
-          tileId: tile.id,
-          layer: layer,
-          row: rowCount,
-          column: colCount,
-          rotation: tile.rotation,
-        },
+        layer: layer,
+        row: rowCount,
+        column: colCount,
       }
+    );
+  }
+
+  updateEvacuationZone(
+    id: string,
+    layer: number,
+    row: number,
+    column: number,
+    across: boolean,
+    entry?: { x: number; y: number; position: number },
+    exit?: { x: number; y: number; position: number }
+  ) {
+    return this.httpClient.patch<Map>(
+      `${environment.baseUrlV1}/map/evacuation/${id}`,
+      {
+        id,
+        layer,
+        row,
+        column,
+        across,
+        entry,
+        exit,
+      }
+    );
+  }
+
+  deleteEvacuationZone(id: string) {
+    return this.httpClient.delete<Map>(
+      `${environment.baseUrlV1}/map/evacuation/${id}`
     );
   }
 }

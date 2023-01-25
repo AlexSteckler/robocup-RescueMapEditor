@@ -3,7 +3,6 @@ import {
   Component,
   ElementRef,
   EventEmitter,
-  HostListener,
   Input,
   Output,
   ViewChild,
@@ -15,6 +14,7 @@ import { Tile } from '../tile/dto/tile.dto';
 import { Map } from '../dto/map.dto';
 import { GridCanvasService } from './grid-canvas.service';
 import { ActivatedRoute } from '@angular/router';
+import { ENTRANCECOLOR, EXITCOLOR } from '../tile/tile.component';
 
 const TileCount = 30;
 const OutsideDrag = 100;
@@ -36,6 +36,7 @@ export class GridCanvasComponent {
   @Input() isInTrash: boolean = false;
 
   map: Map | undefined;
+  tileSelection: Array<Tile> = [];
 
   canvasValues: Transform | undefined;
   panzoomCanvas: any = null;
@@ -49,7 +50,8 @@ export class GridCanvasComponent {
   deleteActive: Boolean = false;
 
   @Input() innerHeight: number = 0;
-  evacuation: Evacuation = this.getEvacuationDto(-1, -1);
+  @Input() innerWidth: number = 0;
+  evacuation: Evacuation = this.getEvacuationDto(-1, -1, -1, true);
   startPosition: { layer: number; x: number; y: number } = {
     layer: -1,
     x: -1,
@@ -61,7 +63,7 @@ export class GridCanvasComponent {
   constructor(
     private toastr: ToastrService,
     private gridCanvasService: GridCanvasService,
-    private route : ActivatedRoute,
+    private route: ActivatedRoute
   ) {
     this.addLayer();
 
@@ -84,21 +86,110 @@ export class GridCanvasComponent {
     });
   }
 
-  ngOnInit(): void {
-    this.route.params.subscribe(params => {
+  loadGrid(tileSelection: Tile[]) {
+    this.tileSelection = tileSelection;
+
+    this.route.params.subscribe((params) => {
       this.gridCanvasService.getMap(params['id']).subscribe((map) => {
         this.map = map;
-        console.log(this.map);
+
+        this.loading = false;
+
+        map.tilePosition.forEach((tilePosition) => {
+          if (tilePosition.layer >= this.grids.length) {
+            for (let i = this.grids.length; i <= tilePosition.layer; i++) {
+              this.addLayer();
+            }
+          }
+
+          let tile = tileSelection.find(
+            (tile) => tile.id === tilePosition.tileId
+          ) as Tile;
+          if (tile != undefined) {
+            tile = { ...tile };
+            if (tile.name.includes('start')) {
+              this.startPosition = {
+                layer: tilePosition.layer,
+                x: tilePosition.column,
+                y: tilePosition.row,
+              };
+            }
+            tile.rotation = tilePosition.rotation;
+            this.grids[tilePosition.layer][tilePosition.row][
+              tilePosition.column
+            ] = tile;
+            this.addPlaceholder(
+              tilePosition.layer,
+              tilePosition.row,
+              tilePosition.column,
+              tile
+            );
+          } else {
+            this.toastr.error('Tile wurde nicht gefunden');
+            console.log(tilePosition.tileId);
+          }
+        });
+
+        let evacuationZone = map.evacuationZonePosition;
+
+        if (evacuationZone != undefined) {
+          this.evacuationExists.emit(true);
+          if (evacuationZone.across) {
+            this.addEvacuationZoneAcross(
+              evacuationZone.layer,
+              evacuationZone.row,
+              evacuationZone.column,
+              false,
+              true
+            );
+          } else {
+            this.addEvacuationZoneUpright(
+              evacuationZone.layer,
+              evacuationZone.row,
+              evacuationZone.column,
+              false,
+              true
+            );
+          }
+
+          if (
+            evacuationZone.entry != undefined &&
+            evacuationZone.entry.position != -1
+          ) {
+            this.grids[evacuationZone.layer][evacuationZone.entry.y][
+              evacuationZone.entry.x
+            ].border![evacuationZone.entry.position] = ENTRANCECOLOR;
+          }
+
+          if (
+            evacuationZone.exit != undefined &&
+            evacuationZone.exit.position != -1
+          ) {
+            this.grids[evacuationZone.layer][evacuationZone.exit.y][
+              evacuationZone.exit.x
+            ].border![evacuationZone.exit.position] = EXITCOLOR;
+          }
+          console.log(evacuationZone);
+          this.evacuation = evacuationZone;
+          console.log(this.evacuation);
+        } else {
+          this.evacuationExists.emit(false);
+        }
+
         this.calcTotalPoints();
       });
     });
   }
+
+  ngOnInit(): void {}
 
   ngAfterViewInit() {
     this.panzoomCanvas = panzoom(this.canvasElement!.nativeElement, {
       maxZoom: 2,
       minZoom: 0.5,
     });
+
+    this.panzoomCanvas.moveTo((-TileCount * 100) / 2, (-TileCount * 100) / 2);
 
     this.panzoomCanvas.on('transform', (e: any) => {
       this.canvasValues = this.panzoomCanvas.getTransform();
@@ -200,14 +291,14 @@ export class GridCanvasComponent {
     colCount: number,
     tile: Tile
   ) {
-    if (this.grids[this.grids.length + this.layer] == undefined) {
+    if (this.grids[this.grids.length + layer] == undefined) {
       this.addLayer();
     }
     this.grids[layer + 1][rowCount][colCount] = {
       ...tile,
       isPlaceholder: true,
     };
-    if (this.layer == 1) {
+    if (layer == 1) {
       this.grids[layer - 1][rowCount][colCount] = {
         ...tile,
         isPlaceholder: true,
@@ -216,14 +307,34 @@ export class GridCanvasComponent {
   }
 
   tileChange(tile: Tile, rowCount: number, colCount: number) {
-    this.gridCanvasService
-      .updateTile(this.map!.id, this.layer, rowCount, colCount, tile)
-      .subscribe((map: Map) => {
-        this.map = map;
-      });
+    if (
+      !this.grids[this.layer][rowCount][colCount].name.includes('evacuation')
+    ) {
+      this.gridCanvasService
+        .updateTile(this.map!.id, this.layer, rowCount, colCount, tile)
+        .subscribe((map: Map) => {
+          this.map = map;
+        });
+    }
 
     this.calcTotalPoints();
     this.addPlaceholder(this.layer, rowCount, colCount, tile);
+  }
+
+  evacuationZoneChange($event: any) {
+    this.gridCanvasService
+      .updateEvacuationZone(
+        this.map!.id,
+        this.layer,
+        this.evacuation.row,
+        this.evacuation.column,
+        this.evacuation.across,
+        this.evacuation.entry,
+        this.evacuation.exit
+      )
+      .subscribe((map: Map) => {
+        this.map = map;
+      });
   }
 
   //---------- Drag & Drop -----------//
@@ -266,12 +377,11 @@ export class GridCanvasComponent {
 
       if (this.grids[this.layer][rowCount][colCount].name.includes('start')) {
         if (this.startPosition.x != -1) {
-          this.grids[this.startPosition.layer][this.startPosition.y][
-            this.startPosition.x
-          ] = this.newTile();
-          this.grids[this.startPosition.layer + 1][this.startPosition.y][
-            this.startPosition.x
-          ] = this.newTile();
+          this.grids[this.startPosition.layer][this.startPosition.y][this.startPosition.x] = this.newTile();
+          this.grids[this.startPosition.layer + 1][this.startPosition.y][this.startPosition.x] = this.newTile();
+          this.gridCanvasService.deleteTile(this.map!.id, this.startPosition.layer, this.startPosition.y, this.startPosition.x).subscribe((map: Map) => {
+            this.map = map;
+          });
         }
         this.startPosition = { layer: this.layer, x: colCount, y: rowCount };
       }
@@ -281,11 +391,9 @@ export class GridCanvasComponent {
       colCount <= TileCount - 4 &&
       !tile.name.includes('evacuationZone')
     ) {
-      this.addEvacuationZoneAcross(this.layer, colCount, rowCount);
-      this.evacuation = this.getEvacuationDto(colCount, rowCount);
+      this.addEvacuationZoneAcross(this.layer, rowCount, colCount);
     } else if ($event.previousIndex == 1) {
-      this.addEvacuationZoneUpright(this.layer, colCount, rowCount);
-      this.evacuation = this.getEvacuationDto(colCount, rowCount);
+      this.addEvacuationZoneUpright(this.layer, rowCount, colCount);
     }
 
     this.calcTotalPoints();
@@ -327,7 +435,8 @@ export class GridCanvasComponent {
       let newY = (Math.floor((y - 50) / 100) + 1) * yDirection + rowCount;
 
       if (tile.name.includes('evacuationZone')) {
-        this.evacuation!.position! = { x: newX, y: newY };
+        this.evacuation.column = newX;
+        this.evacuation.row = newY;
 
         let x = +tile.name.substring(
           tile.name.length - 2,
@@ -348,9 +457,23 @@ export class GridCanvasComponent {
           ) {
             this.deleteEvacuationZone(layerCount, rowCount - x, colCount - y);
             if (!this.isInTrash) {
-              tile.name.includes('Upright')
-                ? this.addEvacuationZoneUpright(this.layer, newX, newY)
-                : this.addEvacuationZoneAcross(this.layer, newX, newY);
+              let success = tile.name.includes('Upright')
+                ? this.addEvacuationZoneUpright(this.layer, newY, newX)
+                : this.addEvacuationZoneAcross(this.layer, newY, newX);
+
+              if (!success) {
+                tile.name.includes('Upright')
+                  ? this.addEvacuationZoneUpright(
+                      this.layer,
+                      rowCount,
+                      colCount
+                    )
+                  : this.addEvacuationZoneAcross(
+                      this.layer,
+                      rowCount,
+                      colCount
+                    );
+              }
             }
           }
         }, 10);
@@ -392,8 +515,7 @@ export class GridCanvasComponent {
               this.map!.id,
               this.layer,
               rowCount,
-              colCount,
-              this.newTile()
+              colCount
             )
             .subscribe((map: Map) => {
               this.map = map;
@@ -415,8 +537,7 @@ export class GridCanvasComponent {
                 this.map!.id,
                 this.layer,
                 rowCount,
-                colCount,
-                this.newTile()
+                colCount
               )
               .subscribe((map: Map) => {
                 this.map = map;
@@ -447,10 +568,10 @@ export class GridCanvasComponent {
       y: point.y + zoomMoveYDifference - scale * 50,
     };
   };
+  loading: boolean = true;
 
   calcTotalPoints() {
     let loopCount = 0;
-
     if (this.startPosition.x == -1) {
       this.totalPoints = 'Keine Startkachel gegeben';
       return;
@@ -458,6 +579,7 @@ export class GridCanvasComponent {
 
     let currentPoints = 5;
     let currentPosition = { ...this.startPosition };
+
     let orientation =
       (this.grids[currentPosition.layer][currentPosition.y][currentPosition.x]
         .rotation! +
@@ -467,6 +589,7 @@ export class GridCanvasComponent {
           .to +
         2) %
       4;
+
     this.totalPoints = currentPoints.toString();
 
     let multiplier: number = 1;
@@ -504,22 +627,23 @@ export class GridCanvasComponent {
 
       if (currentTile.name.includes('evacuationZone')) {
         if (
-          this.evacuation.entrancePosition.x != currentPosition.x ||
-          this.evacuation.entrancePosition.y != currentPosition.y ||
-          this.evacuation.entrancePosition.borderPosition != orientation
+          this.evacuation.entry == undefined ||
+          this.evacuation.entry.x != currentPosition.x ||
+          this.evacuation.entry.y != currentPosition.y ||
+          this.evacuation.entry.position != orientation
         ) {
           return;
         }
-        if (this.evacuation.exitPosition.x == -1) {
+        if (this.evacuation.exit == undefined || this.evacuation.exit.x == -1) {
           return;
         }
 
         currentPosition = {
           layer: this.layer,
-          x: this.evacuation.exitPosition.x,
-          y: this.evacuation.exitPosition.y,
+          x: this.evacuation.exit.x,
+          y: this.evacuation.exit.y,
         };
-        orientation = (this.evacuation.exitPosition.borderPosition + 2) % 4;
+        orientation = (this.evacuation.exit.position + 2) % 4;
 
         multiplier = 4.3904;
       } else {
@@ -556,11 +680,33 @@ export class GridCanvasComponent {
 
   private addEvacuationZoneAcross(
     layer: number,
-    colCount: number,
     rowCount: number,
-    isPlaceholder: boolean = false
+    colCount: number,
+    isPlaceholder: boolean = false,
+    load: boolean = false
   ) {
-    this.evacuation = this.getEvacuationDto(colCount, rowCount);
+    if (this.grids[this.layer].length + 1 != undefined) {
+      for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 3; j++) {
+          if (
+            this.grids[layer][rowCount + j][colCount + i].name != '' ||
+            this.grids[layer + 1][rowCount + j][colCount + i].name != ''
+          ) {
+            this.toastr.warning('Kacheln sind belegt');
+            return false;
+          }
+        }
+      }
+    }
+
+    if (!isPlaceholder && !load) {
+      this.evacuation = this.getEvacuationDto(layer, rowCount, colCount, true);
+      this.gridCanvasService
+        .updateEvacuationZone(this.map!.id, layer, rowCount, colCount, true)
+        .subscribe((map: Map) => {
+          this.map = map;
+        });
+    }
 
     this.grids[layer][rowCount][colCount] = {
       name: 'evacuationZoneAcross_00',
@@ -627,17 +773,40 @@ export class GridCanvasComponent {
       if (this.grids[this.grids.length + layer] == undefined) {
         this.addLayer();
       }
-      this.addEvacuationZoneAcross(layer + 1, colCount, rowCount, true);
+      this.addEvacuationZoneAcross(layer + 1, rowCount, colCount, true);
     }
+
+    return true;
   }
 
   private addEvacuationZoneUpright(
     layer: number,
-    colCount: number,
     rowCount: number,
-    isPlaceholder: boolean = false
+    colCount: number,
+    isPlaceholder: boolean = false,
+    load: boolean = false
   ) {
-    this.evacuation = this.getEvacuationDto(colCount, rowCount);
+    if (this.grids[this.layer].length + 1 != undefined) {
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 4; j++) {
+          if (
+            this.grids[layer][rowCount + j][colCount + i].name != '' ||
+            this.grids[layer + 1][rowCount + j][colCount + i].name != ''
+          ) {
+            this.toastr.warning('Kacheln sind belegt');
+            return false;
+          }
+        }
+      }
+    }
+    if (!isPlaceholder && !load) {
+      this.evacuation = this.getEvacuationDto(layer, rowCount, colCount, false);
+      this.gridCanvasService
+        .updateEvacuationZone(this.map!.id, layer, rowCount, colCount, false)
+        .subscribe((map: Map) => {
+          this.map = map;
+        });
+    }
 
     this.grids[layer][rowCount][colCount] = {
       name: 'evacuationZoneUpright_00',
@@ -704,14 +873,24 @@ export class GridCanvasComponent {
       if (this.grids[this.grids.length + layer] == undefined) {
         this.addLayer();
       }
-      this.addEvacuationZoneUpright(layer + 1, colCount, rowCount, true);
+      this.addEvacuationZoneUpright(layer + 1, rowCount, colCount, true);
     }
+
+    return true;
   }
 
   deleteEvacuationZone(layerCount: number, rowCount: number, colCount: number) {
-    this.evacuation = this.getEvacuationDto(-1, -1);
+    this.evacuation = this.getEvacuationDto(-1, -1, -1, true);
     const upright: boolean =
       this.grids[layerCount][rowCount][colCount].name.includes('Upright');
+
+    if (this.isInTrash) {
+      this.gridCanvasService
+        .deleteEvacuationZone(this.map!.id)
+        .subscribe((map) => {
+          this.map = map;
+        });
+    }
 
     for (let i = 0; i < (upright ? 3 : 4); i++) {
       for (let j = 0; j < (upright ? 4 : 3); j++) {
@@ -721,15 +900,20 @@ export class GridCanvasComponent {
     }
   }
 
-  getEvacuationDto(x: number, y: number) {
-    this.evacuationExists.emit(x == -1 ? false : true);
+  getEvacuationDto(
+    layer: number,
+    row: number,
+    column: number,
+    across: boolean
+  ) {
+    this.evacuationExists.emit(row == -1 ? false : true);
     return {
-      position: { x, y },
-      exitPlaced: false,
-      entrancePlaced: false,
-      alignment: 1,
-      exitPosition: { x: -1, y: -1, borderPosition: -1 },
-      entrancePosition: { x: -1, y: -1, borderPosition: -1 },
+      layer,
+      column,
+      row,
+      across,
+      exit: { x: -1, y: -1, position: -1 },
+      entry: { x: -1, y: -1, position: -1 },
     };
   }
 

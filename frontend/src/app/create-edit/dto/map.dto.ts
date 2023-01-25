@@ -2,6 +2,7 @@ export interface Map {
   id: string;
   name: string;
   description: string;
+  createdBy: string;
 
   tilePosition: {
     tileId: string;
@@ -11,13 +12,12 @@ export interface Map {
     rotation: number;
   }[];
 
-  evacuation: {
+  evacuationZonePosition: {
     layer: number;
     row: number;
     column: number;
-    entry: { x: number; y: number; rotation: number };
-    exit: { x: number; y: number; rotation: number };
+    entry: { x: number; y: number; position: number };
+    exit: { x: number; y: number; position: number };
+    across: boolean;
   };
-
-  createdBy: string;
 }
