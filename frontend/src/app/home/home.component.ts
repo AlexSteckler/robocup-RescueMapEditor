@@ -14,10 +14,12 @@ export class HomeComponent {
 
   mapName: string = '';
 
+  panelOpenState = true;
+
   constructor(
     private gridCanvasService: GridCanvasService,
     private toastr: ToastrService,
-    private router: Router,
+    private router: Router
   ) {}
 
   ngOnInit() {
