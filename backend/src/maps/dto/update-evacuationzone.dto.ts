@@ -25,8 +25,8 @@ export class UpdateEvacuationZoneDto {
   across: boolean;
 
   @IsOptional()
-  entry: { x: number; y: number; rotation: number };
+  entry: { x: number; y: number; position: number };
 
   @IsOptional()
-  exit: { x: number; y: number; rotation: number };
+  exit: { x: number; y: number; position: number };
 }

@@ -4,9 +4,10 @@ import {trigger, state, style} from '@angular/animations';
 import { Transform } from 'panzoom';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Evacuation } from './dto/evacuation.dto';
+import { GridCanvasService } from '../grid-canvas/grid-canvas.service';
 
-const EXITCOLOR: string = 'green';
-const ENTRANCECOLOR: string = '#f0f0f0';
+export const EXITCOLOR: string = 'green';
+export const ENTRANCECOLOR: string = '#f0f0f0';
 
 @Component({
   selector: 'app-tile',
@@ -35,9 +36,11 @@ export class TileComponent implements OnInit{
 
   state: string = '0';
 
+  constructor(private gridCanvasService : GridCanvasService) {}
+
   ngOnInit(): void {
     this.state = this.tile?.rotation?.toString()!;
-    
+
   }
 
   onRightClick(position:number = -1) {
@@ -55,20 +58,20 @@ export class TileComponent implements OnInit{
     if (this.evacuationZone && this.position) {
       if (this.tile!.border![index] == ENTRANCECOLOR) {
         this.tile!.border![index] = 'black';
-        this.evacuationZone.entrancePosition = {x: -1, y : -1, borderPosition: -1};
+        this.evacuationZone.entry = {x: -1, y : -1, position: -1};
       }
       else if (this.tile!.border![index] == EXITCOLOR) {
         this.tile!.border![index] = 'black';
-        this.evacuationZone.exitPosition = {x: -1, y : -1, borderPosition: -1};
+        this.evacuationZone.exit = {x: -1, y : -1, position: -1};
       }
       else {
-        if (this.evacuationZone!.entrancePosition.x == -1) {
+        if (this.evacuationZone!.entry == undefined || this.evacuationZone!.entry.x == -1) {
         this.tile!.border![index] = ENTRANCECOLOR;
-        this.evacuationZone.entrancePosition = {x: this.position.x, y : this.position.y, borderPosition: index};
+        this.evacuationZone.entry = {x: this.position.x, y : this.position.y, position: index};
         }
-        else if (this.evacuationZone!.exitPosition.x == -1) {
+        else if (this.evacuationZone!.exit == undefined || this.evacuationZone!.exit.x == -1) {
           this.tile!.border![index] =  EXITCOLOR;
-          this.evacuationZone.exitPosition = {x: this.position.x, y : this.position.y, borderPosition: index};
+          this.evacuationZone.exit = {x: this.position.x, y : this.position.y, position: index};
         }
       }
       this.evacuationZoneChange.emit(this.evacuationZone);

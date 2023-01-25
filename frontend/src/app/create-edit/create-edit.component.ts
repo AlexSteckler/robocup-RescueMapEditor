@@ -16,7 +16,7 @@ export class CreateEditComponent {
   isInTrash: boolean = false;
   currentDraggedTile: Tile | undefined;
   canvasValues: Transform | undefined;
-  evacuationExists: boolean = false;
+  evacuationExists: boolean = true;
   innerHeight: number = 0;
   innerWidth: number = 0;
 

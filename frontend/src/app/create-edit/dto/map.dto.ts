@@ -16,8 +16,8 @@ export interface Map {
     layer: number;
     row: number;
     column: number;
-    entry: { x: number; y: number; rotation: number };
-    exit: { x: number; y: number; rotation: number };
+    entry: { x: number; y: number; position: number };
+    exit: { x: number; y: number; position: number };
     across: boolean;
   };
 }

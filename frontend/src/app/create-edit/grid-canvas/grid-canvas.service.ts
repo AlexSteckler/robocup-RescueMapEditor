@@ -70,7 +70,9 @@ export class GridCanvasService {
     layer: number,
     row: number,
     column: number,
-    across: boolean
+    across: boolean,
+    entry?: { x: number; y: number; position: number },
+    exit?: { x: number; y: number; position: number }
   ) {
     return this.httpClient.patch<Map>(
       `${environment.baseUrlV1}/map/evacuation/${id}`,
@@ -80,6 +82,8 @@ export class GridCanvasService {
         row,
         column,
         across,
+        entry,
+        exit,
       }
     );
   }
