@@ -113,15 +113,14 @@ export class GridCanvasComponent {
               };
             }
             tile.rotation = tilePosition.rotation;
-            this.grids[tilePosition.layer][tilePosition.row][
-              tilePosition.column
-            ] = tile;
+            this.grids[tilePosition.layer][tilePosition.row][tilePosition.column] = tile;
+            this.addPlaceholder(tilePosition.layer, tilePosition.row, tilePosition.column, tile);
           } else {
             this.toastr.error('Tile wurde nicht gefunden');
             console.log(tilePosition.tileId);
           }
         });
-        //console.log(this.map);
+
         this.calcTotalPoints();
       });
     });
@@ -237,18 +236,19 @@ export class GridCanvasComponent {
     colCount: number,
     tile: Tile
   ) {
-    if (this.grids[this.grids.length + this.layer] == undefined) {
+    if (this.grids[this.grids.length + layer] == undefined) {
       this.addLayer();
     }
     this.grids[layer + 1][rowCount][colCount] = {
       ...tile,
       isPlaceholder: true,
     };
-    if (this.layer == 1) {
+    if (layer == 1) {
       this.grids[layer - 1][rowCount][colCount] = {
         ...tile,
         isPlaceholder: true,
       };
+      console.log('test');
     }
   }
 
