@@ -90,6 +90,7 @@ export class GridCanvasComponent {
               this.addLayer();
             }
           }
+          this.loading = false;
 
           let tile = tileSelection.find((tile) => tile.id === tilePosition.tileId) as Tile;
           if (tile != undefined) {
@@ -470,6 +471,7 @@ export class GridCanvasComponent {
       y: point.y + zoomMoveYDifference - scale * 50,
     };
   };
+  loading: boolean = true;
 
   calcTotalPoints() {
     let loopCount = 0;

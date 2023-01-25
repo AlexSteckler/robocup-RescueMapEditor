@@ -7,6 +7,9 @@
 </div>
 <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
   <div #canvas>
+    <div class="spinner-border" [ngStyle]="{'top': innerHeight/2+'px'}" *ngIf="loading">
+      <span class="visually-hidden">Loading...</span>
+    </div>
     <div *ngFor="let layerOfGrids of grids; let layerCount = index" class="layer">
       <div *ngIf="layerCount == layer">
         <div *ngFor="let row of layerOfGrids; let rowCount = index" class="row d-flex flex-nowrap">
