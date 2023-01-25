@@ -7,9 +7,7 @@
 </div>
 <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
   <div #canvas>
-    <div class="spinner-border" [ngStyle]="{'top': innerHeight/2-50+'px'}" *ngIf="loading">
-      <span class="visually-hidden">Loading...</span>
-    </div>
+
     <div *ngFor="let layerOfGrids of grids; let layerCount = index" class="layer">
       <div *ngIf="layerCount == layer">
         <div *ngFor="let row of layerOfGrids; let rowCount = index" class="row d-flex flex-nowrap">
@@ -40,6 +38,10 @@
   <div class="rounded border border-3 p-2 base-bg" >
     <i class="bi bi-trash-fill"></i>
   </div>
+</div>
+
+<div class="spinner-border" [ngStyle]="{'top': innerHeight/2-50+'px'}" *ngIf="loading">
+  <span class="visually-hidden">Loading...</span>
 </div>
 
 <div class="position-absolute p-2" style="bottom: 0px; background-color: rgba(177, 103, 12, 0.252);">
