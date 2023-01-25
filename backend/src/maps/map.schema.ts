@@ -4,8 +4,9 @@ class Evacuation {
   layer: number;
   row: number;
   column: number;
-  entry: { x: number; y: number; rotation: number };
-  exit: { x: number; y: number; rotation: number };
+  entry: { x: number; y: number; position: number };
+  exit: { x: number; y: number; position: number };
+  across: boolean;
 }
 
 @Schema({ timestamps: true })
@@ -26,7 +27,7 @@ export class Map {
   }[];
 
   @Prop(Evacuation)
-  evacuation: Evacuation;
+  evacuationZonePosition: Evacuation;
 
   @Prop()
   createdBy: string;

@@ -20,11 +20,12 @@ export class CreateMapDto {
   }[];
 
   @IsOptional()
-  evacuation: {
+  evacuationZonePosition: {
     layer: number;
     row: number;
     column: number;
     entry: { x: number; y: number; rotation: number };
     exit: { x: number; y: number; rotation: number };
+    across: boolean;
   };
 }

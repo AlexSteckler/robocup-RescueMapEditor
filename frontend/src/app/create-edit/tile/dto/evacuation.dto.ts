@@ -1,6 +1,8 @@
 export interface Evacuation {
-  position: { x: number, y: number };
-
-  exitPosition: { x: number, y: number, borderPosition: number };
-  entrancePosition: { x: number, y: number, borderPosition: number };
+  layer: number;
+    row: number;
+    column: number;
+    entry: { x: number; y: number; position: number };
+    exit: { x: number; y: number; position: number };
+    across: boolean;
 }
