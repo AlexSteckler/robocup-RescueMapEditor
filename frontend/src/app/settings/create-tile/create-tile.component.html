@@ -1,44 +1,86 @@
-<div class="p-3">
-  <h3 cla>Erstelle eine Kachel</h3>
-  <div class="d-flex flex-column">
-    <div class="d-flex flex-column p-3">
-      <div class="d-flex flex-row p-3">
-      <input type="text" class="form-control m-3" placeholder="Name" [(ngModel)]="name">
-      <input type="number" class="form-control m-3" placeholder="Value" [(ngModel)]="value">
+<div class="d-flex flex-column">
+  <div class="d-flex flex-column p-3">
+    <div class="d-flex flex-row p-3">
+      <input
+        type="text"
+        class="form-control m-3"
+        placeholder="Name"
+        [(ngModel)]="name"
+      />
+      <input
+        type="number"
+        class="form-control m-3"
+        placeholder="Value"
+        [(ngModel)]="value"
+      />
     </div>
-      <div class="d-flex flex-column align-items-center">
-        <div>
-          <button type="button" class="btn btn-primary" (click)="addDeletePath(true)">
-            <i class="bi bi-plus-circle"></i>
-          </button>
-          <button type="button" class="btn btn-danger" (click)="addDeletePath(false)">
-            <i class="bi bi-dash-circle"></i>
-          </button>
+    <div class="d-flex flex-column align-items-center">
+      <div>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="addDeletePath(true)"
+        >
+          <i class="bi bi-plus-circle"></i>
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="addDeletePath(false)"
+        >
+          <i class="bi bi-dash-circle"></i>
+        </button>
+      </div>
+      <div class="d-flex flex-row" *ngFor="let path of paths">
+        <div class="d-flex flex-row align-items-center">
+          <label>From:</label>
+          <input
+            type="number"
+            class="form-control m-3"
+            placeholder="From"
+            [(ngModel)]="path.from"
+          />
         </div>
-        <div class="d-flex flex-row" *ngFor="let path of paths">
-          <div class="d-flex flex-row align-items-center">
-            <label>From:</label>
-            <input type="number" class="form-control m-3" placeholder="From" [(ngModel)]="path.from">
-          </div>
-          <div class="d-flex flex-row align-items-center">
-            <label>To:</label>
-            <input type="number" class="form-control m-3" placeholder="To" [(ngModel)]="path.to">
-          </div>
-          <div class="d-flex flex-row align-items-center">
-            <label>Layer:</label>
-            <input type="number" class="form-control m-3" placeholder="layer" [(ngModel)]="path.layer">
-          </div>
+        <div class="d-flex flex-row align-items-center">
+          <label>To:</label>
+          <input
+            type="number"
+            class="form-control m-3"
+            placeholder="To"
+            [(ngModel)]="path.to"
+          />
+        </div>
+        <div class="d-flex flex-row align-items-center">
+          <label>Layer:</label>
+          <input
+            type="number"
+            class="form-control m-3"
+            placeholder="layer"
+            [(ngModel)]="path.layer"
+          />
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="input-group d-flex m-3 text-white">
-      <input #fileChooser type="file" class="form-control dark-bg text-white" id="formFile"
-             accept="image/*, application/pdf" (change)="onFileSelected($event)">
-    </div>
+  <div class="input-group d-flex m-3 text-white">
+    <input
+      #fileChooser
+      type="file"
+      class="form-control dark-bg text-white"
+      id="formFile"
+      accept="image/*, application/pdf"
+      (change)="onFileSelected($event)"
+    />
+  </div>
 
-    <div class="p-3">
-      <button class="btn btn-primary" [class.disabled]="!uploadActive || name == ''" (click)="create()">Erstellen</button>
-    </div>
+  <div class="p-3">
+    <button
+      class="btn btn-primary"
+      [class.disabled]="!uploadActive || name == ''"
+      (click)="create()"
+    >
+      Erstellen
+    </button>
   </div>
 </div>
