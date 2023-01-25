@@ -1,4 +1,4 @@
-import { Component, HostListener, Input } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Transform } from 'panzoom';
 import { Tile } from '../tile/dto/tile.dto';
@@ -12,6 +12,8 @@ import { TilesService } from './tiles.service';
 export class TileSelectionComponent {
   tiles: Tile[] = [];
   greenTiles: Tile[] = [];
+
+  @Output() tileSelectionChange = new EventEmitter<Tile[]>();
 
   @Input() canvasValues: Transform | undefined;
   @Input() innerHeight: number = 0;
@@ -32,10 +34,10 @@ export class TileSelectionComponent {
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           tile.image = img;
           tile.rotation = 0;
-
         });
           this.tiles.push(tile);
       });
+      this.tileSelectionChange.emit(this.tiles);
     });
   }
 

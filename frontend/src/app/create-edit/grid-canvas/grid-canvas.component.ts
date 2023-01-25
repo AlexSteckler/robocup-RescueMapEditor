@@ -36,6 +36,7 @@ export class GridCanvasComponent {
   @Input() isInTrash: boolean = false;
 
   map: Map | undefined;
+  tileSelection: Array<Tile> = [];
 
   canvasValues: Transform | undefined;
   panzoomCanvas: any = null;
@@ -61,7 +62,7 @@ export class GridCanvasComponent {
   constructor(
     private toastr: ToastrService,
     private gridCanvasService: GridCanvasService,
-    private route : ActivatedRoute,
+    private route: ActivatedRoute
   ) {
     this.addLayer();
 
@@ -84,15 +85,50 @@ export class GridCanvasComponent {
     });
   }
 
-  ngOnInit(): void {
-    this.route.params.subscribe(params => {
+  loadGrid(tileSelection: Tile[]) {
+    this.tileSelection = tileSelection;
+
+    this.route.params.subscribe((params) => {
       this.gridCanvasService.getMap(params['id']).subscribe((map) => {
         this.map = map;
+
+        map.tilePosition.forEach((tilePosition) => {
+          if (tilePosition.layer >= this.grids.length) {
+            for (let i = this.grids.length; i <= tilePosition.layer; i++) {
+              this.addLayer();
+            }
+          }
+
+          let tile = tileSelection.find((tile) => tile.id === tilePosition.tileId);
+
+
+
+          if (tile != undefined) {
+            console.log(tile);
+            tile = { ...tile, image: tile.image };
+
+            if (tile.name.includes('start')) {
+              this.startPosition = {
+                layer: tilePosition.layer,
+                x: tilePosition.column,
+                y: tilePosition.row,
+              };
+            }
+
+            tile.rotation = tilePosition.rotation;
+            this.grids[tilePosition.layer][tilePosition.row][tilePosition.column] = tile;
+          } else {
+            this.toastr.error('Tile wurde nicht gefunden');
+            console.log(tilePosition.tileId);
+          }
+        });
         console.log(this.map);
         this.calcTotalPoints();
       });
     });
   }
+
+  ngOnInit(): void {}
 
   ngAfterViewInit() {
     this.panzoomCanvas = panzoom(this.canvasElement!.nativeElement, {
