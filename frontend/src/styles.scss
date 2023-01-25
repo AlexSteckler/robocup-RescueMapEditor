@@ -8,7 +8,6 @@ $dark-color-bg: #212529;
 $base-bg-btn-color: rgb(68, 45, 9);
 $base-blue: rgb(7, 139, 186);
 
-
 html {
   height: 100%;
 }
@@ -35,7 +34,8 @@ body {
   text-decoration: none;
 
   .link-base.active {
-    border-bottom: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+    border-bottom: var(--bs-border-width) var(--bs-border-style)
+      var(--bs-border-color) !important;
     border-bottom-width: 100% !important;
     border-bottom-style: inset !important;
     border-bottom-color: $base-color !important;
@@ -83,9 +83,14 @@ h1 {
   color: white;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 
 .cdk-overlay-pane {
   transform: translate(55px, -85px) !important;
@@ -94,4 +99,13 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .row {
   --bs-gutter-x: 0;
   --bs-gutter-y: 0;
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+.mat-expansion-panel-body {
+  padding: 0 24px 16px;
+  background-color: whitesmoke;
 }
