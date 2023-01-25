@@ -1,11 +1,11 @@
-import {Component, HostListener} from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { Transform } from 'panzoom';
 import { Tile } from './tile/dto/tile.dto';
 
 @Component({
   selector: 'app-create-edit',
   templateUrl: './create-edit.component.html',
-  styleUrls: ['./create-edit.component.scss']
+  styleUrls: ['./create-edit.component.scss'],
 })
 export class CreateEditComponent {
   @HostListener('window:resize', ['$event'])
@@ -18,8 +18,10 @@ export class CreateEditComponent {
   canvasValues: Transform | undefined;
   evacuationExists: boolean = false;
   innerHeight: number = 0;
+  innerWidth: number = 0;
 
   ngOnInit(): void {
     this.innerHeight = window.innerHeight - 240;
+    this.innerWidth = window.innerWidth;
   }
 }

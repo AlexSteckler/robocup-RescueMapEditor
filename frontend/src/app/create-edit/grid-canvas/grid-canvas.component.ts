@@ -42,6 +42,7 @@ export class GridCanvasComponent {
   deleteActive: Boolean = false;
 
   @Input() innerHeight: number = 0;
+  @Input() innerWidth: number = 0;
   evacuation: Evacuation = this.getEvacuationDto(-1, -1);
   startPosition: { layer: number; x: number; y: number } = {
     layer: -1,
