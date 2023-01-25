@@ -462,13 +462,20 @@ export class GridCanvasComponent {
                 ? this.addEvacuationZoneUpright(this.layer, newY, newX)
                 : this.addEvacuationZoneAcross(this.layer, newY, newX);
 
-                if(!success) {
-                  tile.name.includes('Upright')
-                ? this.addEvacuationZoneUpright(this.layer, rowCount, colCount)
-                : this.addEvacuationZoneAcross(this.layer, rowCount, colCount);
-                }
+              if (!success) {
+                tile.name.includes('Upright')
+                  ? this.addEvacuationZoneUpright(
+                      this.layer,
+                      rowCount,
+                      colCount
+                    )
+                  : this.addEvacuationZoneAcross(
+                      this.layer,
+                      rowCount,
+                      colCount
+                    );
+              }
             }
-
           }
         }, 10);
       } else if (
@@ -568,7 +575,7 @@ export class GridCanvasComponent {
 
   calcTotalPoints() {
     let loopCount = 0;
-    if (this.startPosition.x == -1 ) {
+    if (this.startPosition.x == -1) {
       this.totalPoints = 'Keine Startkachel gegeben';
       return;
     }
@@ -576,15 +583,18 @@ export class GridCanvasComponent {
     let currentPoints = 5;
     let currentPosition = { ...this.startPosition };
 
-    if(this.grids[currentPosition.layer][currentPosition.y][currentPosition.x].paths != undefined) {
-
+    if (
+      this.grids[currentPosition.layer][currentPosition.y][currentPosition.x]
+        .paths != undefined
+    ) {
       let orientation =
         (this.grids[currentPosition.layer][currentPosition.y][currentPosition.x]
           .rotation! +
           this.grids[currentPosition.layer][currentPosition.y][
             currentPosition.x
-          ].paths!.find((path: { from: number; to: number }) => path.from === -1)!
-            .to +
+          ].paths!.find(
+            (path: { from: number; to: number }) => path.from === -1
+          )!.to +
           2) %
         4;
 
@@ -632,7 +642,10 @@ export class GridCanvasComponent {
           ) {
             return;
           }
-          if (this.evacuation.exit == undefined || this.evacuation.exit.x == -1) {
+          if (
+            this.evacuation.exit == undefined ||
+            this.evacuation.exit.x == -1
+          ) {
             return;
           }
 
@@ -663,7 +676,9 @@ export class GridCanvasComponent {
 
             orientation = (tileRotation + tileWay.to + 2) % 4;
             currentPoints += currentTile.value ? currentTile.value + 5 : 5;
-            this.totalPoints = Math.round(currentPoints * multiplier).toString();
+            this.totalPoints = Math.round(
+              currentPoints * multiplier
+            ).toString();
           } else {
             return;
           }
@@ -684,14 +699,18 @@ export class GridCanvasComponent {
     rowCount: number,
     colCount: number,
     isPlaceholder: boolean = false,
-    load: boolean = false,
+    load: boolean = false
   ) {
-
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 3; j++) {
-        if (this.grids[layer][rowCount + j][colCount + i].name != '') {
-          this.toastr.warning('Kacheln sind belegt');
-          return false;
+    if (this.grids[this.layer].length + 1 != undefined) {
+      for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 3; j++) {
+          if (
+            this.grids[layer][rowCount + j][colCount + i].name != '' ||
+            this.grids[layer + 1][rowCount + j][colCount + i].name != ''
+          ) {
+            this.toastr.warning('Kacheln sind belegt');
+            return false;
+          }
         }
       }
     }
@@ -781,14 +800,18 @@ export class GridCanvasComponent {
     rowCount: number,
     colCount: number,
     isPlaceholder: boolean = false,
-    load : boolean = false,
+    load: boolean = false
   ) {
-
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 4; j++) {
-        if (this.grids[layer][rowCount + j][colCount + i].name != '') {
-          this.toastr.warning('Kacheln sind belegt');
-          return false;
+    if (this.grids[this.layer].length + 1 != undefined) {
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 4; j++) {
+          if (
+            this.grids[layer][rowCount + j][colCount + i].name != '' ||
+            this.grids[layer + 1][rowCount + j][colCount + i].name != ''
+          ) {
+            this.toastr.warning('Kacheln sind belegt');
+            return false;
+          }
         }
       }
     }
@@ -897,7 +920,7 @@ export class GridCanvasComponent {
     layer: number,
     row: number,
     column: number,
-    across: boolean,
+    across: boolean
   ) {
     this.evacuationExists.emit(row == -1 ? false : true);
     return {
