@@ -1,8 +1,9 @@
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { Transform } from 'panzoom';
-import { Tile } from '../tile/dto/tile.dto';
-import { TilesService } from './tiles.service';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {DomSanitizer} from '@angular/platform-browser';
+import {Transform} from 'panzoom';
+import {Tile} from '../tile/dto/tile.dto';
+import {TilesService} from './tiles.service';
+import {firstValueFrom} from "rxjs";
 
 @Component({
   selector: 'app-tile-selection',
@@ -24,19 +25,19 @@ export class TileSelectionComponent {
   constructor(
     private tilesService: TilesService,
     private sanitizer: DomSanitizer
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
-    this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
-      tiles.forEach((tile: Tile) => {
-        this.tilesService.getTileImg(tile.imageId!).subscribe((blob: Blob) => {
-          let objectURL = URL.createObjectURL(blob);
-          let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-          tile.image = img;
-          tile.rotation = 0;
-        });
-          this.tiles.push(tile);
-      });
+    this.tilesService.getTiles().subscribe(async (tiles: Tile[]) => {
+      for (const tile of tiles) {
+        let blob = await firstValueFrom(this.tilesService.getTileImg(tile.imageId!));
+        let objectURL = URL.createObjectURL(blob);
+        let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+        tile.image = img;
+        tile.rotation = 0;
+        this.tiles.push(tile);
+      }
       this.tileSelectionChange.emit(this.tiles);
     });
   }

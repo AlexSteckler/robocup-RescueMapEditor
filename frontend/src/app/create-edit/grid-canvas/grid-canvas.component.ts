@@ -1,20 +1,12 @@
-import { CdkDragDrop, CdkDragEnd } from '@angular/cdk/drag-drop';
-import {
-  Component,
-  ElementRef,
-  EventEmitter,
-  HostListener,
-  Input,
-  Output,
-  ViewChild,
-} from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
-import panzoom, { Transform } from 'panzoom';
-import { Evacuation } from '../tile/dto/evacuation.dto';
-import { Tile } from '../tile/dto/tile.dto';
-import { Map } from '../dto/map.dto';
-import { GridCanvasService } from './grid-canvas.service';
-import { ActivatedRoute } from '@angular/router';
+import {CdkDragDrop, CdkDragEnd} from '@angular/cdk/drag-drop';
+import {Component, ElementRef, EventEmitter, Input, Output, ViewChild,} from '@angular/core';
+import {ToastrService} from 'ngx-toastr';
+import panzoom, {Transform} from 'panzoom';
+import {Evacuation} from '../tile/dto/evacuation.dto';
+import {Tile} from '../tile/dto/tile.dto';
+import {Map} from '../dto/map.dto';
+import {GridCanvasService} from './grid-canvas.service';
+import {ActivatedRoute} from '@angular/router';
 
 const TileCount = 30;
 const OutsideDrag = 100;
@@ -99,14 +91,9 @@ export class GridCanvasComponent {
             }
           }
 
-          let tile = tileSelection.find((tile) => tile.id === tilePosition.tileId);
-
-
-
+          let tile = tileSelection.find((tile) => tile.id === tilePosition.tileId) as Tile;
           if (tile != undefined) {
-            console.log(tile);
-            tile = { ...tile, image: tile.image };
-
+            tile = {...tile}
             if (tile.name.includes('start')) {
               this.startPosition = {
                 layer: tilePosition.layer,
@@ -114,7 +101,6 @@ export class GridCanvasComponent {
                 y: tilePosition.row,
               };
             }
-
             tile.rotation = tilePosition.rotation;
             this.grids[tilePosition.layer][tilePosition.row][tilePosition.column] = tile;
           } else {
@@ -122,13 +108,14 @@ export class GridCanvasComponent {
             console.log(tilePosition.tileId);
           }
         });
-        console.log(this.map);
+        //console.log(this.map);
         this.calcTotalPoints();
       });
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 
   ngAfterViewInit() {
     this.panzoomCanvas = panzoom(this.canvasElement!.nativeElement, {
@@ -304,12 +291,12 @@ export class GridCanvasComponent {
         if (this.startPosition.x != -1) {
           this.grids[this.startPosition.layer][this.startPosition.y][
             this.startPosition.x
-          ] = this.newTile();
+            ] = this.newTile();
           this.grids[this.startPosition.layer + 1][this.startPosition.y][
             this.startPosition.x
-          ] = this.newTile();
+            ] = this.newTile();
         }
-        this.startPosition = { layer: this.layer, x: colCount, y: rowCount };
+        this.startPosition = {layer: this.layer, x: colCount, y: rowCount};
       }
     } else if (
       $event.previousIndex == 0 &&
@@ -363,7 +350,7 @@ export class GridCanvasComponent {
       let newY = (Math.floor((y - 50) / 100) + 1) * yDirection + rowCount;
 
       if (tile.name.includes('evacuationZone')) {
-        this.evacuation!.position! = { x: newX, y: newY };
+        this.evacuation!.position! = {x: newX, y: newY};
 
         let x = +tile.name.substring(
           tile.name.length - 2,
@@ -399,8 +386,8 @@ export class GridCanvasComponent {
         !this.grids[this.layer][newY][newX].isPlaceholder
       ) {
         if (!this.isInTrash) {
-          this.grids[layerCount][newY][newX] = { ...tile };
-          this.addPlaceholder(layerCount, newY, newX, { ...tile });
+          this.grids[layerCount][newY][newX] = {...tile};
+          this.addPlaceholder(layerCount, newY, newX, {...tile});
 
           this.gridCanvasService
             .updateTile(this.map!.id, this.layer, newY, newX, tile)
@@ -411,12 +398,12 @@ export class GridCanvasComponent {
           if (
             this.grids[layerCount][rowCount][colCount].name.includes('start')
           ) {
-            this.startPosition = { layer: this.layer, x: newX, y: newY };
+            this.startPosition = {layer: this.layer, x: newX, y: newY};
           }
         } else if (
           this.grids[layerCount][rowCount][colCount].name.includes('start')
         ) {
-          this.startPosition = { layer: this.layer, x: -1, y: -1 };
+          this.startPosition = {layer: this.layer, x: -1, y: -1};
         }
 
         if (!this.altActive) {
@@ -441,7 +428,7 @@ export class GridCanvasComponent {
             if (
               this.grids[layerCount][rowCount][colCount].name.includes('start')
             ) {
-              this.startPosition = { layer: -1, x: -1, y: -1 };
+              this.startPosition = {layer: -1, x: -1, y: -1};
             }
             this.grids[layerCount][rowCount][colCount] = this.newTile();
             this.grids[layerCount + 1][rowCount][colCount] = this.newTile();
@@ -486,20 +473,19 @@ export class GridCanvasComponent {
 
   calcTotalPoints() {
     let loopCount = 0;
-
     if (this.startPosition.x == -1) {
       this.totalPoints = 'Keine Startkachel gegeben';
       return;
     }
 
     let currentPoints = 5;
-    let currentPosition = { ...this.startPosition };
+    let currentPosition = {...this.startPosition};
     let orientation =
       (this.grids[currentPosition.layer][currentPosition.y][currentPosition.x]
-        .rotation! +
+          .rotation! +
         this.grids[currentPosition.layer][currentPosition.y][
           currentPosition.x
-        ].paths!.find((path: { from: number; to: number }) => path.from === -1)!
+          ].paths!.find((path: { from: number; to: number }) => path.from === -1)!
           .to +
         2) %
       4;
@@ -533,7 +519,7 @@ export class GridCanvasComponent {
       let currentTile =
         this.grids[currentPosition.layer][currentPosition.y][
           currentPosition.x
-        ]!;
+          ]!;
       if (!currentTile!.name || currentTile.isPlaceholder) {
         return;
       }
@@ -760,12 +746,12 @@ export class GridCanvasComponent {
   getEvacuationDto(x: number, y: number) {
     this.evacuationExists.emit(x == -1 ? false : true);
     return {
-      position: { x, y },
+      position: {x, y},
       exitPlaced: false,
       entrancePlaced: false,
       alignment: 1,
-      exitPosition: { x: -1, y: -1, borderPosition: -1 },
-      entrancePosition: { x: -1, y: -1, borderPosition: -1 },
+      exitPosition: {x: -1, y: -1, borderPosition: -1},
+      entrancePosition: {x: -1, y: -1, borderPosition: -1},
     };
   }
 
