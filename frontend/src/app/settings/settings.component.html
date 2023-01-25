@@ -1,3 +1,33 @@
-<div class="p-3">
-  <app-create-tile></app-create-tile>
+<div class="row d-flex justify-content-center p-3">
+  <div class="col-9">
+    <h3>Einstellungen</h3>
+
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title class="base-color p-2 m-0 fs-6">
+            Individuelle Kachel hinzufügen
+          </mat-panel-title>
+          <mat-panel-description>
+            Hier können neue Kacheln hinzugefügt werden.
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <app-create-tile></app-create-tile>
+      </mat-expansion-panel>
+      <mat-expansion-panel class="m-0">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="base-color p-2 m-0 fs-5">
+            Kachel Begrenzungen
+          </mat-panel-title>
+          <mat-panel-description>
+            Hier wird bestimmt wie viele Kacheln in einer Karte genutzt werden können.
+          </mat-panel-description>
+        </mat-expansion-panel-header >
+
+          <div class="text-dark p-3">-- nicht verfügbar --</div>
+
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
 </div>
