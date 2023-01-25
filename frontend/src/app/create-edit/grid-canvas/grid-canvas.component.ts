@@ -135,6 +135,8 @@ export class GridCanvasComponent {
       minZoom: 0.5,
     });
 
+    this.panzoomCanvas.moveTo(-TileCount * 100 / 2, -TileCount * 100 / 2);
+
     this.panzoomCanvas.on('transform', (e: any) => {
       this.canvasValues = this.panzoomCanvas.getTransform();
       this.canvasValuesChange.emit(this.canvasValues);
