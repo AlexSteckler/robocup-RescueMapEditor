@@ -113,13 +113,31 @@ export class GridCanvasComponent {
               };
             }
             tile.rotation = tilePosition.rotation;
-            this.grids[tilePosition.layer][tilePosition.row][tilePosition.column] = tile;
-            this.addPlaceholder(tilePosition.layer, tilePosition.row, tilePosition.column, tile);
+            this.grids[tilePosition.layer][tilePosition.row][
+              tilePosition.column
+            ] = tile;
+            this.addPlaceholder(
+              tilePosition.layer,
+              tilePosition.row,
+              tilePosition.column,
+              tile
+            );
           } else {
             this.toastr.error('Tile wurde nicht gefunden');
             console.log(tilePosition.tileId);
           }
         });
+
+        let evacuationZone = map.evacuationZonePosition;
+
+        if (evacuationZone != undefined){
+          if (evacuationZone.across) {
+            this.addEvacuationZoneAcross(evacuationZone.layer, evacuationZone.row, evacuationZone.column);
+          } else {
+            this.addEvacuationZoneUpright(evacuationZone.layer, evacuationZone.row, evacuationZone.column);
+
+          }
+        }
 
         this.calcTotalPoints();
       });
@@ -134,7 +152,7 @@ export class GridCanvasComponent {
       minZoom: 0.5,
     });
 
-    this.panzoomCanvas.moveTo(-TileCount * 100 / 2, -TileCount * 100 / 2);
+    this.panzoomCanvas.moveTo((-TileCount * 100) / 2, (-TileCount * 100) / 2);
 
     this.panzoomCanvas.on('transform', (e: any) => {
       this.canvasValues = this.panzoomCanvas.getTransform();
@@ -248,7 +266,6 @@ export class GridCanvasComponent {
         ...tile,
         isPlaceholder: true,
       };
-      console.log('test');
     }
   }
 
@@ -599,6 +616,15 @@ export class GridCanvasComponent {
   ) {
     this.evacuation = this.getEvacuationDto(colCount, rowCount);
 
+    if (!isPlaceholder) {
+      this.gridCanvasService
+        .updateEvacuationZone(this.map!.id, layer, rowCount, colCount, true)
+        .subscribe((map: Map) => {
+          console.log(map.evacuationZonePosition);
+          this.map = map;
+        });
+    }
+
     this.grids[layer][rowCount][colCount] = {
       name: 'evacuationZoneAcross_00',
       border: ['black', '', '', 'black'],
@@ -676,6 +702,14 @@ export class GridCanvasComponent {
   ) {
     this.evacuation = this.getEvacuationDto(colCount, rowCount);
 
+    if (!isPlaceholder) {
+      this.gridCanvasService
+        .updateEvacuationZone(this.map!.id, layer, rowCount, colCount, false)
+        .subscribe((map: Map) => {
+          this.map = map;
+        });
+    }
+
     this.grids[layer][rowCount][colCount] = {
       name: 'evacuationZoneUpright_00',
       border: ['black', '', '', 'black'],
@@ -750,12 +784,21 @@ export class GridCanvasComponent {
     const upright: boolean =
       this.grids[layerCount][rowCount][colCount].name.includes('Upright');
 
-    for (let i = 0; i < (upright ? 3 : 4); i++) {
-      for (let j = 0; j < (upright ? 4 : 3); j++) {
-        this.grids[layerCount][rowCount + j][colCount + i] = this.newTile();
-        this.grids[layerCount + 1][rowCount + j][colCount + i] = this.newTile();
-      }
+
+    if(this.isInTrash) {
+      this.gridCanvasService.deleteEvacuationZone(this.map!.id).subscribe((map) => {
+        console.log(map.evacuationZonePosition);
+        this.map = map;
+      });
     }
+
+      for (let i = 0; i < (upright ? 3 : 4); i++) {
+        for (let j = 0; j < (upright ? 4 : 3); j++) {
+          this.grids[layerCount][rowCount + j][colCount + i] = this.newTile();
+          this.grids[layerCount + 1][rowCount + j][colCount + i] = this.newTile();
+        }
+      }
+
   }
 
   getEvacuationDto(x: number, y: number) {

@@ -6,6 +6,7 @@ class Evacuation {
   column: number;
   entry: { x: number; y: number; rotation: number };
   exit: { x: number; y: number; rotation: number };
+  across: boolean;
 }
 
 @Schema({ timestamps: true })
@@ -26,7 +27,7 @@ export class Map {
   }[];
 
   @Prop(Evacuation)
-  evacuation: Evacuation;
+  evacuationZonePosition: Evacuation;
 
   @Prop()
   createdBy: string;

@@ -1,9 +1,18 @@
-import { Body, Controller, Get, Param, Post, Patch, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Patch,
+  Delete,
+} from '@nestjs/common';
 import { AuthenticatedUser } from 'nest-keycloak-connect';
 import { map } from 'rxjs';
 import { NotFound } from '../util/not-found.decorator';
 import { CreateMapDto } from './dto/create-map.dto';
 import { FindMapDto } from './dto/find-map.dto';
+import { UpdateEvacuationZoneDto } from './dto/update-evacuationzone.dto';
 import { UpdateTileDto } from './dto/update-tile.dto';
 import { MapService } from './map.service';
 
@@ -59,5 +68,21 @@ export class MapsController {
       updateTileDto.tilePosition.row,
       updateTileDto.tilePosition.column,
     );
+  }
+
+  @Patch('evacuation/:id')
+  async updateEvacuation(
+    @Body() updateEvacuationZoneDto: UpdateEvacuationZoneDto,
+    @Param() findMapDto: FindMapDto,
+  ) {
+    return this.mapService.addEvacuationZone(
+      updateEvacuationZoneDto,
+      findMapDto.id,
+    );
+  }
+
+  @Delete('evacuation/:id')
+  async deleteEvacuation(@Param() findMapDto: FindMapDto) {
+    return this.mapService.deleteEvacuationZone(findMapDto.id);
   }
 }
