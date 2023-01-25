@@ -49,18 +49,13 @@ export class GridCanvasService {
     layer: number,
     rowCount: number,
     colCount: number,
-    tile: Tile
   ) {
     return this.httpClient.patch<Map>(
       `${environment.baseUrlV1}/map/tile/${id}/delete`,
       {
-        tilePosition: {
-          tileId: tile.id,
-          layer: layer,
-          row: rowCount,
-          column: colCount,
-          rotation: tile.rotation,
-        },
+        layer: layer,
+        row: rowCount,
+        column: colCount,
       }
     );
   }

@@ -377,12 +377,11 @@ export class GridCanvasComponent {
 
       if (this.grids[this.layer][rowCount][colCount].name.includes('start')) {
         if (this.startPosition.x != -1) {
-          this.grids[this.startPosition.layer][this.startPosition.y][
-            this.startPosition.x
-          ] = this.newTile();
-          this.grids[this.startPosition.layer + 1][this.startPosition.y][
-            this.startPosition.x
-          ] = this.newTile();
+          this.grids[this.startPosition.layer][this.startPosition.y][this.startPosition.x] = this.newTile();
+          this.grids[this.startPosition.layer + 1][this.startPosition.y][this.startPosition.x] = this.newTile();
+          this.gridCanvasService.deleteTile(this.map!.id, this.startPosition.layer, this.startPosition.y, this.startPosition.x).subscribe((map: Map) => {
+            this.map = map;
+          });
         }
         this.startPosition = { layer: this.layer, x: colCount, y: rowCount };
       }
@@ -516,8 +515,7 @@ export class GridCanvasComponent {
               this.map!.id,
               this.layer,
               rowCount,
-              colCount,
-              this.newTile()
+              colCount
             )
             .subscribe((map: Map) => {
               this.map = map;
@@ -539,8 +537,7 @@ export class GridCanvasComponent {
                 this.map!.id,
                 this.layer,
                 rowCount,
-                colCount,
-                this.newTile()
+                colCount
               )
               .subscribe((map: Map) => {
                 this.map = map;
@@ -583,109 +580,96 @@ export class GridCanvasComponent {
     let currentPoints = 5;
     let currentPosition = { ...this.startPosition };
 
-    if (
-      this.grids[currentPosition.layer][currentPosition.y][currentPosition.x]
-        .paths != undefined
-    ) {
-      let orientation =
-        (this.grids[currentPosition.layer][currentPosition.y][currentPosition.x]
-          .rotation! +
-          this.grids[currentPosition.layer][currentPosition.y][
-            currentPosition.x
-          ].paths!.find(
-            (path: { from: number; to: number }) => path.from === -1
-          )!.to +
-          2) %
-        4;
+    let orientation =
+      (this.grids[currentPosition.layer][currentPosition.y][currentPosition.x]
+        .rotation! +
+        this.grids[currentPosition.layer][currentPosition.y][
+          currentPosition.x
+        ].paths!.find((path: { from: number; to: number }) => path.from === -1)!
+          .to +
+        2) %
+      4;
 
-      this.totalPoints = currentPoints.toString();
+    this.totalPoints = currentPoints.toString();
 
-      let multiplier: number = 1;
+    let multiplier: number = 1;
 
-      while (orientation != -1 && loopCount++ <= 1000) {
-        switch (orientation) {
-          case 0:
-            currentPosition.y += 1;
-            break;
-          case 1:
-            currentPosition.x -= 1;
-            break;
+    while (orientation != -1 && loopCount++ <= 1000) {
+      switch (orientation) {
+        case 0:
+          currentPosition.y += 1;
+          break;
+        case 1:
+          currentPosition.x -= 1;
+          break;
 
-          case 2:
-            currentPosition.y -= 1;
-            break;
+        case 2:
+          currentPosition.y -= 1;
+          break;
 
-          case 3:
-            currentPosition.x += 1;
-            break;
-        }
+        case 3:
+          currentPosition.x += 1;
+          break;
+      }
 
-        if (currentPosition.x < 0 || currentPosition.y < 0) {
-          this.totalPoints = 'Pacours führt aus dem Spielfeld';
-          this.toastr.warning('Pacours führt aus dem Spielfeld');
+      if (currentPosition.x < 0 || currentPosition.y < 0) {
+        this.totalPoints = 'Pacours führt aus dem Spielfeld';
+        this.toastr.warning('Pacours führt aus dem Spielfeld');
+        return;
+      }
+      let currentTile =
+        this.grids[currentPosition.layer][currentPosition.y][
+          currentPosition.x
+        ]!;
+      if (!currentTile!.name || currentTile.isPlaceholder) {
+        return;
+      }
+
+      if (currentTile.name.includes('evacuationZone')) {
+        if (
+          this.evacuation.entry == undefined ||
+          this.evacuation.entry.x != currentPosition.x ||
+          this.evacuation.entry.y != currentPosition.y ||
+          this.evacuation.entry.position != orientation
+        ) {
           return;
         }
-        let currentTile =
-          this.grids[currentPosition.layer][currentPosition.y][
-            currentPosition.x
-          ]!;
-        if (!currentTile!.name || currentTile.isPlaceholder) {
+        if (this.evacuation.exit == undefined || this.evacuation.exit.x == -1) {
           return;
         }
 
-        if (currentTile.name.includes('evacuationZone')) {
-          if (
-            this.evacuation.entry == undefined ||
-            this.evacuation.entry.x != currentPosition.x ||
-            this.evacuation.entry.y != currentPosition.y ||
-            this.evacuation.entry.position != orientation
-          ) {
-            return;
-          }
-          if (
-            this.evacuation.exit == undefined ||
-            this.evacuation.exit.x == -1
-          ) {
+        currentPosition = {
+          layer: this.layer,
+          x: this.evacuation.exit.x,
+          y: this.evacuation.exit.y,
+        };
+        orientation = (this.evacuation.exit.position + 2) % 4;
+
+        multiplier = 4.3904;
+      } else {
+        if (!currentTile.paths) {
+          return;
+        }
+
+        let tileRotation = currentTile.rotation!;
+        let tileWay = currentTile.paths!.find(
+          (path: { from: number; to: number; layer: number }) =>
+            orientation === (path.from + tileRotation) % 4
+        );
+        if (tileWay !== undefined) {
+          currentPosition.layer += tileWay.layer;
+          if (currentPosition.layer < 0) {
+            this.toastr.warning('Rampe führt ins nichts!');
             return;
           }
 
-          currentPosition = {
-            layer: this.layer,
-            x: this.evacuation.exit.x,
-            y: this.evacuation.exit.y,
-          };
-          orientation = (this.evacuation.exit.position + 2) % 4;
-
-          multiplier = 4.3904;
+          orientation = (tileRotation + tileWay.to + 2) % 4;
+          currentPoints += currentTile.value ? currentTile.value + 5 : 5;
+          this.totalPoints = Math.round(currentPoints * multiplier).toString();
         } else {
-          if (!currentTile.paths) {
-            return;
-          }
-
-          let tileRotation = currentTile.rotation!;
-          let tileWay = currentTile.paths!.find(
-            (path: { from: number; to: number; layer: number }) =>
-              orientation === (path.from + tileRotation) % 4
-          );
-          if (tileWay !== undefined) {
-            currentPosition.layer += tileWay.layer;
-            if (currentPosition.layer < 0) {
-              this.toastr.warning('Rampe führt ins nichts!');
-              return;
-            }
-
-            orientation = (tileRotation + tileWay.to + 2) % 4;
-            currentPoints += currentTile.value ? currentTile.value + 5 : 5;
-            this.totalPoints = Math.round(
-              currentPoints * multiplier
-            ).toString();
-          } else {
-            return;
-          }
+          return;
         }
       }
-    } else {
-      this.toastr.warning('Start ist gegeben, aber von Opferraum überlagert');
     }
 
     if (loopCount >= 1000) {
