@@ -10,7 +10,8 @@ import { Tile } from './tile/dto/tile.dto';
 export class CreateEditComponent {
   @HostListener('window:resize', ['$event'])
   onResize() {
-    this.innerHeight = window.innerHeight - 300;
+    this.innerHeight = window.innerHeight - 240;
+    this.innerWidth = window.innerWidth;
   }
 
   isInTrash: boolean = false;
