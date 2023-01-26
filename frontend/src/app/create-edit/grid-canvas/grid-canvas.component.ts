@@ -111,6 +111,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     this.serviceGridCanvas.calcTotalPoints();
     this.tileServiceGridCanvas.addPlaceholder(this.layer, rowCount, colCount, tile);
   }
+
   //---------- Drag & Drop -----------//
   drop($event: CdkDragDrop<Tile[]>, layer: number, rowCount: number, colCount: number) {
     let tileToPlacedOn = this.grids[layer][rowCount][colCount];
@@ -141,16 +142,15 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         .subscribe((map: Map) => this.map = map);
 
       // Remove old start tileToPlacedOn if new start tileToPlacedOn is placed
-      if (
-        this.grids[layer][rowCount][colCount].name.includes('start')
-        && (this.startPosition.layer != layer || this.startPosition.y != rowCount || this.startPosition.x != colCount)
-        && this.startPosition.layer != -1
-      ) {
-        this.grids[this.startPosition.layer][this.startPosition.y][this.startPosition.x] = this.serviceGridCanvas.newTile();
-        this.grids[this.startPosition.layer + 1][this.startPosition.y][this.startPosition.x] = this.serviceGridCanvas.newTile();
-        this.gridCanvasService
-          .deleteTile(this.map!.id, this.startPosition.layer, this.startPosition.y, this.startPosition.x)
-          .subscribe((map: Map) => this.map = map);
+      if (this.grids[layer][rowCount][colCount].name.includes('start')
+        && (this.startPosition.layer != layer || this.startPosition.y != rowCount || this.startPosition.x != colCount)) {
+        if (this.startPosition.layer != -1) {
+          this.grids[this.startPosition.layer][this.startPosition.y][this.startPosition.x] = this.serviceGridCanvas.newTile();
+          this.grids[this.startPosition.layer + 1][this.startPosition.y][this.startPosition.x] = this.serviceGridCanvas.newTile();
+          this.gridCanvasService
+            .deleteTile(this.map!.id, this.startPosition.layer, this.startPosition.y, this.startPosition.x)
+            .subscribe((map: Map) => this.map = map);
+        }
         this.startPosition = {layer: this.layer, x: colCount, y: rowCount};
       }
     } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4) {
