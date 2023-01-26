@@ -147,6 +147,8 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         if (this.startPosition.layer != -1) {
           this.grids[this.startPosition.layer][this.startPosition.y][this.startPosition.x] = this.serviceGridCanvas.newTile();
           this.grids[this.startPosition.layer + 1][this.startPosition.y][this.startPosition.x] = this.serviceGridCanvas.newTile();
+          if (this.startPosition.layer == 1) this.grids[this.startPosition.layer - 1][this.startPosition.y][this.startPosition.x] = this.serviceGridCanvas.newTile();
+
           this.gridCanvasService
             .deleteTile(this.map!.id, this.startPosition.layer, this.startPosition.y, this.startPosition.x)
             .subscribe((map: Map) => this.map = map);
@@ -201,39 +203,48 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
             }
           }
         }, 10);
-      } else if (this.isInTrash) {
-        if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
-          this.startPosition = {layer: -1, x: -1, y: -1};
-        }
-        this.grids[layerCount][rowCount][colCount] = this.serviceGridCanvas.newTile();
-        this.grids[layerCount + 1][rowCount][colCount] = this.serviceGridCanvas.newTile();
-
-        this.gridCanvasService
-          .deleteTile(this.map!.id, this.layer, rowCount, colCount).subscribe((map: Map) => this.map = map);
       } else if (
         newY >= 0 && newY < TileCount && newX >= 0 && newX < TileCount &&
         !this.grids[layerCount][newY][newX].name.includes('evacuationZone') &&
         !this.grids[this.layer][newY][newX].isPlaceholder
       ) {
-        this.grids[layerCount][newY][newX] = {...tile};
-        this.tileServiceGridCanvas.addPlaceholder(layerCount, newY, newX, this.grids[layerCount][newY][newX]);
+        if (this.isInTrash) {
+          if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
+            this.startPosition = {layer: -1, x: -1, y: -1};
+          }
+          this.grids[layerCount][newY][newX] = {...tile};
+          this.tileServiceGridCanvas.addPlaceholder(layerCount, newY, newX, this.grids[layerCount][newY][newX]);
 
-        this.gridCanvasService.updateTile(this.map!.id, this.layer, newY, newX, tile)
-          .subscribe((map: Map) => this.map = map);
-
-        if (!this.controlActive) {
+          this.gridCanvasService.updateTile(this.map!.id, this.layer, newY, newX, tile)
+            .subscribe((map: Map) => this.map = map);
+        } else if (!this.controlActive) {
           this.grids[layerCount][rowCount][colCount] = this.serviceGridCanvas.newTile();
-          this.tileServiceGridCanvas.addPlaceholder(layerCount, rowCount, colCount, this.serviceGridCanvas.newTile());
+          this.grids[layerCount + 1][rowCount][colCount] = this.serviceGridCanvas.newTile();
 
           this.gridCanvasService.deleteTile(this.map!.id, this.layer, rowCount, colCount)
             .subscribe((map: Map) => this.map = map);
         }
       }
     }
-    setTimeout(() => {
-      this.serviceGridCanvas.calcTotalPoints();
-      this.currentDraggedTileChange.emit(this.currentDraggedTile = undefined);
-    }, 50);
+
+    setTimeout(
+      () => {
+        this
+          .serviceGridCanvas
+          .calcTotalPoints();
+
+        this
+          .currentDraggedTileChange
+          .emit(this
+
+            .currentDraggedTile = undefined
+          );
+      }
+
+      ,
+      50
+    )
+    ;
     $event.source._dragRef.reset();
     this.panzoomCanvas.resume();
   }
