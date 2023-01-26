@@ -30,6 +30,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
   @Input() isInTrash: boolean = false;
   @Input() innerHeight: number = 0;
+  @Input() innerWidth: number = 0;
 
   map: Map | undefined;
   tileSelection: Array<Tile> = [];
@@ -67,6 +68,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       if (event.key === 'Control') this.controlActive = false;
       if (event.key === 'Delete') this.deleteActive = false;
     });
+
   }
 
   ngAfterViewInit() {
@@ -267,4 +269,16 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       y: point.y + zoomMoveYDifference - scale * 50,
     };
   };
+  top: number = 0;
+  left: number = 0;
+
+  test($event: any) {
+    let x = this.innerWidth - $event.dropPoint.x - 19
+    let y = $event.dropPoint.y - 110
+    let scale = this.canvasValues!.scale;
+    console.log(x, this.canvasValues!.x);
+    console.log(this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x);
+    this.top = y -this.canvasValues!.y - 5
+    this.left = this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x - 5
+  }
 }
