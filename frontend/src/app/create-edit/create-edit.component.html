@@ -13,6 +13,7 @@
     <app-grid-canvas
       #gridCanvas
       [innerHeight]="innerHeight"
+      [innerWidth]="innerWidth"
       (canvasValuesChange)="canvasValues = $event"
       (currentDraggedTileChange)="currentDraggedTile = $event"
       [(isInTrash)]="isInTrash"

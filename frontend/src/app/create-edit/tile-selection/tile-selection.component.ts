@@ -20,6 +20,9 @@ export class TileSelectionComponent {
 
   @Input() currentDraggedTile: Tile | undefined;
   @Input() evacuationExists: boolean = false;
+  obstacles: any = [
+    "Eins","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn"
+  ];
 
   constructor(
     private tilesService: TilesService,
