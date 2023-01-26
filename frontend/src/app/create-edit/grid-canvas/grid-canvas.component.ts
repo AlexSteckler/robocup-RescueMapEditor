@@ -1,30 +1,25 @@
-import { CdkDragDrop, CdkDragEnd } from '@angular/cdk/drag-drop';
-import {
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  Output,
-  ViewChild,
-} from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
-import panzoom, { Transform } from 'panzoom';
-import { Evacuation } from '../tile/dto/evacuation.dto';
-import { Tile } from '../tile/dto/tile.dto';
-import { Map } from '../dto/map.dto';
-import { GridCanvasService } from './grid-canvas.service';
-import { ActivatedRoute } from '@angular/router';
-import { ENTRANCECOLOR, EXITCOLOR } from '../tile/tile.component';
+import {CdkDragDrop, CdkDragEnd} from '@angular/cdk/drag-drop';
+import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild,} from '@angular/core';
+import {ToastrService} from 'ngx-toastr';
+import panzoom, {Transform} from 'panzoom';
+import {Evacuation} from '../tile/dto/evacuation.dto';
+import {Tile} from '../tile/dto/tile.dto';
+import {Map} from '../dto/map.dto';
+import {GridCanvasService} from './grid-canvas.service';
+import {ActivatedRoute} from '@angular/router';
+import {EvacuationZoneGridCanvas} from "./evacuationZone-grid-canvas";
+import {ServiceGridCanvas} from "./service-grid-canvas";
+import {TileServiceGridCanvas} from "./tileService.grid-canvas";
 
-const TileCount = 30;
-const OutsideDrag = 100;
+export const TileCount = 30;
+export const OutsideDrag = 100;
 
 @Component({
   selector: 'app-grid-canvas',
   templateUrl: './grid-canvas.component.html',
   styleUrls: ['./grid-canvas.component.scss'],
 })
-export class GridCanvasComponent {
+export class GridCanvasComponent implements OnInit, AfterViewInit {
   @ViewChild('canvas') canvasElement: ElementRef | undefined;
   @ViewChild('canvas_wrapper') canvasWrapperElement: ElementRef | undefined;
 
@@ -34,524 +29,228 @@ export class GridCanvasComponent {
   @Output() evacuationExists = new EventEmitter<boolean>();
 
   @Input() isInTrash: boolean = false;
+  @Input() innerHeight: number = 0;
 
   map: Map | undefined;
   tileSelection: Array<Tile> = [];
 
   canvasValues: Transform | undefined;
   panzoomCanvas: any = null;
-  tileIsDragged: boolean = false;
   currentDraggedTile: Tile | undefined;
-
   layer: number = 0;
   grids: Array<Array<Array<Tile>>> = [];
-
-  altActive: Boolean = false;
+  controlActive: Boolean = false;
   deleteActive: Boolean = false;
-
-  @Input() innerHeight: number = 0;
-  @Input() innerWidth: number = 0;
-  evacuation: Evacuation = this.getEvacuationDto(-1, -1, -1, true);
-  startPosition: { layer: number; x: number; y: number } = {
-    layer: -1,
-    x: -1,
-    y: -1,
-  };
-
+  evacuationZoneGridCanvas: EvacuationZoneGridCanvas;
+  evacuation: Evacuation;
+  startPosition: { layer: number; x: number; y: number } = {layer: -1, x: -1, y: -1,};
   totalPoints: string = '';
+  loading: boolean = true;
+  serviceGridCanvas: ServiceGridCanvas;
+  tileServiceGridCanvas: TileServiceGridCanvas;
 
-  constructor(
-    private toastr: ToastrService,
-    private gridCanvasService: GridCanvasService,
-    private route: ActivatedRoute
-  ) {
-    this.addLayer();
+  constructor(private toastr: ToastrService, private gridCanvasService: GridCanvasService, private route: ActivatedRoute) {
+    this.evacuationZoneGridCanvas = new EvacuationZoneGridCanvas(this, this.gridCanvasService, this.toastr);
+    this.serviceGridCanvas = new ServiceGridCanvas(this, toastr);
+    this.tileServiceGridCanvas = new TileServiceGridCanvas(this, toastr);
+    this.evacuation = this.evacuationZoneGridCanvas.getEvacuationDto(-1, -1, -1, true);
+  }
 
+  ngOnInit(): void {
+    this.serviceGridCanvas.addLayer();
     //keypress event
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Control') {
-        this.altActive = true;
-      }
-      if (event.key === 'Delete') {
-        this.deleteActive = true;
-      }
+      if (event.key === 'Control') this.controlActive = true;
+      if (event.key === 'Delete') this.deleteActive = true;
     });
     document.addEventListener('keyup', (event) => {
-      if (event.key === 'Control') {
-        this.altActive = false;
-      }
-      if (event.key === 'Delete') {
-        this.deleteActive = false;
-      }
+      if (event.key === 'Control') this.controlActive = false;
+      if (event.key === 'Delete') this.deleteActive = false;
     });
   }
-
-  loadGrid(tileSelection: Tile[]) {
-    this.tileSelection = tileSelection;
-
-    this.route.params.subscribe((params) => {
-      this.gridCanvasService.getMap(params['id']).subscribe((map) => {
-        this.map = map;
-
-        this.loading = false;
-
-        map.tilePosition.forEach((tilePosition) => {
-          if (tilePosition.layer >= this.grids.length) {
-            for (let i = this.grids.length; i <= tilePosition.layer; i++) {
-              this.addLayer();
-            }
-          }
-
-          let tile = tileSelection.find(
-            (tile) => tile.id === tilePosition.tileId
-          ) as Tile;
-          if (tile != undefined) {
-            tile = { ...tile };
-            if (tile.name.includes('start')) {
-              this.startPosition = {
-                layer: tilePosition.layer,
-                x: tilePosition.column,
-                y: tilePosition.row,
-              };
-            }
-            tile.rotation = tilePosition.rotation;
-            this.grids[tilePosition.layer][tilePosition.row][
-              tilePosition.column
-            ] = tile;
-            this.addPlaceholder(
-              tilePosition.layer,
-              tilePosition.row,
-              tilePosition.column,
-              tile
-            );
-          } else {
-            this.toastr.error('Tile wurde nicht gefunden');
-            console.log(tilePosition.tileId);
-          }
-        });
-
-        let evacuationZone = map.evacuationZonePosition;
-
-        if (evacuationZone != undefined) {
-          this.evacuationExists.emit(true);
-          if (evacuationZone.across) {
-            this.addEvacuationZoneAcross(
-              evacuationZone.layer,
-              evacuationZone.row,
-              evacuationZone.column,
-              false,
-              true
-            );
-          } else {
-            this.addEvacuationZoneUpright(
-              evacuationZone.layer,
-              evacuationZone.row,
-              evacuationZone.column,
-              false,
-              true
-            );
-          }
-
-          if (
-            evacuationZone.entry != undefined &&
-            evacuationZone.entry.position != -1
-          ) {
-            this.grids[evacuationZone.layer][evacuationZone.entry.y][
-              evacuationZone.entry.x
-            ].border![evacuationZone.entry.position] = ENTRANCECOLOR;
-          }
-
-          if (
-            evacuationZone.exit != undefined &&
-            evacuationZone.exit.position != -1
-          ) {
-            this.grids[evacuationZone.layer][evacuationZone.exit.y][
-              evacuationZone.exit.x
-            ].border![evacuationZone.exit.position] = EXITCOLOR;
-          }
-          console.log(evacuationZone);
-          this.evacuation = evacuationZone;
-          console.log(this.evacuation);
-        } else {
-          this.evacuationExists.emit(false);
-        }
-
-        this.calcTotalPoints();
-      });
-    });
-  }
-
-  ngOnInit(): void {}
 
   ngAfterViewInit() {
     this.panzoomCanvas = panzoom(this.canvasElement!.nativeElement, {
       maxZoom: 2,
       minZoom: 0.5,
     });
-
-    this.panzoomCanvas.moveTo((-TileCount * 100) / 2, (-TileCount * 100) / 2);
-
-    this.panzoomCanvas.on('transform', (e: any) => {
-      this.canvasValues = this.panzoomCanvas.getTransform();
-      this.canvasValuesChange.emit(this.canvasValues);
-
-      const nativeElement = this.canvasWrapperElement!.nativeElement;
-      const scale = this.canvasValues!.scale;
-      const x = this.canvasValues!.x;
-      const y = this.canvasValues!.y;
-
-      if (this.canvasValues != undefined) {
-        if (this.canvasValues.scale >= 1) {
-          if (x > OutsideDrag) {
-            this.panzoomCanvas.moveTo(OutsideDrag, y);
-          }
-
-          if (y > OutsideDrag) {
-            this.panzoomCanvas.moveTo(x, OutsideDrag);
-          }
-
-          if (
-            x <
-            nativeElement.offsetWidth - TileCount * 100 * scale - OutsideDrag
-          ) {
-            this.panzoomCanvas.moveTo(
-              nativeElement.offsetWidth - TileCount * 100 * scale - OutsideDrag,
-              y
-            );
-          }
-
-          if (
-            y <
-            nativeElement.offsetHeight - TileCount * 100 * scale - OutsideDrag
-          ) {
-            this.panzoomCanvas.moveTo(
-              x,
-              nativeElement.offsetHeight - TileCount * 100 * scale - OutsideDrag
-            );
-          }
-        } else {
-          const reference = 500 * scale;
-
-          if (x < TileCount * 100 * -scale + 500 * scale) {
-            this.panzoomCanvas.moveTo(
-              TileCount * 100 * -scale + 500 * scale,
-              y
-            );
-          }
-
-          if (y < TileCount * 100 * -scale + 500 * scale) {
-            this.panzoomCanvas.moveTo(
-              x,
-              TileCount * 100 * -scale + 500 * scale
-            );
-          }
-
-          if (x > nativeElement.offsetWidth - reference) {
-            this.panzoomCanvas.moveTo(nativeElement.offsetWidth - reference, y);
-          }
-
-          if (y > nativeElement.offsetHeight - reference) {
-            this.panzoomCanvas.moveTo(
-              x,
-              nativeElement.offsetHeight - reference
-            );
-          }
-        }
-      }
-    });
-
     this.panzoomCanvas.setZoomSpeed(0.05);
+    this.panzoomCanvas.moveTo((-TileCount * 50), (-TileCount * 50));
+    this.serviceGridCanvas.stopDragForFarAwayMoving();
   }
 
-  addLayer() {
-    let tempgrid: Array<Array<Tile>> = [];
-
-    for (let i = 0; i < TileCount; i++) {
-      let row: Array<Tile> = [];
-      for (let j = 0; j < TileCount; j++) {
-        row.push(this.newTile());
-      }
-      tempgrid.push(row);
-    }
-    this.grids.push(tempgrid);
+  loadGrid(tileSelection: Tile[]) {
+    this.tileSelection = tileSelection;
+    this.route.params.subscribe((params) => {
+      this.gridCanvasService.getMap(params['id']).subscribe((map) => {
+        this.map = map;
+        this.loading = false;
+        this.tileServiceGridCanvas.loadTile();
+        this.evacuationZoneGridCanvas.loadEvacuation(map.evacuationZonePosition);
+        this.serviceGridCanvas.calcTotalPoints();
+      });
+    });
   }
 
-  buttonLayerChange(direction: string) {
-    if (direction == 'up' && this.layer < 5) {
+
+  buttonLayerChange(isUp: boolean) {
+    if (isUp && this.layer < 5) {
       this.layer++;
-      this.addLayer();
-    } else if (direction == 'down' && this.layer > 0) {
+      this.serviceGridCanvas.addLayer();
+    } else if (!isUp && this.layer > 0) {
       this.layer--;
     }
   }
 
-  addPlaceholder(
-    layer: number,
-    rowCount: number,
-    colCount: number,
-    tile: Tile
-  ) {
-    if (this.grids[this.grids.length + layer] == undefined) {
-      this.addLayer();
-    }
-    this.grids[layer + 1][rowCount][colCount] = {
-      ...tile,
-      isPlaceholder: true,
-    };
-    if (layer == 1) {
-      this.grids[layer - 1][rowCount][colCount] = {
-        ...tile,
-        isPlaceholder: true,
-      };
-    }
-  }
-
-  tileChange(tile: Tile, rowCount: number, colCount: number) {
-    if (
-      !this.grids[this.layer][rowCount][colCount].name.includes('evacuation')
-    ) {
+  tileChange(tile: Tile, layer: number, rowCount: number, colCount: number) {
+    if (!this.grids[layer][rowCount][colCount].name.includes('evacuation')) {
       this.gridCanvasService
         .updateTile(this.map!.id, this.layer, rowCount, colCount, tile)
-        .subscribe((map: Map) => {
-          this.map = map;
-        });
+        .subscribe((map: Map) => this.map = map);
     }
-
-    this.calcTotalPoints();
-    this.addPlaceholder(this.layer, rowCount, colCount, tile);
-  }
-
-  evacuationZoneChange($event: any) {
-    this.gridCanvasService
-      .updateEvacuationZone(
-        this.map!.id,
-        this.layer,
-        this.evacuation.row,
-        this.evacuation.column,
-        this.evacuation.across,
-        this.evacuation.entry,
-        this.evacuation.exit
-      )
-      .subscribe((map: Map) => {
-        this.map = map;
-      });
+    this.serviceGridCanvas.calcTotalPoints();
+    this.tileServiceGridCanvas.addPlaceholder(this.layer, rowCount, colCount, tile);
   }
 
   //---------- Drag & Drop -----------//
-
-  drop($event: CdkDragDrop<Tile[]>, rowCount: number, colCount: number) {
-    let tile = this.grids[this.layer][rowCount][colCount];
-
+  drop($event: CdkDragDrop<Tile[]>, layer: number, rowCount: number, colCount: number) {
+    let tileToPlacedOn = this.grids[layer][rowCount][colCount];
     if (
       this.grids[this.layer + 1] != undefined &&
       this.grids[this.layer + 1][rowCount][colCount].name != '' &&
       !this.grids[this.layer + 1][rowCount][colCount].isPlaceholder
     ) {
-      this.toastr.warning(
-        `Es existiert eine Kachel eine Ebene darüber`,
-        'Darf nicht platziert werden'
-      );
-    } else if (
-      $event.previousContainer.data &&
-      !tile.name.includes('evacuationZone') &&
-      !tile.isPlaceholder
-    ) {
-      this.grids[this.layer][rowCount][colCount] = {
-        ...$event.previousContainer.data[$event.previousIndex],
-      };
-      this.addPlaceholder(this.layer, rowCount, colCount, {
-        ...$event.previousContainer.data[$event.previousIndex],
-      });
-
-      this.gridCanvasService
-        .updateTile(
-          this.map!.id,
-          this.layer,
-          rowCount,
-          colCount,
-          this.grids[this.layer][rowCount][colCount]
-        )
-        .subscribe((map: Map) => {
-          this.map = map;
-        });
-
-      if (this.grids[this.layer][rowCount][colCount].name.includes('start')) {
-        if (this.startPosition.x != -1) {
-          this.grids[this.startPosition.layer][this.startPosition.y][this.startPosition.x] = this.newTile();
-          this.grids[this.startPosition.layer + 1][this.startPosition.y][this.startPosition.x] = this.newTile();
-          this.gridCanvasService.deleteTile(this.map!.id, this.startPosition.layer, this.startPosition.y, this.startPosition.x).subscribe((map: Map) => {
-            this.map = map;
-          });
-        }
-        this.startPosition = { layer: this.layer, x: colCount, y: rowCount };
-      }
-    } else if (
-      $event.previousIndex == 0 &&
-      rowCount <= TileCount - 3 &&
-      colCount <= TileCount - 4 &&
-      !tile.name.includes('evacuationZone')
-    ) {
-      this.addEvacuationZoneAcross(this.layer, rowCount, colCount);
-    } else if ($event.previousIndex == 1) {
-      this.addEvacuationZoneUpright(this.layer, rowCount, colCount);
+      this.toastr.warning(`Es existiert eine Kachel eine Ebene darüber`, 'kachel darf nicht platziert werden');
+      return;
+    }
+    if (tileToPlacedOn.name.includes('evacuation')) {
+      this.toastr.warning("Platzierung auf Evakuierungszonen ist nicht erlaubt");
+      return;
+    }
+    if (tileToPlacedOn.isPlaceholder) {
+      this.toastr.warning("Platzierung auf Platzhalter ist nicht erlaubt");
+      return;
     }
 
-    this.calcTotalPoints();
+    if ($event.previousContainer.data) {
+      //Normal Tile
+      let tile = {...$event.previousContainer.data[$event.previousIndex]};
+      this.grids[layer][rowCount][colCount] = tile;
+      this.tileServiceGridCanvas.addPlaceholder(layer, rowCount, colCount, tile);
+      this.gridCanvasService
+        .updateTile(this.map!.id, layer, rowCount, colCount, tile)
+        .subscribe((map: Map) => this.map = map);
+
+      // Remove old start tileToPlacedOn if new start tileToPlacedOn is placed
+      if (this.grids[layer][rowCount][colCount].name.includes('start')
+        && (this.startPosition.layer != layer || this.startPosition.y != rowCount || this.startPosition.x != colCount)) {
+        if (this.startPosition.layer != -1) {
+          this.grids[this.startPosition.layer][this.startPosition.y][this.startPosition.x] = this.serviceGridCanvas.newTile();
+          this.grids[this.startPosition.layer + 1][this.startPosition.y][this.startPosition.x] = this.serviceGridCanvas.newTile();
+          if (this.startPosition.layer == 1) this.grids[this.startPosition.layer - 1][this.startPosition.y][this.startPosition.x] = this.serviceGridCanvas.newTile();
+
+          this.gridCanvasService
+            .deleteTile(this.map!.id, this.startPosition.layer, this.startPosition.y, this.startPosition.x)
+            .subscribe((map: Map) => this.map = map);
+        }
+        this.startPosition = {layer: this.layer, x: colCount, y: rowCount};
+      }
+    } else if ($event.previousIndex == 0 && rowCount <= TileCount - 3 && colCount <= TileCount - 4) {
+      this.evacuationZoneGridCanvas!.addEvacuationZoneAcross(this.layer, rowCount, colCount);
+    } else if ($event.previousIndex == 1 && rowCount <= TileCount - 4 && colCount <= TileCount - 3) {
+      this.evacuationZoneGridCanvas!.addEvacuationZoneUpright(this.layer, rowCount, colCount);
+    }
+    this.serviceGridCanvas.calcTotalPoints();
   }
 
   dragStartMovement(tile: Tile) {
     this.currentDraggedTile = tile;
     this.currentDraggedTileChange.emit(this.currentDraggedTile);
-    tile.isBeingDragged = true;
-    this.tileIsDragged = true;
     this.isInTrash = false;
     this.isInTrashChange.emit(this.isInTrash);
     if (tile.id != '0') {
-      this.pausePanzoom();
+      this.panzoomCanvas.pause();
     }
   }
 
-  dragEndMovement(
-    tile: Tile,
-    $event: CdkDragEnd,
-    rowCount: number,
-    colCount: number,
-    layerCount: number
-  ) {
-    tile.isBeingDragged = false;
+  dragEndMovement(tile: Tile, $event: CdkDragEnd, layerCount: number, rowCount: number, colCount: number) {
+    let x = $event.distance.x / this.canvasValues!.scale;
+    let y = $event.distance.y / this.canvasValues!.scale;
 
-    let x = $event.distance.x;
-    let y = $event.distance.y;
-
+    //Moved out of own tile
     if (Math.abs(x) > 50 || Math.abs(y) > 50) {
-      const xDirection = x > 0 ? 1 : -1;
-      const yDirection = y > 0 ? 1 : -1;
-      x *= xDirection;
-      y *= yDirection;
-      x /= this.canvasValues!.scale;
-      y /= this.canvasValues!.scale;
-
-      let newX = (Math.floor((x - 50) / 100) + 1) * xDirection + colCount;
-      let newY = (Math.floor((y - 50) / 100) + 1) * yDirection + rowCount;
+      let newX = (Math.floor((Math.abs(x) - 50) / 100) + 1) * (x > 0 ? 1 : -1) + colCount;
+      let newY = (Math.floor((Math.abs(y) - 50) / 100) + 1) * (y > 0 ? 1 : -1) + rowCount;
 
       if (tile.name.includes('evacuationZone')) {
-        this.evacuation.column = newX;
-        this.evacuation.row = newY;
-
-        let x = +tile.name.substring(
-          tile.name.length - 2,
-          tile.name.length - 1
-        );
+        let x = +tile.name.substring(tile.name.length - 2, tile.name.length - 1);
         let y = +tile.name.substring(tile.name.length - 1);
+        const evacuationX = tile.name.includes('Upright') ? 2 : 3;
+        const evacuationY = tile.name.includes('Upright') ? 3 : 2;
 
         setTimeout(() => {
-          const evacuationX = tile.name.includes('Upright') ? 2 : 3;
-          const evacuationY = tile.name.includes('Upright') ? 3 : 2;
-
-          if (
-            (newY >= 0 &&
-              newY < TileCount - evacuationY &&
-              newX >= 0 &&
-              newX < TileCount - evacuationX) ||
-            this.isInTrash
-          ) {
-            this.deleteEvacuationZone(layerCount, rowCount - x, colCount - y);
+          if ((newY >= 0 && newY < TileCount - evacuationY && newX >= 0 && newX < TileCount - evacuationX) || this.isInTrash) {
+            this.evacuationZoneGridCanvas.deleteEvacuationZone(layerCount, rowCount - x, colCount - y);
             if (!this.isInTrash) {
               let success = tile.name.includes('Upright')
-                ? this.addEvacuationZoneUpright(this.layer, newY, newX)
-                : this.addEvacuationZoneAcross(this.layer, newY, newX);
-
+                ? this.evacuationZoneGridCanvas!.addEvacuationZoneUpright(layerCount, newY, newX)
+                : this.evacuationZoneGridCanvas!.addEvacuationZoneAcross(layerCount, newY, newX);
               if (!success) {
-                tile.name.includes('Upright')
-                  ? this.addEvacuationZoneUpright(
-                      this.layer,
-                      rowCount,
-                      colCount
-                    )
-                  : this.addEvacuationZoneAcross(
-                      this.layer,
-                      rowCount,
-                      colCount
-                    );
+                tile.name.includes('Upright') ?
+                  this.evacuationZoneGridCanvas!.addEvacuationZoneUpright(layerCount, rowCount, colCount)
+                  : this.evacuationZoneGridCanvas!.addEvacuationZoneAcross(layerCount, rowCount, colCount);
               }
             }
           }
         }, 10);
+      } else if (this.isInTrash) {
+        if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
+          this.startPosition = {layer: -1, x: -1, y: -1};
+        }
+        this.grids[layerCount][rowCount][colCount] = this.serviceGridCanvas.newTile();
+        this.grids[layerCount + 1][rowCount][colCount] = this.serviceGridCanvas.newTile();
+
+        this.gridCanvasService
+          .deleteTile(this.map!.id, this.layer, rowCount, colCount).subscribe((map: Map) => this.map = map);
       } else if (
-        newY >= 0 &&
-        newY < TileCount &&
-        newX >= 0 &&
-        newX < TileCount &&
+        newY >= 0 && newY < TileCount && newX >= 0 && newX < TileCount &&
         !this.grids[layerCount][newY][newX].name.includes('evacuationZone') &&
         !this.grids[this.layer][newY][newX].isPlaceholder
       ) {
-        if (!this.isInTrash) {
-          this.grids[layerCount][newY][newX] = { ...tile };
-          this.addPlaceholder(layerCount, newY, newX, { ...tile });
-
-          this.gridCanvasService
-            .updateTile(this.map!.id, this.layer, newY, newX, tile)
-            .subscribe((map: Map) => {
-              this.map = map;
-            });
-
-          if (
-            this.grids[layerCount][rowCount][colCount].name.includes('start')
-          ) {
-            this.startPosition = { layer: this.layer, x: newX, y: newY };
-          }
-        } else if (
-          this.grids[layerCount][rowCount][colCount].name.includes('start')
-        ) {
-          this.startPosition = { layer: this.layer, x: -1, y: -1 };
+        if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
+          this.startPosition = {layer: layerCount, y: newY, x: newX};
         }
+        this.grids[layerCount][newY][newX] = {...tile};
+        this.tileServiceGridCanvas.addPlaceholder(layerCount, newY, newX, this.grids[layerCount][newY][newX]);
 
-        if (!this.altActive) {
-          this.grids[layerCount][rowCount][colCount] = this.newTile();
-          this.addPlaceholder(layerCount, rowCount, colCount, this.newTile());
+        this.gridCanvasService.updateTile(this.map!.id, this.layer, newY, newX, tile)
+          .subscribe((map: Map) => this.map = map);
+        if (!this.controlActive || this.grids[layerCount][rowCount][colCount].name.includes('start')) {
+          this.grids[layerCount][rowCount][colCount] = this.serviceGridCanvas.newTile();
+          this.grids[layerCount + 1][rowCount][colCount] = this.serviceGridCanvas.newTile();
 
-          this.gridCanvasService
-            .deleteTile(
-              this.map!.id,
-              this.layer,
-              rowCount,
-              colCount
-            )
-            .subscribe((map: Map) => {
-              this.map = map;
-            });
+          this.gridCanvasService.deleteTile(this.map!.id, this.layer, rowCount, colCount)
+            .subscribe((map: Map) => this.map = map);
         }
-      } else {
-        setTimeout(() => {
-          if (this.isInTrash) {
-            if (
-              this.grids[layerCount][rowCount][colCount].name.includes('start')
-            ) {
-              this.startPosition = { layer: -1, x: -1, y: -1 };
-            }
-            this.grids[layerCount][rowCount][colCount] = this.newTile();
-            this.grids[layerCount + 1][rowCount][colCount] = this.newTile();
-
-            this.gridCanvasService
-              .deleteTile(
-                this.map!.id,
-                this.layer,
-                rowCount,
-                colCount
-              )
-              .subscribe((map: Map) => {
-                this.map = map;
-              });
-          }
-        }, 30);
       }
     }
-    setTimeout(() => {
-      this.tileIsDragged = false;
-      this.calcTotalPoints();
-    }, 50);
+
+    setTimeout(
+      () => {
+        this
+          .serviceGridCanvas
+          .calcTotalPoints();
+
+        this
+          .currentDraggedTileChange
+          .emit(this
+
+            .currentDraggedTile = undefined
+          );
+      },50);
+
     $event.source._dragRef.reset();
-    this.resumePanzoom();
+    this.panzoomCanvas.resume();
   }
 
   dragConstrainPoint = (point: any, dragRef: any) => {
@@ -568,372 +267,4 @@ export class GridCanvasComponent {
       y: point.y + zoomMoveYDifference - scale * 50,
     };
   };
-  loading: boolean = true;
-
-  calcTotalPoints() {
-    let loopCount = 0;
-    if (this.startPosition.x == -1) {
-      this.totalPoints = 'Keine Startkachel gegeben';
-      return;
-    }
-
-    let currentPoints = 5;
-    let currentPosition = { ...this.startPosition };
-
-    let orientation =
-      (this.grids[currentPosition.layer][currentPosition.y][currentPosition.x]
-        .rotation! +
-        this.grids[currentPosition.layer][currentPosition.y][
-          currentPosition.x
-        ].paths!.find((path: { from: number; to: number }) => path.from === -1)!
-          .to +
-        2) %
-      4;
-
-    this.totalPoints = currentPoints.toString();
-
-    let multiplier: number = 1;
-
-    while (orientation != -1 && loopCount++ <= 1000) {
-      switch (orientation) {
-        case 0:
-          currentPosition.y += 1;
-          break;
-        case 1:
-          currentPosition.x -= 1;
-          break;
-
-        case 2:
-          currentPosition.y -= 1;
-          break;
-
-        case 3:
-          currentPosition.x += 1;
-          break;
-      }
-
-      if (currentPosition.x < 0 || currentPosition.y < 0) {
-        this.totalPoints = 'Pacours führt aus dem Spielfeld';
-        this.toastr.warning('Pacours führt aus dem Spielfeld');
-        return;
-      }
-      let currentTile =
-        this.grids[currentPosition.layer][currentPosition.y][
-          currentPosition.x
-        ]!;
-      if (!currentTile!.name || currentTile.isPlaceholder) {
-        return;
-      }
-
-      if (currentTile.name.includes('evacuationZone')) {
-        if (
-          this.evacuation.entry == undefined ||
-          this.evacuation.entry.x != currentPosition.x ||
-          this.evacuation.entry.y != currentPosition.y ||
-          this.evacuation.entry.position != orientation
-        ) {
-          return;
-        }
-        if (this.evacuation.exit == undefined || this.evacuation.exit.x == -1) {
-          return;
-        }
-
-        currentPosition = {
-          layer: this.layer,
-          x: this.evacuation.exit.x,
-          y: this.evacuation.exit.y,
-        };
-        orientation = (this.evacuation.exit.position + 2) % 4;
-
-        multiplier = 4.3904;
-      } else {
-        if (!currentTile.paths) {
-          return;
-        }
-
-        let tileRotation = currentTile.rotation!;
-        let tileWay = currentTile.paths!.find(
-          (path: { from: number; to: number; layer: number }) =>
-            orientation === (path.from + tileRotation) % 4
-        );
-        if (tileWay !== undefined) {
-          currentPosition.layer += tileWay.layer;
-          if (currentPosition.layer < 0) {
-            this.toastr.warning('Rampe führt ins nichts!');
-            return;
-          }
-
-          orientation = (tileRotation + tileWay.to + 2) % 4;
-          currentPoints += currentTile.value ? currentTile.value + 5 : 5;
-          this.totalPoints = Math.round(currentPoints * multiplier).toString();
-        } else {
-          return;
-        }
-      }
-    }
-
-    if (loopCount >= 1000) {
-      this.totalPoints =
-        'Ihre Bahn erzeugt eine Schleife. Parkour nicht zugelassen!';
-    }
-  }
-
-  private addEvacuationZoneAcross(
-    layer: number,
-    rowCount: number,
-    colCount: number,
-    isPlaceholder: boolean = false,
-    load: boolean = false
-  ) {
-    if (this.grids[this.layer].length + 1 != undefined) {
-      for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < 3; j++) {
-          if (
-            this.grids[layer][rowCount + j][colCount + i].name != '' ||
-            this.grids[layer + 1][rowCount + j][colCount + i].name != ''
-          ) {
-            this.toastr.warning('Kacheln sind belegt');
-            return false;
-          }
-        }
-      }
-    }
-
-    if (!isPlaceholder && !load) {
-      this.evacuation = this.getEvacuationDto(layer, rowCount, colCount, true);
-      this.gridCanvasService
-        .updateEvacuationZone(this.map!.id, layer, rowCount, colCount, true)
-        .subscribe((map: Map) => {
-          this.map = map;
-        });
-    }
-
-    this.grids[layer][rowCount][colCount] = {
-      name: 'evacuationZoneAcross_00',
-      border: ['black', '', '', 'black'],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount][colCount + 1] = {
-      name: 'evacuationZoneAcross_01',
-      border: ['black', '', '', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount][colCount + 2] = {
-      name: 'evacuationZoneAcross_02',
-      border: ['black', '', '', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount][colCount + 3] = {
-      name: 'evacuationZoneAcross_03',
-      border: ['black', 'black', '', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 1][colCount + 3] = {
-      name: 'evacuationZoneAcross_13',
-      border: ['', 'black', '', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 2][colCount + 3] = {
-      name: 'evacuationZoneAcross_23',
-      border: ['', 'black', 'black', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 2][colCount + 2] = {
-      name: 'evacuationZoneAcross_22',
-      border: ['', '', 'black', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 2][colCount + 1] = {
-      name: 'evacuationZoneAcross_21',
-      border: ['', '', 'black', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 2][colCount] = {
-      name: 'evacuationZoneAcross_20',
-      border: ['', '', 'black', 'black'],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 1][colCount] = {
-      name: 'evacuationZoneAcross_10',
-      border: ['', '', '', 'black'],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 1][colCount + 1] = {
-      name: 'evacuationZoneAcross_11',
-      border: ['', '', '', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 1][colCount + 2] = {
-      name: 'evacuationZoneAcross_12',
-      border: ['', '', '', ''],
-      isPlaceholder,
-    };
-
-    if (isPlaceholder == false) {
-      if (this.grids[this.grids.length + layer] == undefined) {
-        this.addLayer();
-      }
-      this.addEvacuationZoneAcross(layer + 1, rowCount, colCount, true);
-    }
-
-    return true;
-  }
-
-  private addEvacuationZoneUpright(
-    layer: number,
-    rowCount: number,
-    colCount: number,
-    isPlaceholder: boolean = false,
-    load: boolean = false
-  ) {
-    if (this.grids[this.layer].length + 1 != undefined) {
-      for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 4; j++) {
-          if (
-            this.grids[layer][rowCount + j][colCount + i].name != '' ||
-            this.grids[layer + 1][rowCount + j][colCount + i].name != ''
-          ) {
-            this.toastr.warning('Kacheln sind belegt');
-            return false;
-          }
-        }
-      }
-    }
-    if (!isPlaceholder && !load) {
-      this.evacuation = this.getEvacuationDto(layer, rowCount, colCount, false);
-      this.gridCanvasService
-        .updateEvacuationZone(this.map!.id, layer, rowCount, colCount, false)
-        .subscribe((map: Map) => {
-          this.map = map;
-        });
-    }
-
-    this.grids[layer][rowCount][colCount] = {
-      name: 'evacuationZoneUpright_00',
-      border: ['black', '', '', 'black'],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount][colCount + 1] = {
-      name: 'evacuationZoneUpright_01',
-      border: ['black', '', '', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount][colCount + 2] = {
-      name: 'evacuationZoneUpright_02',
-      border: ['black', 'black', '', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 1][colCount + 2] = {
-      name: 'evacuationZoneUpright_12',
-      border: ['', 'black', '', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 2][colCount + 2] = {
-      name: 'evacuationZoneUpright_22',
-      border: ['', 'black', '', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 3][colCount + 2] = {
-      name: 'evacuationZoneUpright_32',
-      border: ['', 'black', 'black', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 3][colCount + 1] = {
-      name: 'evacuationZoneUpright_31',
-      border: ['', '', 'black', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 3][colCount] = {
-      name: 'evacuationZoneUpright_30',
-      border: ['', '', 'black', 'black'],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 2][colCount] = {
-      name: 'evacuationZoneUpright_20',
-      border: ['', '', '', 'black'],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 1][colCount] = {
-      name: 'evacuationZoneUpright_10',
-      border: ['', '', '', 'black'],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 1][colCount + 1] = {
-      name: 'evacuationZoneUpright_11',
-      border: ['', '', '', ''],
-      isPlaceholder,
-    };
-    this.grids[layer][rowCount + 2][colCount + 1] = {
-      name: 'evacuationZoneUpright_21',
-      border: ['', '', '', ''],
-      isPlaceholder,
-    };
-
-    if (isPlaceholder == false) {
-      if (this.grids[this.grids.length + layer] == undefined) {
-        this.addLayer();
-      }
-      this.addEvacuationZoneUpright(layer + 1, rowCount, colCount, true);
-    }
-
-    return true;
-  }
-
-  deleteEvacuationZone(layerCount: number, rowCount: number, colCount: number) {
-    this.evacuation = this.getEvacuationDto(-1, -1, -1, true);
-    const upright: boolean =
-      this.grids[layerCount][rowCount][colCount].name.includes('Upright');
-
-    if (this.isInTrash) {
-      this.gridCanvasService
-        .deleteEvacuationZone(this.map!.id)
-        .subscribe((map) => {
-          this.map = map;
-        });
-    }
-
-    for (let i = 0; i < (upright ? 3 : 4); i++) {
-      for (let j = 0; j < (upright ? 4 : 3); j++) {
-        this.grids[layerCount][rowCount + j][colCount + i] = this.newTile();
-        this.grids[layerCount + 1][rowCount + j][colCount + i] = this.newTile();
-      }
-    }
-  }
-
-  getEvacuationDto(
-    layer: number,
-    row: number,
-    column: number,
-    across: boolean
-  ) {
-    this.evacuationExists.emit(row == -1 ? false : true);
-    return {
-      layer,
-      column,
-      row,
-      across,
-      exit: { x: -1, y: -1, position: -1 },
-      entry: { x: -1, y: -1, position: -1 },
-    };
-  }
-
-  newTile() {
-    return {
-      id: '0',
-      name: '',
-      imageId: '',
-      image: undefined,
-      paths: undefined,
-      rotation: 0,
-      isPlaceholder: false,
-    };
-  }
-
-  pausePanzoom() {
-    this.panzoomCanvas.pause();
-  }
-
-  resumePanzoom() {
-    this.panzoomCanvas.resume();
-  }
 }
