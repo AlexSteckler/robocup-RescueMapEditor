@@ -269,16 +269,15 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       y: point.y + zoomMoveYDifference - scale * 50,
     };
   };
+
   top: number = 0;
   left: number = 0;
 
   test($event: any) {
-    let x = this.innerWidth - $event.dropPoint.x - 19
-    let y = $event.dropPoint.y - 110
     let scale = this.canvasValues!.scale;
-    console.log(x, this.canvasValues!.x);
-    console.log(this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x);
-    this.top = y -this.canvasValues!.y - 5
-    this.left = this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x - 5
+    let x = this.innerWidth - $event.dropPoint.x - 14;
+    let y = $event.dropPoint.y - 113;
+    this.top = (y -this.canvasValues!.y - 5) / scale
+    this.left = (this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x - 5) / scale;
   }
 }
