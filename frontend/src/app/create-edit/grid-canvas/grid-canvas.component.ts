@@ -272,6 +272,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
   top: number = 0;
   left: number = 0;
+  absolute: string = 'absolute';
 
   test($event: any) {
     let scale = this.canvasValues!.scale;
@@ -279,5 +280,15 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     let y = $event.dropPoint.y - 113;
     this.top = (y -this.canvasValues!.y - 5) / scale
     this.left = (this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x - 5) / scale;
+    this.absolute = 'absolute';
+  }
+
+  dragObstacleStartMovement() {
+    this.panzoomCanvas.pause();
+  }
+
+  dragObstacleEndMovement($event: any){
+    this.test($event);
+    this.panzoomCanvas.resume();
   }
 }

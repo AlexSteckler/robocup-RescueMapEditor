@@ -8,11 +8,19 @@
 <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }"
      cdkDropList (cdkDropListDropped)="test($event)">
   <div #canvas>
-    <div style="position: absolute; top:{{top}}px; left: {{left}}px; height: 10px; width: 10px; background-color: red"></div>
+    <div
+      cdkDrag
+      (cdkDragStarted)="dragObstacleStartMovement()"
+      (cdkDragEnded)="dragObstacleEndMovement($event)"
+      class="position-absolute"
+      style="top:{{top}}px; left: {{left}}px; height: 10px; width: 10px; background-color: red;"
+      >
+    </div>
     <div *ngFor="let layerOfGrids of grids; let layerCount = index" class="layer">
       <div *ngIf="layerCount == layer">
         <div *ngFor="let row of layerOfGrids; let rowCount = index" class="row d-flex flex-nowrap">
           <app-tile *ngFor="let tile of row; let colCount = index"
+
                     [class.white]="tile.id"
                     [canvasValues]="canvasValues"
                     [evacuationZone]="evacuation"
