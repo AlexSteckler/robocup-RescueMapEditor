@@ -13,6 +13,5 @@ export interface Tile {
    border?: string[];
    temp?: boolean;
 
-   isBeingDragged?: boolean;
    isPlaceholder?: boolean;
 }

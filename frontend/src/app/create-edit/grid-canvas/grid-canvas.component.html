@@ -1,8 +1,8 @@
 <div class="pb-1 d-flex w-100 justify-content-between">
   <div class="base-color fw-bold"> {{map?.name}}</div>
   <div>
-    <button class="me-1" (click)="buttonLayerChange('down')">Ebene tiefer</button>
-    <button (click)="buttonLayerChange('up')">Ebene höher</button>
+    <button class="me-1" (click)="buttonLayerChange(false)">Ebene tiefer</button>
+    <button (click)="buttonLayerChange(true)">Ebene höher</button>
   </div>
 </div>
 <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
@@ -12,21 +12,24 @@
       <div *ngIf="layerCount == layer">
         <div *ngFor="let row of layerOfGrids; let rowCount = index" class="row d-flex flex-nowrap">
           <app-tile *ngFor="let tile of row; let colCount = index"
-                    (contextmenu)="$event.preventDefault();"
+                    cdkDropList
+                    cdkDrag
+
                     [class.white]="tile.id"
                     [canvasValues]="canvasValues"
                     [evacuationZone]="evacuation"
-                    (evacuationZoneChange)="evacuation = $event; evacuationZoneChange($event)"
-                    (tileChange)="tileChange(tile, rowCount, colCount)"
                     [position]="{x: colCount, y: rowCount, layer: layerCount}"
-                    [tile]="tile"
-                    cdkDropList
-                    (cdkDropListDropped)="drop($event, rowCount, colCount)"
-                    cdkDrag
                     [cdkDragConstrainPosition]="dragConstrainPoint"
+                    [tile]="tile"
                     [cdkDragDisabled]="tile.id == '0' || tile.isPlaceholder"
+                    [isCurrentlyDraggedTile]="currentDraggedTile === tile"
+
+                    (contextmenu)="$event.preventDefault();"
+                    (evacuationZoneChange)="evacuationZoneGridCanvas.evacuationZoneChange($event)"
+                    (tileChange)="tileChange(tile, layerCount, rowCount, colCount)"
+                    (cdkDropListDropped)="drop($event, layerCount, rowCount, colCount)"
                     (cdkDragStarted)="dragStartMovement(tile)"
-                    (cdkDragEnded)="dragEndMovement(tile, $event, rowCount, colCount, layerCount)"
+                    (cdkDragEnded)="dragEndMovement(tile, $event,layerCount, rowCount, colCount )"
                     >
           </app-tile>
         </div>
@@ -35,7 +38,7 @@
   </div>
 </div>
 
-<div *ngIf="tileIsDragged" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false" class="position-absolute p-2" style="bottom: 50%;">
+<div *ngIf="currentDraggedTile" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false" class="position-absolute p-2" style="bottom: 50%;">
   <div class="rounded border border-3 p-2 base-bg" >
     <i class="bi bi-trash-fill"></i>
   </div>
