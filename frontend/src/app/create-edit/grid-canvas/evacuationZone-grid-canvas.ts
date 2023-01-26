@@ -257,5 +257,4 @@ export class EvacuationZoneGridCanvas {
         evacuation.exit
       ).subscribe((map: Map) => this.gridCanvasComponent.map = map);
   }
-
 }

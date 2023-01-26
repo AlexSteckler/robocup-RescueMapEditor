@@ -247,12 +247,8 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
             .currentDraggedTile = undefined
           );
-      }
+      },50);
 
-      ,
-      50
-    )
-    ;
     $event.source._dragRef.reset();
     this.panzoomCanvas.resume();
   }
