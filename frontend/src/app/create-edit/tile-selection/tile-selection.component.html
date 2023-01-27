@@ -63,7 +63,7 @@
        (cdkDragStarted)="draggedStartObstacle(obstacle)"
        (cdkDragEnded)="draggedEndObstacle(obstacle)"
   >
-    {{obstacle.name}}
+  <div *cdkDragPlaceholder=""></div>
   </div>
 </div>
 
