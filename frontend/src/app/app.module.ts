@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment';
 import { CreateTileComponent } from './settings/create-tile/create-tile.component';
 import { FormsModule } from '@angular/forms';
 import { MatExpansionModule } from '@angular/material/expansion';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -32,35 +33,36 @@ function initializeKeycloak(keycloak: KeycloakService) {
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    SettingsComponent,
-    CreateTileComponent,
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    CreateEditModule,
-    MatSnackBarModule,
-    KeycloakAngularModule,
-    ToastrModule.forRoot(),
-    FormsModule,
-    MatExpansionModule,
-  ],
-  providers: [
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initializeKeycloak,
-      multi: true,
-      deps: [KeycloakService],
-    },
-    { provide: Window, useValue: window },
-    { provide: LOCALE_ID, useValue: 'fr' },
-    ToastrService,
-  ],
-  bootstrap: [AppComponent],
+    declarations: [
+        AppComponent,
+        HomeComponent,
+        SettingsComponent,
+        CreateTileComponent,
+    ],
+    providers: [
+        {
+            provide: APP_INITIALIZER,
+            useFactory: initializeKeycloak,
+            multi: true,
+            deps: [KeycloakService],
+        },
+        { provide: Window, useValue: window },
+        { provide: LOCALE_ID, useValue: 'fr' },
+        ToastrService,
+    ],
+    bootstrap: [AppComponent],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        HttpClientModule,
+        CreateEditModule,
+        MatSnackBarModule,
+        KeycloakAngularModule,
+        ToastrModule.forRoot(),
+        FormsModule,
+        MatExpansionModule,
+        MatCheckboxModule
+    ]
 })
 export class AppModule {}
