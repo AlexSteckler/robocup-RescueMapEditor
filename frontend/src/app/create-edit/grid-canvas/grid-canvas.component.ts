@@ -34,13 +34,14 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   @Input() innerWidth: number = 0;
   @Input() isObstacleMoving: boolean = false;
 
-  @Input() currentObstacle : Obstacle | undefined;
+  @Input() currentObstacle: Obstacle | undefined;
 
   map: Map | undefined;
   tileSelection: Array<Tile> = [];
 
   canvasValues: Transform | undefined;
   panzoomCanvas: any = null;
+  private panzoomDummyCanvas: any = null;
   currentDraggedTile: Tile | undefined;
   layer: number = 0;
   grids: Array<Array<Array<Tile>>> = [];
@@ -53,6 +54,8 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   loading: boolean = true;
   serviceGridCanvas: ServiceGridCanvas;
   tileServiceGridCanvas: TileServiceGridCanvas;
+
+  obstacles: Obstacle[] = [];
 
   constructor(private toastr: ToastrService, private gridCanvasService: GridCanvasService, private route: ActivatedRoute) {
     this.evacuationZoneGridCanvas = new EvacuationZoneGridCanvas(this, this.gridCanvasService, this.toastr);
@@ -80,6 +83,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       maxZoom: 2,
       minZoom: 0.5,
     });
+
     this.panzoomCanvas.setZoomSpeed(0.05);
     this.panzoomCanvas.moveTo((-TileCount * 50), (-TileCount * 50));
     this.serviceGridCanvas.stopDragForFarAwayMoving();
@@ -120,6 +124,15 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
   //---------- Drag & Drop -----------//
   drop($event: CdkDragDrop<Tile[]>, layer: number, rowCount: number, colCount: number) {
+    if (this.currentObstacle !== undefined) {
+      let x = this.innerWidth - $event.dropPoint.x
+      let y = $event.dropPoint.y - 160
+      let scale = this.canvasValues!.scale;
+      let top = (y - this.canvasValues!.y) / scale
+      let left = (this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x - 5) / scale;
+      this.obstacles.push({name: this.currentObstacle.name, x: left, y: top, showPositionX: left, showPositionY: top} as Obstacle)
+      return;
+    }
     let tileToPlacedOn = this.grids[layer][rowCount][colCount];
     if (
       this.grids[this.layer + 1] != undefined &&
@@ -253,7 +266,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
             .currentDraggedTile = undefined
           );
-      },50);
+      }, 50);
 
     $event.source._dragRef.reset();
     this.panzoomCanvas.resume();
@@ -273,16 +286,14 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       y: point.y + zoomMoveYDifference - scale * 50,
     };
   };
-  top: number = 0;
-  left: number = 0;
 
-  test($event: any) {
-    let x = this.innerWidth - $event.dropPoint.x - 19
-    let y = $event.dropPoint.y - 110
-    let scale = this.canvasValues!.scale;
-    console.log(x, this.canvasValues!.x);
-    console.log(this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x);
-    this.top = y -this.canvasValues!.y - 5
-    this.left = this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x - 5
+  moveObsStart(obstacle: Obstacle) {
+    this.panzoomCanvas.pause();
+  }
+
+  moveObstacleEnd(obstacle: Obstacle, $event: CdkDragEnd) {
+    obstacle.x += $event.distance.x;
+    obstacle.y += $event.distance.y;
+    this.panzoomCanvas.resume();
   }
 }
