@@ -57,8 +57,9 @@
 cdkDropList>
   <div class="obstacles" *ngFor="let obstacle of obstacles"
   cdkDrag
+  (cdkDragStarted)="draggedStartObstacle(obstacle)"
   >
-    {{obstacle}}
+    {{obstacle.name}}
   </div>
 </div>
 
