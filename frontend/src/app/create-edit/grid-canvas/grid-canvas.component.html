@@ -1,3 +1,4 @@
+{{currentObstacle !== undefined}}
 <div class="pb-1 d-flex w-100 justify-content-between">
   <div class="base-color fw-bold"> {{map?.name}}</div>
   <div>
@@ -5,37 +6,15 @@
     <button (click)="buttonLayerChange(true)">Ebene höher</button>
   </div>
 </div>
-<div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }"
-     cdkDropList (cdkDropListDropped)="test($event)">
-  <div #canvas *ngIf="currentObstacle !== undefined">
-    <div style="position: absolute; top:{{top}}px; left: {{left}}px; height: 10px; width: 10px; background-color: red"></div>
-    <div *ngFor="let layerOfGrids of grids; let layerCount = index" class="layer">
-      <div *ngIf="layerCount == layer">
-        <div *ngFor="let row of layerOfGrids; let rowCount = index" class="row d-flex flex-nowrap">
-          <app-tile *ngFor="let tile of row; let colCount = index"
-                    [class.white]="tile.id"
-                    [canvasValues]="canvasValues"
-                    [evacuationZone]="evacuation"
-                    [position]="{x: colCount, y: rowCount, layer: layerCount}"
-                    [tile]="tile"
-                    [isCurrentlyDraggedTile]="currentDraggedTile === tile"
-                    (contextmenu)="$event.preventDefault();"
-                    (evacuationZoneChange)="evacuationZoneGridCanvas.evacuationZoneChange($event)"
-                    (tileChange)="tileChange(tile, layerCount, rowCount, colCount)"
-          >
-          </app-tile>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div #canvas *ngIf="currentObstacle === undefined">
-
+<div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
+  <div #canvas>
     <div *ngFor="let layerOfGrids of grids; let layerCount = index" class="layer">
       <div *ngIf="layerCount == layer">
         <div *ngFor="let row of layerOfGrids; let rowCount = index" class="row d-flex flex-nowrap">
           <app-tile *ngFor="let tile of row; let colCount = index"
                     cdkDropList
                     cdkDrag
+                    cdkDropListSortingDisabled
 
                     [class.white]="tile.id"
                     [canvasValues]="canvasValues"
@@ -52,16 +31,29 @@
                     (cdkDropListDropped)="drop($event, layerCount, rowCount, colCount)"
                     (cdkDragStarted)="dragStartMovement(tile)"
                     (cdkDragEnded)="dragEndMovement(tile, $event,layerCount, rowCount, colCount )"
-                    >
+                    [cdkDropListDisabled]="true"
+          >
           </app-tile>
         </div>
       </div>
     </div>
+    <div *ngFor="let obstacle of obstacles"
+         class="position-absolute"
+         style="height: 50px; width: 50px; background-color: red;"
+         [ngStyle]="{'top.px': obstacle.showPositionY, 'left.px': obstacle.showPositionX}"
+         cdkDrag
+         (cdkDragStarted)="moveObsStart(obstacle)"
+         (cdkDragEnded)="moveObstacleEnd(obstacle, $event)"
+    >
+      {{obstacle.name}}
+    </div>
   </div>
 </div>
 
-<div *ngIf="currentDraggedTile" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false" class="position-absolute p-2" style="bottom: 50%;">
-  <div class="rounded border border-3 p-2 base-bg" >
+
+<div *ngIf="currentDraggedTile" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false"
+     class="position-absolute p-2" style="bottom: 50%;">
+  <div class="rounded border border-3 p-2 base-bg">
     <i class="bi bi-trash-fill"></i>
   </div>
 </div>
@@ -85,11 +77,17 @@
     <i class="bi bi-info-circle-fill"></i>
   </div>
   <mat-menu #afterMenu="matMenu" xPosition="after">
-    <div class="p-2 d-flex flex-column"><span>Kachel verschieben</span><span class="base-color">'Linke Maustaste' auf Kachel halten</span></div>
-    <div class="p-2 d-flex flex-column"><span>Raster verschieben</span><span class="base-color">'Linke Maustaste' oder 'Mausrad drücken'</span></div>
-    <div class="p-2 d-flex flex-column"><span>Im Raster zoomen</span><span class="base-color">'Mausrad drehen'</span></div>
-    <div class="p-2 d-flex flex-column"><span>Kachel drehen</span><span class="base-color">'Rechtsklick' auf Kachel / Doppel-Tippen</span></div>
-    <div class="p-2 d-flex flex-column"><span>Kachel im Raster kopieren</span><span class="base-color">'STRG' beim absetzen halten</span></div>
-    <div class="p-2 d-flex flex-column"><span>Kachel löschen</span><span class="base-color">Kachel halten und in den Papierkorb schieben</span></div>
+    <div class="p-2 d-flex flex-column"><span>Kachel verschieben</span><span class="base-color">'Linke Maustaste' auf Kachel halten</span>
+    </div>
+    <div class="p-2 d-flex flex-column"><span>Raster verschieben</span><span class="base-color">'Linke Maustaste' oder 'Mausrad drücken'</span>
+    </div>
+    <div class="p-2 d-flex flex-column"><span>Im Raster zoomen</span><span class="base-color">'Mausrad drehen'</span>
+    </div>
+    <div class="p-2 d-flex flex-column"><span>Kachel drehen</span><span class="base-color">'Rechtsklick' auf Kachel / Doppel-Tippen</span>
+    </div>
+    <div class="p-2 d-flex flex-column"><span>Kachel im Raster kopieren</span><span class="base-color">'STRG' beim absetzen halten</span>
+    </div>
+    <div class="p-2 d-flex flex-column"><span>Kachel löschen</span><span class="base-color">Kachel halten und in den Papierkorb schieben</span>
+    </div>
   </mat-menu>
 </div>

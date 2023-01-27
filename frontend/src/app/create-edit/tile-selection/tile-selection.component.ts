@@ -9,6 +9,9 @@ export interface Obstacle {
   x: number;
   y: number;
 
+  showPositionX?: number;
+  showPositionY?: number;
+
   layer: number;
 }
 
@@ -118,5 +121,9 @@ export class TileSelectionComponent {
 
   draggedStartObstacle(obstacle: Obstacle) {
      this.currentDraggedObstacle.emit(obstacle);
+  }
+
+  draggedEndObstacle(obstacle: Obstacle) {
+    this.currentDraggedObstacle.emit(undefined);
   }
 }
