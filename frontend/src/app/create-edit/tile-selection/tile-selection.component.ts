@@ -4,6 +4,14 @@ import {Transform} from 'panzoom';
 import {Tile} from '../tile/dto/tile.dto';
 import {TilesService} from './tiles.service';
 
+export interface Obstacle {
+  name: string;
+  x: number;
+  y: number;
+
+  layer: number;
+}
+
 @Component({
   selector: 'app-tile-selection',
   templateUrl: './tile-selection.component.html',
@@ -20,8 +28,39 @@ export class TileSelectionComponent {
 
   @Input() currentDraggedTile: Tile | undefined;
   @Input() evacuationExists: boolean = false;
-  obstacles: any = [
-    "Eins","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn"
+
+  @Output() currentDraggedObstacle = new EventEmitter<Obstacle>;
+  obstacles: Obstacle[] = [
+    {
+      name: 'Obstacle 1',
+      x: 0,
+      y: 0,
+      layer: 0,
+    },
+    {
+      name: 'Obstacle 2',
+      x: 0,
+      y: 0,
+      layer: 0,
+    },
+    {
+      name: 'Obstacle 3',
+      x: 0,
+      y: 0,
+      layer: 0,
+    },
+    {
+      name: 'Obstacle 4',
+      x: 0,
+      y: 0,
+      layer: 0,
+    },
+    {
+      name: 'Obstacle 5',
+      x: 0,
+      y: 0,
+      layer: 0,
+    },
   ];
 
   constructor(
@@ -75,5 +114,9 @@ export class TileSelectionComponent {
 
   falseEnter() {
     return false;
+  }
+
+  draggedStartObstacle(obstacle: Obstacle) {
+     this.currentDraggedObstacle.emit(obstacle);
   }
 }

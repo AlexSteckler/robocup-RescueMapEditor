@@ -10,6 +10,7 @@ import {ActivatedRoute} from '@angular/router';
 import {EvacuationZoneGridCanvas} from "./evacuationZone-grid-canvas";
 import {ServiceGridCanvas} from "./service-grid-canvas";
 import {TileServiceGridCanvas} from "./tileService.grid-canvas";
+import {Obstacle} from "../tile-selection/tile-selection.component";
 
 export const TileCount = 30;
 export const OutsideDrag = 100;
@@ -31,6 +32,9 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   @Input() isInTrash: boolean = false;
   @Input() innerHeight: number = 0;
   @Input() innerWidth: number = 0;
+  @Input() isObstacleMoving: boolean = false;
+
+  @Input() currentObstacle : Obstacle | undefined;
 
   map: Map | undefined;
   tileSelection: Array<Tile> = [];

@@ -7,7 +7,7 @@
 </div>
 <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }"
      cdkDropList (cdkDropListDropped)="test($event)">
-  <div #canvas>
+  <div #canvas *ngIf="currentObstacle !== undefined">
     <div style="position: absolute; top:{{top}}px; left: {{left}}px; height: 10px; width: 10px; background-color: red"></div>
     <div *ngFor="let layerOfGrids of grids; let layerCount = index" class="layer">
       <div *ngIf="layerCount == layer">
@@ -28,7 +28,7 @@
       </div>
     </div>
   </div>
-  <!--<div #canvas>
+  <div #canvas *ngIf="currentObstacle === undefined">
 
     <div *ngFor="let layerOfGrids of grids; let layerCount = index" class="layer">
       <div *ngIf="layerCount == layer">
@@ -57,7 +57,7 @@
         </div>
       </div>
     </div>
-  </div>-->
+  </div>
 </div>
 
 <div *ngIf="currentDraggedTile" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false" class="position-absolute p-2" style="bottom: 50%;">
