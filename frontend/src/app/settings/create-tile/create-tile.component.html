@@ -1,13 +1,24 @@
 
 <div class="d-flex justify-content-center p-3">
-  <button class="btn button-link" (click)="openModal(true)">
+  <button class="btn button-link" (click)="openBasicModal()">
     <i class="bi bi-plus-circle"></i> Kachel hinzufügen
   </button>
 </div>
-<div class="d-flex flew-row flex-wrap justify-content-center ">
-  <div *ngFor="let tile of tiles" class="d-flex flex-column p-3 text-black border ">
+<div class="d-flex flew-row flex-wrap justify-content-center  ">
+  <div *ngFor="let tile of tiles" class="d-flex flex-column p-3 text-black border align-items-center" (click)="getTileFromId(tile)">
     <img [src]="tile.image" class="img-fluid" style="width: 100px;"/>
     <span class="text-center">{{tile.name}}</span>
+    <span>{{tile.imageId}}</span>
+    <div *ngFor="let path of tile.paths" class="d-flex flex-column">
+      <div class="d-flex flex-row">
+        {{path.from}}
+        {{path.to}}
+        {{path.layer}}
+      </div>
+    </div>
+    <div class="d-flex flex-row">
+      <span class="base-color">Value: </span> {{tile.value}}
+    </div>
   </div>
 </div>
 
@@ -32,7 +43,7 @@
         </div>
         <div class="d-flex flex-column align-items-center p-2">
           <div class="d-flex flex-column justify-content-center border-base border rounded p-3">
-            <div class="row d-flex flex-row justify-content-center">
+            <div class="row d-flex flex-row justify-content-center w-100">
               <div class="col-8 d-flex flex-column">
                 <div  *ngFor="let path of paths">
                   <div class="d-flex flex-row">
@@ -59,7 +70,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-2 d-flex flex-column justify-content-center align-items-end pt-3">
+              <div class="col-4 d-flex flex-column justify-content-center align-items-end pt-3">
                 <button type="button" class="btn btn-primary"(click)="addDeletePath(true)">
                   <i class="bi bi-plus-circle"></i>
                 </button>
@@ -68,7 +79,7 @@
                 </button>
               </div>
             </div>
-            <div class="pt-3">
+            <div *ngIf="!selectedTile" class="pt-3">
               <img src="../assets/tiles/Tile_description_line.png" class="img-fluid" style="width: 100%;"/>
             </div>
 
@@ -99,8 +110,12 @@
       </div>
 
       <div class="p-3">
-        <button class="btn btn-primary" [class.disabled]="!uploadActive || name == ''" (click)="create()">
+        <button class="btn btn-primary p-1" [class.disabled]="!uploadActive || name == ''" (click)="createTile()">
           Erstellen
+        </button>
+
+        <button class="btn btn-secondary p-1" (click)="updateTile()">
+          Update
         </button>
 
       </div>
