@@ -32,4 +32,8 @@ export class TilesService {
     formData.append('image', file, file.name);
     return this.httpClient.post<Image>(`${environment.baseUrlV1}/tile/image`, formData);
   }
+
+  public deleteTile(id: string): Observable<any> {
+    return this.httpClient.delete(`${environment.baseUrlV1}/tile/${id}`);
+  }
 }

@@ -4,10 +4,24 @@
     <i class="bi bi-plus-circle"></i> Kachel hinzufügen
   </button>
 </div>
-<div class="d-flex flew-row flex-wrap justify-content-center  ">
-  <div *ngFor="let tile of tiles" class="d-flex flex-column p-3 text-black border align-items-center" (click)="updateTile(tile)">
-    <img [src]="tile.image" class="img-fluid" style="width: 100px;"/>
-    <span class="text-center">{{tile.name}}</span>
+
+<div *ngIf="locationTiles.length > 0" class="d-flex flex-column">
+  <h3 class="text-black">Lokale Kacheln</h3>
+  <div class="d-flex flew-row flex-wrap justify-content-center">
+    <div *ngFor="let tile of locationTiles" class="d-flex flex-column p-3 text-black border align-items-center" (click)="updateTile(tile)">
+      <img [src]="tile.image" class="img-fluid" style="width: 100px;"/>
+      <span class="text-center">{{tile.name}}</span>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex flex-column">
+  <h3 class="text-black">Globale Kacheln</h3>
+  <div class="d-flex flew-row flex-wrap justify-content-center">
+    <div *ngFor="let tile of tiles" class="d-flex flex-column p-3 text-black border align-items-center" (click)="updateTile(tile)">
+      <img [src]="tile.image" class="img-fluid" style="width: 100px;"/>
+      <span class="text-center">{{tile.name}}</span>
+    </div>
   </div>
 </div>
 
@@ -103,9 +117,14 @@
           Erstellen
         </button>
 
-        <button *ngIf="selectedTile" class="btn button-link p-1" [class.disabled]="!name" (click)="modal.close()">
-          Update
-        </button>
+        <div *ngIf="selectedTile" class="d-flex flex-row justify-content-between">
+          <button class="btn text-danger fs-5" (click)="deleteTile(selectedTile)">
+            <i class="bi bi-trash3-fill"></i>
+          </button>
+          <button class="btn button-link p-1" [class.disabled]="!name" (click)="modal.close()">
+            Update
+          </button>
+        </div>
 
       </div>
     </div>

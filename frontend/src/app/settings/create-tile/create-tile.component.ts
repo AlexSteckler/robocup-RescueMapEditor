@@ -17,6 +17,7 @@ export class CreateTileComponent {
   public toUpload!: File | null;
 
   tiles: Tile[] = [];
+  locationTiles: Tile[] = [];
 
   selectedTile: Tile | undefined;
 
@@ -36,7 +37,6 @@ export class CreateTileComponent {
     private tilesService: TilesService,
     private sanitizer: DomSanitizer) {}
 
-
   //--------------------------------------------------------------------------------
 
   ngOnInit(): void {
@@ -49,7 +49,12 @@ export class CreateTileComponent {
           tile.image = img;
           tile.rotation = 0;
           loaded++;
-          this.tiles.push(tile);
+
+          if (tile.location) {
+            this.locationTiles.push(tile);
+          } else {
+            this.tiles.push(tile);
+          }
         });
       });
     });
@@ -121,13 +126,14 @@ export class CreateTileComponent {
             }
 
             this.tilesService.createTile(tileDto).subscribe((resultTile: Tile) => {
-              this.value = 0;
-              this.toUpload = null;
-              this.toastr.success('Tile created');
 
               if (!this.tiles.find((tile) => tile.id == resultTile.id)) {
                 resultTile.image = tileImage;
-                this.tiles.unshift(resultTile);
+                if (resultTile.location) {
+                  this.locationTiles.unshift(resultTile);
+                } else {
+                  this.tiles.unshift(resultTile);
+                }
               }
 
               this.toastr.success('Kachel wurde erstellt');
@@ -177,8 +183,14 @@ export class CreateTileComponent {
     } else {
       this.tilesService.updateTile(selectedTile.id!, tileDto).subscribe((returnTile: Tile) => {
         returnTile.image = selectedTile.image;
-        let tileIndex = this.tiles.findIndex((tile) => tile.id == returnTile.id);
-        this.tiles[tileIndex] = returnTile;
+
+        if (returnTile.location) {
+          let tileIndex = this.locationTiles.findIndex((tile) => tile.id == returnTile.id);
+           this.locationTiles[tileIndex] = returnTile;
+        } else {
+          let tileIndex = this.tiles.findIndex((tile) => tile.id == returnTile.id);
+          this.tiles[tileIndex] = returnTile;
+        }
       });
     }
     this.toastr.success('Kachel wurde geupdated');
@@ -186,4 +198,14 @@ export class CreateTileComponent {
     this.toastr.warning('Kachel wurde nicht geupdated');
   });
   }
+
+  //--------------------------------------------------------------------------------
+
+  deleteTile(selectedTile: Tile) {
+    this.tilesService.deleteTile(selectedTile.id!).subscribe(() => {
+      this.tiles = this.tiles.filter((tile) => tile.id != selectedTile.id);
+      this.toastr.success('Kachel wurde gelöscht');
+
+    });
+  this.modalService.dismissAll();  }
 }
