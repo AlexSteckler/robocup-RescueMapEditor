@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -14,5 +15,10 @@ export class TileService {
 
   async create(createTileDto: CreateTileDto) {
     return this.tileModel.create(createTileDto);
+  }
+
+  async updateTile(id: string, updateTileDto: CreateTileDto): Promise<Tile> {
+    return this.tileModel.findOneAndUpdate( { _id: id}, {updateTileDto}, { new: true },)
+      .exec();
   }
 }
