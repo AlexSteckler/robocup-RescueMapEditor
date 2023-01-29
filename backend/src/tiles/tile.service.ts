@@ -13,11 +13,11 @@ export class TileService {
     return this.tileModel.find().exec();
   }
 
-  async create(createTileDto: CreateTileDto) {
+  async create(createTileDto: CreateTileDto) : Promise<Tile> {
     return this.tileModel.create(createTileDto);
   }
 
-  async updateTile(id: string, tileDto: any) {
+  async updateTile(id: string, tileDto: any) : Promise<Tile> {
     return this.tileModel.findByIdAndUpdate(
       {_id: id}, tileDto, {new: true});
   }

@@ -1,5 +1,5 @@
 import { Component, ElementRef, Sanitizer, ViewChild } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { TilesService } from 'src/app/create-edit/tile-selection/tiles.service';
@@ -53,7 +53,6 @@ export class CreateTileComponent {
           loaded++;
           this.tiles.push(tile);
         });
-
       });
     });
   }
@@ -107,96 +106,85 @@ export class CreateTileComponent {
 
   //--------------------------------------------------------------------------------
 
-  createTile() {
+  createTile(name: string, value: number, paths: { from: number; to: number; layer: number }[]) {
     if(this.toUpload) {
       this.tilesService.uploadImage(this.toUpload).subscribe((image) => {
 
-        let tmpImageId = (image as any).id
 
-        let dto : any = {
-          name: this.name,
-          value: this.value,
-          paths: this.paths,
-          imageId: tmpImageId
-        }
+        console.log(image);
+        let tileImage : any;
 
-        this.tilesService.createTile(dto).subscribe((resultTile: Tile) => {
-          this.value = 0;
-          this.toUpload = null;
-          this.toastr.success('Tile created');
+        this.tilesService.getTileImg((image as any).id).subscribe((blob: Blob) => {
+          let objectURL = URL.createObjectURL(blob);
+          tileImage = this.sanitizer.bypassSecurityTrustUrl(objectURL);
 
-          if (!this.tiles.find((tile) => tile.id == resultTile.id)) {
-
-            this.tilesService.getTileImg(tmpImageId).subscribe((blob: Blob) => {
-              let objectURL = URL.createObjectURL(blob);
-              let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-              resultTile.image = img;
-              this.tiles.push(resultTile);
-            });
+          let tileDto : any = {
+            name: name,
+            value: value,
+            paths: paths,
+            imageId: (image as any).id
           }
+
+          console.log(tileDto);
+
+          this.tilesService.createTile(tileDto).subscribe((resultTile: Tile) => {
+            this.value = 0;
+            this.toUpload = null;
+            this.toastr.success('Tile created');
+
+            if (!this.tiles.find((tile) => tile.id == resultTile.id)) {
+              resultTile.image = tileImage;
+              this.tiles.push(resultTile);
+            }
+
+          });
         });
       });
     }
+    this.modalService.dismissAll();
   }
 
   //--------------------------------------------------------------------------------
 
   updateTile() {
-    if (this.selectedTile && this.selectedTile.id) {
-      let tileId = this.selectedTile.id;
 
-      if (this.toUpload) {
-        this.tilesService.uploadImage(this.toUpload).subscribe((image) => {
-          let id = (image as any).id
-          this.toUpload = null;
+    if(this.toUpload) {
+      this.tilesService.uploadImage(this.toUpload).subscribe((image) => {
 
-          let tileDto = {
-            name: this.name,
-            value: this.value,
-            paths: this.paths,
-            imageId: id
-          }
+        console.log(this.selectedTile);
+        if (this.selectedTile && this.selectedTile.id) {
 
-          this.updateTileDto(tileId, tileDto);
+        let imageId = (image as any).id
 
-        });
-      } else {
         let tileDto = {
           name: this.name,
           value: this.value,
           paths: this.paths,
-          imageId: this.selectedTile.imageId
+          imageId: imageId
         }
 
-        this.updateTileDto(tileId, tileDto);
+        let imgUrl: any;
+
+        this.tilesService.updateTile(this.selectedTile.id, tileDto).subscribe((returnTile: Tile) => {
+          this.tilesService.getTileImg(imageId).subscribe((blob: Blob) => {
+            let objectURL = URL.createObjectURL(blob);
+
+            returnTile.image = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+            console.log(returnTile.image)
+
+            let tileIndex = this.tiles.findIndex((tile) => tile.id == returnTile.id);
+            this.tiles[tileIndex] = returnTile;
+
+          });
+        });
       }
-
-      this.tilesService.getTileImg(tileId).subscribe((blob: Blob) => {
-        let objectURL = URL.createObjectURL(blob);
-        let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-      });
-
-      } else {
-        this.toastr.error('Kachel nicht gefunden');
-      }
-    this.modalService.dismissAll();
-  }
-
-  updateTileDto(id: string, dto: any) {
-    this.tilesService.updateTile(id, dto).subscribe((returnTile: Tile) => {
-      this.value = 0;
-
-      this.tilesService.getTileImg(returnTile.imageId!).subscribe((blob: Blob) => {
-        let objectURL = URL.createObjectURL(blob);
-        let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-        returnTile.image = img;
-      });
-
-      let tileIndex = this.tiles.findIndex((tile) => tile.id == returnTile.id);
-      this.tiles[tileIndex] = returnTile;
     });
-    this.toastr.success('Tile updated');
   }
+  this.modalService.dismissAll();
+}
+
+
+  //--------------------------------------------------------------------------------
 
   openBasicModal() {
     this.modalService.open(this.basicModal, {centered: true}).result

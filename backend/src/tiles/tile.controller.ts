@@ -2,8 +2,6 @@
 import { Controller } from '@nestjs/common';
 import { Body, Get, Param } from '@nestjs/common/decorators';
 import { Patch, Post } from '@nestjs/common/decorators/http/request-mapping.decorator';
-import { Public } from 'nest-keycloak-connect';
-import { UpdateTileDto } from 'src/maps/dto/update-tile.dto';
 import { NotFound } from '../util/not-found.decorator';
 import { CreateTileDto } from './dto/create-tile.dto';
 import { FindTileDto } from './dto/find-tile.dto';
@@ -29,7 +27,7 @@ export class TilesController {
     @Patch(':id')
     async updateTile(
         @Body() createTileDto: CreateTileDto, 
-        @Param() findTileDto: FindTileDto) {
+        @Param() findTileDto: FindTileDto) : Promise<Tile> {
             return this.tileService.updateTile(findTileDto.id, createTileDto);
     }
 }

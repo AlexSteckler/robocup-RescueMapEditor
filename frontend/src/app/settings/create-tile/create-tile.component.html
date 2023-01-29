@@ -99,7 +99,7 @@
       </div>
 
       <div class="p-3">
-        <button *ngIf="!selectedTile" class="btn btn-primary p-1" [class.disabled]="!toUpload || name == ''" (click)="createTile()">
+        <button *ngIf="!selectedTile" class="btn btn-primary p-1" [class.disabled]="!toUpload || name == ''" (click)="createTile(name, value, paths)">
           Erstellen
         </button>
 
