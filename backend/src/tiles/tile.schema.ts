@@ -13,6 +13,9 @@ export class Tile {
 
   @Prop()
   imageId: string;
+
+  @Prop()
+  location: string;
 }
 
 export const TileSchema = SchemaFactory.createForClass(Tile);

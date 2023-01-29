@@ -62,6 +62,8 @@
         <div
           class="d-flex flex-row justify-content-center align-items-center base-color"
         >
+
+
           <a
             *ngIf="authenticated === false"
             class="nav-link p-3 text-center text-lg-end text-uppercase fw-bold link-base-reverse"
@@ -69,7 +71,7 @@
             (click)="login()"
             >Anmelden
           </a>
-          <span *ngIf="authenticated" class="p-3 ps-0 pe-0 text-white">|</span>
+          <span *ngIf="authenticated" class="p-3 ps-0 pe-0 text-white">{{name}}  |</span>
           <a
             *ngIf="authenticated"
             class="nav-link p-3 text-uppercase text-center text-lg-end fw-bold link-base-reverse"

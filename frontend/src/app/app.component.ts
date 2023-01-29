@@ -11,6 +11,8 @@ export class AppComponent {
 
   authenticated : boolean = false;
 
+  name: string = '';
+
   constructor(
     private keycloakService: KeycloakService,
     private window: Window,
@@ -18,6 +20,9 @@ export class AppComponent {
 
   async ngOnInit() {
     this.authenticated = await this.keycloakService.isLoggedIn();
+    this.keycloakService.loadUserProfile().then((profile) => {
+      this.name = profile.firstName + ' ' + profile.lastName;
+    });
   }
 
   login() {

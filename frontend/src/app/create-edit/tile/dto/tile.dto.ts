@@ -14,4 +14,6 @@ export interface Tile {
    temp?: boolean;
 
    isPlaceholder?: boolean;
+
+   location?: string;
 }
