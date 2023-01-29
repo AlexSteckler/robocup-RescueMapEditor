@@ -23,13 +23,13 @@ export class TilesService {
     return this.httpClient.get(`${environment.baseUrlV1}/tile/image/${source}`,{ responseType: 'blob' });
   }
 
-  public createTile(dto: any) {
-    return this.httpClient.post(`${environment.baseUrlV1}/tile`, dto)
+  public createTile(dto: any): Observable<Tile>{
+    return this.httpClient.post<Tile>(`${environment.baseUrlV1}/tile`, dto);
   }
 
   public uploadImage(file: File): Observable<Image> {
     const formData: FormData = new FormData();
     formData.append('image', file, file.name);
-    return this.httpClient.post<Image>(`${environment.baseUrlV1}/tile/image`, formData)
+    return this.httpClient.post<Image>(`${environment.baseUrlV1}/tile/image`, formData);
   }
 }

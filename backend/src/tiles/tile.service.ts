@@ -17,8 +17,8 @@ export class TileService {
     return this.tileModel.create(createTileDto);
   }
 
-  async updateTile(id: string, updateTileDto: CreateTileDto): Promise<Tile> {
-    return this.tileModel.findOneAndUpdate( { _id: id}, {updateTileDto}, { new: true },)
-      .exec();
+  async updateTile(id: string, tileDto: any) {
+    return this.tileModel.findByIdAndUpdate(
+      {_id: id}, tileDto, {new: true});
   }
 }

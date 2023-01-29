@@ -7,6 +7,7 @@ import { UpdateTileDto } from 'src/maps/dto/update-tile.dto';
 import { NotFound } from '../util/not-found.decorator';
 import { CreateTileDto } from './dto/create-tile.dto';
 import { FindTileDto } from './dto/find-tile.dto';
+import { Tile } from './tile.schema';
 import { TileService } from './tile.service';
 
 @Controller({path:'tile', version: '1'})
@@ -21,7 +22,7 @@ export class TilesController {
     }
 
     @Post()
-    async create(@Body() createTileDto: CreateTileDto) {
+    async create(@Body() createTileDto: CreateTileDto) : Promise<Tile> {
         return this.tileService.create(createTileDto);
     }
 

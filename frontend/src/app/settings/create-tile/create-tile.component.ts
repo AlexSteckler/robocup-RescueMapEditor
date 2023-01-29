@@ -1,10 +1,10 @@
 import { Component, ElementRef, Sanitizer, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { TilesService } from 'src/app/create-edit/tile-selection/tiles.service';
 import { Tile } from 'src/app/create-edit/tile/dto/tile.dto';
+import { Image } from './dto/image.dto';
 
 
 @Component({
@@ -23,7 +23,6 @@ export class CreateTileComponent {
   selectedTile: Tile | undefined;
 
   fileSrc: any;
-  uploadActive: boolean = false;
 
   name: string = '';
   value: number = 0;
@@ -39,6 +38,8 @@ export class CreateTileComponent {
     private tilesService: TilesService,
     private sanitizer: DomSanitizer) {}
 
+
+  //--------------------------------------------------------------------------------
 
   ngOnInit(): void {
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
@@ -57,6 +58,8 @@ export class CreateTileComponent {
     });
   }
 
+  //--------------------------------------------------------------------------------
+
   getTileFromId(selectedTile: Tile) {
     this.selectedTile = this.tiles.find((tile) => tile.id == selectedTile?.id);
 
@@ -69,6 +72,8 @@ export class CreateTileComponent {
     }
   }
 
+  //--------------------------------------------------------------------------------
+
   addDeletePath(add : boolean) {
     if(this.paths.length < 4 && add) {
       this.paths.push({ from: 0, to: 0, layer: 0 });
@@ -77,15 +82,18 @@ export class CreateTileComponent {
     }
   }
 
+  //--------------------------------------------------------------------------------
+
   onFileSelected(event: Event) {
     const file: File = (event.target as HTMLInputElement).files?.item(
       0
     ) as File;
     if (file) {
       this.toUpload = file;
-      this.uploadActive = true;
     }
   }
+
+  //--------------------------------------------------------------------------------
 
   readUrl(event: any) {
     if (event.target.files && event.target.files[0]) {
@@ -97,51 +105,98 @@ export class CreateTileComponent {
     }
   }
 
+  //--------------------------------------------------------------------------------
+
   createTile() {
     if(this.toUpload) {
       this.tilesService.uploadImage(this.toUpload).subscribe((image) => {
+
+        let tmpImageId = (image as any).id
 
         let dto : any = {
           name: this.name,
           value: this.value,
           paths: this.paths,
-          imageId: (image as any).id
+          imageId: tmpImageId
         }
 
-        this.tilesService.createTile(dto).subscribe(() => {
+        this.tilesService.createTile(dto).subscribe((resultTile: Tile) => {
           this.value = 0;
           this.toUpload = null;
-          this.uploadActive = false;
           this.toastr.success('Tile created');
+
+          if (!this.tiles.find((tile) => tile.id == resultTile.id)) {
+
+            this.tilesService.getTileImg(tmpImageId).subscribe((blob: Blob) => {
+              let objectURL = URL.createObjectURL(blob);
+              let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+              resultTile.image = img;
+              this.tiles.push(resultTile);
+            });
+          }
         });
       });
     }
   }
 
+  //--------------------------------------------------------------------------------
+
   updateTile() {
+    if (this.selectedTile && this.selectedTile.id) {
+      let tileId = this.selectedTile.id;
 
-    if (this.selectedTile) {
+      if (this.toUpload) {
+        this.tilesService.uploadImage(this.toUpload).subscribe((image) => {
+          let id = (image as any).id
+          this.toUpload = null;
 
-      let tileDto = {
-        name: this.name,
-        value: this.value,
-        paths: this.paths,
-        imageId: this.selectedTile.imageId
+          let tileDto = {
+            name: this.name,
+            value: this.value,
+            paths: this.paths,
+            imageId: id
+          }
+
+          this.updateTileDto(tileId, tileDto);
+
+        });
+      } else {
+        let tileDto = {
+          name: this.name,
+          value: this.value,
+          paths: this.paths,
+          imageId: this.selectedTile.imageId
+        }
+
+        this.updateTileDto(tileId, tileDto);
       }
 
-      console.log(tileDto);
-      this.tilesService.updateTile(this.selectedTile.id!, tileDto).subscribe((returnTile: Tile) => {
-        this.value = 0;
-        this.toUpload = null;
-        this.uploadActive = false;
-        this.toastr.success('Tile updated');
+      this.tilesService.getTileImg(tileId).subscribe((blob: Blob) => {
+        let objectURL = URL.createObjectURL(blob);
+        let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
       });
-    } else {
-      this.toastr.error('Kein Tile ausgewählt');
-    }
+
+      } else {
+        this.toastr.error('Kachel nicht gefunden');
+      }
     this.modalService.dismissAll();
   }
 
+  updateTileDto(id: string, dto: any) {
+    this.tilesService.updateTile(id, dto).subscribe((returnTile: Tile) => {
+      this.value = 0;
+
+      this.tilesService.getTileImg(returnTile.imageId!).subscribe((blob: Blob) => {
+        let objectURL = URL.createObjectURL(blob);
+        let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+        returnTile.image = img;
+      });
+
+      let tileIndex = this.tiles.findIndex((tile) => tile.id == returnTile.id);
+      this.tiles[tileIndex] = returnTile;
+    });
+    this.toastr.success('Tile updated');
+  }
 
   openBasicModal() {
     this.modalService.open(this.basicModal, {centered: true}).result
