@@ -22,6 +22,10 @@ export class MapService {
     return this.mapModel.create({ createdBy: user.sub, ...createMapDto });
   }
 
+  deleteMap(id: string) {
+    return this.mapModel.findByIdAndDelete(id).exec();
+  }
+
   findOne(user: any, id: string) {
     if (user.realm_access.roles.includes('admin')) {
       return this.mapModel.findOne({ _id: id }).exec();

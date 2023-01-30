@@ -9,10 +9,15 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root',
 })
 export class GridCanvasService {
+
   constructor(private httpClient: HttpClient) {}
 
   createMap(name: string): Observable<Map> {
     return this.httpClient.post<Map>(`${environment.baseUrlV1}/map`, { name });
+  }
+
+  deleteMap(id: string) {
+    return this.httpClient.delete<Map>(`${environment.baseUrlV1}/map/${id}`);
   }
 
   getMaps(): Observable<Map[]> {

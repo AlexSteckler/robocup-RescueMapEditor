@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Map } from '../create-edit/dto/map.dto';
 import { GridCanvasService } from '../create-edit/grid-canvas/grid-canvas.service';
@@ -10,16 +11,21 @@ import { GridCanvasService } from '../create-edit/grid-canvas/grid-canvas.servic
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent {
+  @ViewChild('basicModal') basicModal: ElementRef | undefined;
+
   maps: Map[] = [];
 
   mapName: string = '';
+
+  header: string = '';
 
   panelOpenState = true;
 
   constructor(
     private gridCanvasService: GridCanvasService,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private modalService: NgbModal,
   ) {}
 
   ngOnInit() {
@@ -36,6 +42,23 @@ export class HomeComponent {
     } else {
       this.toastr.error('Bitte einen Namen eingeben');
     }
+  }
+
+  deleteMap(map: Map) {
+
+    this.header = 'Diesen Map wirklich löschen?';
+
+    this.modalService.open(this.basicModal, { centered: true }).result.then(
+      (result) => {
+        this.gridCanvasService.deleteMap(map.id).subscribe(() => {
+          this.maps = this.maps.filter((m) => m.id !== map.id);
+          this.toastr.success('Map gelöscht');
+        });
+      },
+      (reason) => {
+        this.toastr.info('Map nicht gelöscht');
+      }
+    );
   }
 
   checkOutMap(map: Map) {
