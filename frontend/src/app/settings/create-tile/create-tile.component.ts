@@ -1,6 +1,7 @@
 import { Component, ElementRef, Sanitizer, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { KeycloakService } from 'keycloak-angular';
 import { ToastrService } from 'ngx-toastr';
 import { TilesService } from 'src/app/create-edit/tile-selection/tiles.service';
 import { Tile } from 'src/app/create-edit/tile/dto/tile.dto';
@@ -15,6 +16,8 @@ export class CreateTileComponent {
   @ViewChild('fileChooser') private input!: ElementRef;
   @ViewChild('basicModal') basicModal: ElementRef | undefined;
   public toUpload!: File | null;
+
+  roles : string[] = [];
 
   tiles: Tile[] = [];
   locationTiles: Tile[] = [];
@@ -35,11 +38,15 @@ export class CreateTileComponent {
     private toastr : ToastrService,
     private modalService: NgbModal,
     private tilesService: TilesService,
-    private sanitizer: DomSanitizer) {}
+    private sanitizer: DomSanitizer,
+    private keycloakService: KeycloakService) {}
 
   //--------------------------------------------------------------------------------
 
   ngOnInit(): void {
+
+    this.roles = this.keycloakService.getUserRoles()
+    console.log(this.roles);
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
       let loaded = 0;
       tiles.forEach((tile: Tile) => {
@@ -110,6 +117,8 @@ export class CreateTileComponent {
 
       if(this.toUpload) {
         this.tilesService.uploadImage(this.toUpload).subscribe((image) => {
+
+          console.log('create tile');
 
           let tileImage : any;
 
