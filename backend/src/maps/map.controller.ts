@@ -44,6 +44,11 @@ export class MapsController {
     return this.mapService.create(user, createMapDto);
   }
 
+  @Delete(':id')
+  async deleteMap(@Param() findMapDto: FindMapDto) {
+    return this.mapService.deleteMap(findMapDto.id);
+  }
+
   @Patch('tile/:id')
   async updateTile(
     @Body() updateTileDto: UpdateTileDto,

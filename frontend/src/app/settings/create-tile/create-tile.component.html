@@ -22,10 +22,10 @@
 
     <div *ngFor="let tile of tiles" class="d-flex flex-column p-3 text-black border align-items-center tile-image" >
 
-      <div *ngIf="!roles.includes('admin')" class="d-flex jsutify-content-center w-100 h-100 float-left">
+      <div *ngIf="!roles.includes('admin')" class="d-flex justify-content-center w-100 h-100 float-left">
         <img [src]="tile.image" class="img-fluid" style="width: 100px;"/>
       </div>
-      <div *ngIf="roles.includes('admin')" (click)="updateTile(tile)" class="d-flex jsutify-content-center w-100 h-100 float-left">
+      <div *ngIf="roles.includes('admin')" (click)="updateTile(tile)" class="d-flex justify-content-center w-100 h-100 float-left">
         <img [src]="tile.image" class="img-fluid" style="width: 100px;"/>
       </div>
 

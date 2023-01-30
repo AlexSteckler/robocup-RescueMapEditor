@@ -44,7 +44,7 @@
                       <span class="text-white">Line/Maze</span>
                     </div>
                     <div class="p-1">
-                      <button class="btn text-danger fs-5" (click)="checkOutMap(map)">
+                      <button class="btn text-danger fs-5" (click)="deleteMap(map)">
                         <i class="bi bi-trash3-fill"></i>
                       </button>
                     </div>
@@ -57,3 +57,18 @@
     </mat-accordion>
   </div>
 </div>
+
+<ng-template #basicModal let-modal>
+  <div class="modal-header base-bg">
+    <h4 class="modal-title text-white">{{header}}</h4>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body bg-dark text-white" style="text-align: center;">
+      <h1 class="p-3">Sind Sie sich sicher?</h1>
+    <div>
+      <button type="button" class="btn btn-danger" (click)="modal.close()">Löschen</button>
+      <button type="button" class="btn" style="color: grey; padding-right: 15px;" (click)="modal.dismiss()">Abbrechen
+      </button>
+    </div>
+  </div>
+</ng-template>
