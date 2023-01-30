@@ -1,26 +1,17 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Transform} from 'panzoom';
 import {Tile} from '../tile/dto/tile.dto';
 import {TilesService} from './tiles.service';
+import {Obstacle} from "../grid-canvas/dto/obstacle.dto";
 
-export interface Obstacle {
-  name: string;
-  x: number;
-  y: number;
-
-  showPositionX?: number;
-  showPositionY?: number;
-
-  layer: number;
-}
 
 @Component({
   selector: 'app-tile-selection',
   templateUrl: './tile-selection.component.html',
   styleUrls: ['./tile-selection.component.scss'],
 })
-export class TileSelectionComponent {
+export class TileSelectionComponent implements OnInit{
   tiles: Tile[] = [];
   greenTiles: Tile[] = [];
 
@@ -36,30 +27,35 @@ export class TileSelectionComponent {
   obstacles: Obstacle[] = [
     {
       name: 'Obstacle 1',
+      id: '1',
       x: 0,
       y: 0,
       layer: 0,
     },
     {
       name: 'Obstacle 2',
+      id: '2',
       x: 0,
       y: 0,
       layer: 0,
     },
     {
       name: 'Obstacle 3',
+      id: '3',
       x: 0,
       y: 0,
       layer: 0,
     },
     {
       name: 'Obstacle 4',
+      id: '4',
       x: 0,
       y: 0,
       layer: 0,
     },
     {
       name: 'Obstacle 5',
+      id: '5',
       x: 0,
       y: 0,
       layer: 0,

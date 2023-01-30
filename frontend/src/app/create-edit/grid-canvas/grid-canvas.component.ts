@@ -10,7 +10,7 @@ import {ActivatedRoute} from '@angular/router';
 import {EvacuationZoneGridCanvas} from "./evacuationZone-grid-canvas";
 import {ServiceGridCanvas} from "./service-grid-canvas";
 import {TileServiceGridCanvas} from "./tileService.grid-canvas";
-import {Obstacle} from "../tile-selection/tile-selection.component";
+import {Obstacle} from "./dto/obstacle.dto";
 
 export const TileCount = 30;
 export const OutsideDrag = 100;
@@ -130,7 +130,10 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       let scale = this.canvasValues!.scale;
       let top = (y - this.canvasValues!.y) / scale
       let left = (this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x - 5) / scale;
-      this.obstacles.push({name: this.currentObstacle.name, x: left, y: top, showPositionX: left, showPositionY: top} as Obstacle)
+      this.obstacles.push({name: this.currentObstacle.name, x: left, y: top, id: this.currentObstacle.id} as Obstacle)
+      // generate unique id
+      this.currentObstacle.id = Math.random().toString(36).substr(2, 9);
+
       return;
     }
     let tileToPlacedOn = this.grids[layer][rowCount][colCount];
@@ -273,6 +276,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   dragConstrainPoint = (point: any, dragRef: any) => {
+    console.log(point, dragRef.getFreeDragPosition());
     let zoomMoveXDifference = 0;
     let zoomMoveYDifference = 0;
     let scale = this.canvasValues!.scale;
@@ -286,14 +290,34 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       y: point.y + zoomMoveYDifference - scale * 50,
     };
   };
+  dragConstrainPointObstacle = (point: any, dragRef: any) => {
+    let zoomMoveXDifference = 0;
+    let zoomMoveYDifference = 0;
+    let scale = this.canvasValues!.scale;
+
+    if (scale != 1) {
+      zoomMoveXDifference = (1 - scale) * dragRef.getFreeDragPosition().x;
+      zoomMoveYDifference = (1 - scale) * dragRef.getFreeDragPosition().y;
+    }
+    return {
+      x: point.x + zoomMoveXDifference - scale * 25,
+      y: point.y + zoomMoveYDifference - scale * 25,
+    };
+  };
 
   moveObsStart(obstacle: Obstacle) {
     this.panzoomCanvas.pause();
   }
 
   moveObstacleEnd(obstacle: Obstacle, $event: CdkDragEnd) {
-    obstacle.x += $event.distance.x;
-    obstacle.y += $event.distance.y;
+    console.log($event.distance);
+    let scale = this.canvasValues!.scale;
+    obstacle.x += $event.distance.x / scale;
+    obstacle.y += $event.distance.y / scale;
+    let newObstacle = {...obstacle};
+    console.log(newObstacle);
+    let index = this.obstacles.findIndex((obstacle) => obstacle.id === newObstacle.id);
+    this.obstacles[index] = newObstacle;
     this.panzoomCanvas.resume();
   }
 }
