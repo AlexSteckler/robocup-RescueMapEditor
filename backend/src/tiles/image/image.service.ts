@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   GridFSBucket,
   GridFSBucketReadStream,
@@ -26,6 +26,10 @@ export class ImageService {
         _id: new ObjectId(id),
       })
       .tryNext();
+
+    if(doc == null) {
+      throw new BadRequestException('Image not found');
+    }
     return this.fileModel.openDownloadStream(doc._id);
   }
 
