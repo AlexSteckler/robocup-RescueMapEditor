@@ -1,5 +1,5 @@
 export interface Image {
-  readonly _id: string;
+  readonly id: string;
   readonly filename: string;
   readonly uploadDate: string;
   readonly contentType: string;

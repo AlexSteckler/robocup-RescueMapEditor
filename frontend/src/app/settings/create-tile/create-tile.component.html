@@ -1,13 +1,36 @@
 
 <div class="d-flex justify-content-center p-3">
-  <button class="btn button-link" (click)="openModal(true)">
+  <button class="btn button-link" (click)="createTile()">
     <i class="bi bi-plus-circle"></i> Kachel hinzufügen
   </button>
 </div>
-<div class="d-flex flew-row flex-wrap justify-content-center ">
-  <div *ngFor="let tile of tiles" class="d-flex flex-column p-3 text-black border ">
-    <img [src]="tile.image" class="img-fluid" style="width: 100px;"/>
-    <span class="text-center">{{tile.name}}</span>
+
+<div *ngIf="locationTiles.length > 0" class="d-flex flex-column">
+  <h3 class="text-black">Lokale Kacheln</h3>
+  <div class="d-flex flew-row flex-wrap justify-content-center">
+    <div *ngFor="let tile of locationTiles" class="d-flex flex-column p-3 text-black border align-items-center" (click)="updateTile(tile)">
+      <img [src]="tile.image" class="img-fluid" style="width: 100px;"/>
+      <span class="text-center">{{tile.name}}</span>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex flex-column">
+  <h3 class="text-black">Globale Kacheln</h3>
+  <div class="d-flex flew-row flex-wrap justify-content-center" >
+
+
+    <div *ngFor="let tile of tiles" class="d-flex flex-column p-3 text-black border align-items-center tile-image" >
+
+      <div *ngIf="!roles.includes('admin')" class="d-flex jsutify-content-center w-100 h-100 float-left">
+        <img [src]="tile.image" class="img-fluid" style="width: 100px;"/>
+      </div>
+      <div *ngIf="roles.includes('admin')" (click)="updateTile(tile)" class="d-flex jsutify-content-center w-100 h-100 float-left">
+        <img [src]="tile.image" class="img-fluid" style="width: 100px;"/>
+      </div>
+
+      <span class="text-center">{{tile.name}}</span>
+    </div>
   </div>
 </div>
 
@@ -32,7 +55,7 @@
         </div>
         <div class="d-flex flex-column align-items-center p-2">
           <div class="d-flex flex-column justify-content-center border-base border rounded p-3">
-            <div class="row d-flex flex-row justify-content-center">
+            <div class="row d-flex flex-row justify-content-center w-100">
               <div class="col-8 d-flex flex-column">
                 <div  *ngFor="let path of paths">
                   <div class="d-flex flex-row">
@@ -59,7 +82,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-2 d-flex flex-column justify-content-center align-items-end pt-3">
+              <div class="col-4 d-flex flex-column justify-content-center align-items-end pt-3">
                 <button type="button" class="btn btn-primary"(click)="addDeletePath(true)">
                   <i class="bi bi-plus-circle"></i>
                 </button>
@@ -68,7 +91,7 @@
                 </button>
               </div>
             </div>
-            <div class="pt-3">
+            <div *ngIf="!selectedTile" class="pt-3">
               <img src="../assets/tiles/Tile_description_line.png" class="img-fluid" style="width: 100%;"/>
             </div>
 
@@ -77,14 +100,14 @@
       </div>
 
       <div class="pt-1">
-        <div class="row d-flex justify-content-center" *ngIf="fileSrc">
+        <div class="row d-flex justify-content-center" *ngIf="tileImage">
           <div class=" col-6 d-flex flex-row">
             <div class="d-flex align-items-center">
               <span class="pe-1">Links</span>
             </div>
             <div class="d-flex flex-column">
               <span>Oben</span>
-              <img [src]="fileSrc"  class="img-fluid" style="width: 100%;"/>
+              <img [src]="tileImage"  class="img-fluid" style="width: 100%;"/>
               <span>Unten</span>
             </div>
             <div class="d-flex align-items-center">
@@ -99,9 +122,18 @@
       </div>
 
       <div class="p-3">
-        <button class="btn btn-primary" [class.disabled]="!uploadActive || name == ''" (click)="create()">
+        <button *ngIf="!selectedTile" class="btn btn-primary p-1" [class.disabled]="!toUpload || !name" (click)="modal.close()">
           Erstellen
         </button>
+
+        <div *ngIf="selectedTile" class="d-flex flex-row justify-content-between">
+          <button class="btn text-danger fs-5" (click)="deleteTile(selectedTile)">
+            <i class="bi bi-trash3-fill"></i>
+          </button>
+          <button class="btn button-link p-1" [class.disabled]="!name" (click)="modal.close()">
+            Update
+          </button>
+        </div>
 
       </div>
     </div>
