@@ -1,8 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Controller } from '@nestjs/common';
 import { AuthenticatedUser } from 'nest-keycloak-connect';
-import { UpdateTileDto } from 'src/maps/dto/update-tile.dto';
-import { Public } from 'nest-keycloak-connect';
 import { Body, Get, Param } from '@nestjs/common/decorators';
 import { Delete, Patch, Post } from '@nestjs/common/decorators/http/request-mapping.decorator';
 import { NotFound } from '../util/not-found.decorator';

@@ -1,6 +1,4 @@
 import { Component, ElementRef, Sanitizer, ViewChild } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { KeycloakService } from 'keycloak-angular';

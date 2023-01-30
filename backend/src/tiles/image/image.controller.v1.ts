@@ -17,7 +17,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { GridFSFile, ObjectId } from 'mongodb';
 import { Response } from 'express';
 import { AuthenticatedUser, Public, Roles } from 'nest-keycloak-connect';
-import { FindImagesParams } from './dto/find-images-params.dto';
 import { FindImageParamsDto } from './dto/find-image-params.dto';
 import { NotFound } from '../../util/not-found.decorator';
 @Controller({
