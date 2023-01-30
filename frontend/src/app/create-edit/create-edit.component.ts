@@ -1,7 +1,7 @@
 import { Component, HostListener } from '@angular/core';
 import { Transform } from 'panzoom';
 import { Tile } from './tile/dto/tile.dto';
-import {Obstacle} from "./tile-selection/tile-selection.component";
+import {Obstacle} from "./grid-canvas/dto/obstacle.dto";
 
 @Component({
   selector: 'app-create-edit',
