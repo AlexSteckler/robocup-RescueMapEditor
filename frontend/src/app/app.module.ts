@@ -15,6 +15,7 @@ import { CreateTileComponent } from './settings/create-tile/create-tile.componen
 import { FormsModule } from '@angular/forms';
 import { MatExpansionModule } from '@angular/material/expansion';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { CreateObstacleComponent } from './settings/create-obstacle/create-obstacle.component';
 
 function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -38,6 +39,7 @@ function initializeKeycloak(keycloak: KeycloakService) {
         HomeComponent,
         SettingsComponent,
         CreateTileComponent,
+        CreateObstacleComponent,
     ],
     providers: [
         {

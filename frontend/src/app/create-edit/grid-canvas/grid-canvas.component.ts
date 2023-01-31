@@ -10,7 +10,7 @@ import {ActivatedRoute} from '@angular/router';
 import {EvacuationZoneGridCanvas} from "./evacuationZone-grid-canvas";
 import {ServiceGridCanvas} from "./service-grid-canvas";
 import {TileServiceGridCanvas} from "./tileService.grid-canvas";
-import {Obstacle} from "./dto/obstacle.dto";
+import {Obstacle} from "../obstacle/dto/obstacle.dto";
 
 export const TileCount = 30;
 export const OutsideDrag = 100;

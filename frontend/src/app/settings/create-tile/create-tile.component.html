@@ -34,7 +34,7 @@
   </div>
 </div>
 
-<!-- Modal: Team löschen -->
+<!-- Modal -->
 <ng-template #basicModal let-modal>
   <div class="modal-header base-bg">
     <h4 class="text-white">Kachel hinzufügen</h4>
@@ -117,7 +117,7 @@
         </div>
       </div>
 
-      <div class="input-group d-flex m-3 text-white">
+      <div class="input-group d-flex p-3 text-white">
         <input #fileChooser type="file" class="form-control dark-bg text-white" id="formFile" accept="image/*" (change)="onFileSelected($event); readUrl($event)" />
       </div>
 

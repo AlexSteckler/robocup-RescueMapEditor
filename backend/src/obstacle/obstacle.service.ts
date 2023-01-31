@@ -9,6 +9,7 @@ import { Obstacle, ObstacleDocument } from './obstacle.schema';
 export class ObstacleService {
     
     
+    
     constructor(@InjectModel(Obstacle.name) private obstacleModel: Model<ObstacleDocument>) {}
     
     async findAll(user: any):  Promise<Obstacle[]> {
@@ -20,6 +21,11 @@ export class ObstacleService {
 
     async create(user: any, createObstacleDto: CreateObstacleDto): Promise<Obstacle> {
         return this.obstacleModel.create({...createObstacleDto, location: user.location});
+    }
+
+    async updateObstacle(id: string, createObstacleDto: CreateObstacleDto): Promise<Obstacle> {
+        return this.obstacleModel.findByIdAndUpdate(
+            {_id: id}, createObstacleDto, {new: true});
     }
 
     async deleteObstacle(id: string): Promise<Obstacle> {

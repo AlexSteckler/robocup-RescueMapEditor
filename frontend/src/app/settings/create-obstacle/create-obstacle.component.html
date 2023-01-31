@@ -1,0 +1,88 @@
+<div class="d-flex justify-content-center p-3">
+  <button class="btn btn-info" (click)="createObstacle()">
+    <i class="bi bi-plus-circle"></i> Hindernis hinzufügen
+  </button>
+</div>
+
+<hr class="base-color"/>
+
+<div *ngIf="localObstacles.length > 0" class="d-flex flex-column">
+  <h3 class="text-black">Lokale Kacheln</h3>
+  <div class="d-flex flew-row flex-wrap justify-content-center">
+    <div *ngFor="let obstacle of localObstacles" class="d-flex flex-column p-3 text-black border align-items-center">
+      <img [src]="obstacle.image" class="img-fluid" style="width: 100px;"/>
+      <span class="text-center">{{obstacle.name}}</span>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex flex-column">
+  <h3 class="text-black">Globale Obstacles</h3>
+  <div class="d-flex flew-row flex-wrap justify-content-center" >
+
+    <div class="d-flex flex-row w-100 flex-wrap justify-content-center">
+      <div *ngFor="let obstacle of globaleObstacles" class="d-flex flex-column p-3 text-black border align-items-center tile-image" >
+        <div class="d-flex justify-content-end w-100 fw-bold base-color">
+          <span>{{obstacle.value}}</span>
+        </div>
+        <div *ngIf="!roles.includes('admin')" class="d-flex justify-content-center w-100 h-100 float-left">
+          <img [src]="obstacle.image" class="img-fluid" style="width: 100px; height: 100px;"/>
+        </div>
+        <div *ngIf="roles.includes('admin')" (click)="updateObstacle(obstacle)" class="d-flex justify-content-center w-100 h-100 float-left">
+          <img [src]="obstacle.image" class="img-fluid" style="width: 100px; height: 100px;"/>
+        </div>
+        <span class="text-center">{{obstacle.name}}</span>
+
+      </div>
+    </div>
+    <div *ngIf="globaleObstacles.length <= 0">
+      <span class="text-dark">-- Keine Hindernisse vorhanden --</span>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+
+<ng-template #basicModal let-modal>
+  <div class="modal-header base-bg">
+    <h4 class="text-white">{{modalHeader}}</h4>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body bg-dark text-white text-center p-3 pt-0">
+    <div class="row justify-content-between p-3">
+      <div class="col-8 d-flex flex-column align-items-start">
+        <span>Name:</span>
+        <input type="text" class="form-control" placeholder="Name" [(ngModel)]="name"/>
+      </div>
+      <div class="col-3 d-flex flex-column align-items-start">
+        <span>Punktzahl:</span>
+        <input type="number" class="form-control" placeholder="Value" [(ngModel)]="value"/>
+      </div>
+    </div>
+
+    <div class="input-group d-flex p-3 text-white">
+      <input #fileChooser type="file" class="form-control dark-bg text-white" id="formFile" accept="image/*" (change)="onFileSelected($event); readUrl($event)" />
+    </div>
+
+    <div *ngIf="obstacleImage" class="d-flex justify-content-center w-100">
+      <div style="width: 150px; height: 150px;">
+        <img [src]="obstacleImage"  class="img-fluid w-100"/>
+      </div>
+    </div>
+
+    <div class="p-3">
+      <button *ngIf="!selectedObstacle" class="btn btn-primary p-1" [class.disabled]="!toUpload || !name" (click)="modal.close()">
+        Erstellen
+      </button>
+
+      <div *ngIf="selectedObstacle" class="d-flex flex-row justify-content-between">
+        <button class="btn text-danger fs-5" (click)="deleteObstacle(selectedObstacle)">
+          <i class="bi bi-trash3-fill"></i>
+        </button>
+        <button class="btn button-link p-1" [class.disabled]="!name" (click)="modal.close()">
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>

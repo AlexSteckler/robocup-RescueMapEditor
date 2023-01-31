@@ -3,7 +3,8 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {Transform} from 'panzoom';
 import {Tile} from '../tile/dto/tile.dto';
 import {TilesService} from './tiles.service';
-import {Obstacle} from "../grid-canvas/dto/obstacle.dto";
+import {Obstacle} from "../obstacle/dto/obstacle.dto";
+import { ImageService } from 'src/app/shared/image.service';
 
 
 @Component({
@@ -64,6 +65,7 @@ export class TileSelectionComponent implements OnInit{
 
   constructor(
     private tilesService: TilesService,
+    private imageService: ImageService,
     private sanitizer: DomSanitizer
   ) {
   }
@@ -72,7 +74,7 @@ export class TileSelectionComponent implements OnInit{
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
       let loaded = 0;
       tiles.forEach((tile: Tile) => {
-        this.tilesService.getTileImg(tile.imageId!).subscribe((blob: Blob) => {
+        this.imageService.getImg(tile.imageId!).subscribe((blob: Blob) => {
           let objectURL = URL.createObjectURL(blob);
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           tile.image = img;
