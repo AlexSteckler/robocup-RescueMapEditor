@@ -2,7 +2,7 @@ import {CdkDragDrop, CdkDragEnd} from '@angular/cdk/drag-drop';
 import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild,} from '@angular/core';
 import {ToastrService} from 'ngx-toastr';
 import panzoom, {Transform} from 'panzoom';
-import {Evacuation} from '../tile/dto/evacuation.dto';
+import {Evacuation} from '../dto/evacuation.dto';
 import {Tile} from '../tile/dto/tile.dto';
 import {Map} from '../dto/map.dto';
 import {GridCanvasService} from './grid-canvas.service';
@@ -37,11 +37,12 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   @Input() currentObstacle: Obstacle | undefined;
 
   map: Map | undefined;
+
   tileSelection: Array<Tile> = [];
+  obstacles: Obstacle[] = [];
 
   canvasValues: Transform | undefined;
   panzoomCanvas: any = null;
-  private panzoomDummyCanvas: any = null;
   currentDraggedTile: Tile | undefined;
   layer: number = 0;
   grids: Array<Array<Array<Tile>>> = [];
@@ -55,9 +56,12 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   serviceGridCanvas: ServiceGridCanvas;
   tileServiceGridCanvas: TileServiceGridCanvas;
 
-  obstacles: Obstacle[] = [];
-
-  constructor(private toastr: ToastrService, private gridCanvasService: GridCanvasService, private route: ActivatedRoute) {
+  constructor(
+    private toastr: ToastrService,
+    private gridCanvasService: GridCanvasService,
+    private route: ActivatedRoute
+  )
+  {
     this.evacuationZoneGridCanvas = new EvacuationZoneGridCanvas(this, this.gridCanvasService, this.toastr);
     this.serviceGridCanvas = new ServiceGridCanvas(this, toastr);
     this.tileServiceGridCanvas = new TileServiceGridCanvas(this, toastr);
@@ -125,12 +129,13 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   //---------- Drag & Drop -----------//
   drop($event: CdkDragDrop<Tile[]>, layer: number, rowCount: number, colCount: number) {
     if (this.currentObstacle !== undefined) {
+      console.log(this.currentObstacle);
       let x = this.innerWidth - $event.dropPoint.x
       let y = $event.dropPoint.y - 160
       let scale = this.canvasValues!.scale;
       let top = (y - this.canvasValues!.y) / scale
       let left = (this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x - 5) / scale;
-      this.obstacles.push({name: this.currentObstacle.name, x: left, y: top, id: this.currentObstacle.id} as Obstacle)
+      this.obstacles.push({name: this.currentObstacle.name, x: left, y: top, id: this.currentObstacle.id, image: this.currentObstacle.image} as Obstacle)
       // generate unique id
       this.currentObstacle.id = Math.random().toString(36).substr(2, 9);
 
@@ -288,22 +293,6 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     return {
       x: point.x + zoomMoveXDifference - scale * 50,
       y: point.y + zoomMoveYDifference - scale * 50,
-    };
-  }
-
-  dragConstrainPointObstacle = (point: any, dragRef: any) => {
-    let zoomMoveXDifference = 0;
-    let zoomMoveYDifference = 0;
-    let scale = this.canvasValues!.scale;
-
-    if (scale != 1) {
-      zoomMoveXDifference = (1 - scale) * dragRef.getFreeDragPosition().x;
-      zoomMoveYDifference = (1 - scale) * dragRef.getFreeDragPosition().y;
-    }
-
-    return {
-      x: point.x + zoomMoveXDifference - scale * 25,
-      y: point.y + zoomMoveYDifference - scale * 25,
     };
   }
 

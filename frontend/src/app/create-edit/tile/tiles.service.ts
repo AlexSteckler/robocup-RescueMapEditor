@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { Tile } from '../tile/dto/tile.dto';
+import { Tile } from './dto/tile.dto';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Image } from '../../shared/image.dto';

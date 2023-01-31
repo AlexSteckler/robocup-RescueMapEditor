@@ -55,15 +55,22 @@
 </div>
 
 <h3 class="ps-3">Hindernisse</h3>
-<div class="p-3"
+<div class="p-3 d-flex d-flex justify-content-around flex-wrap"
      cdkDropList
      cdkDropListSortingDisabled>
-  <div class="obstacles" *ngFor="let obstacle of obstacles"
-       cdkDrag
-       (cdkDragStarted)="draggedStartObstacle(obstacle)"
-       (cdkDragEnded)="draggedEndObstacle(obstacle)"
+  <app-obstacle
+        *ngFor="let obstacle of obstacles"
+        [obstacle]="obstacle"
+        cdkDrag
+        (cdkDragStarted)="draggedStartObstacle(obstacle)"
+        (cdkDragEnded)="draggedEndObstacle(obstacle)"
+        class="borderObstacle"
   >
-  <div *cdkDragPlaceholder=""></div>
-  </div>
+  <app-obstacle *cdkDragPreview [obstacle]="obstacle"
+              [canvasValues]="canvasValues"
+              [ngStyle]="{'width.px': 100 * canvasValues!.scale, 'height.px': 100 * canvasValues!.scale}"
+    ></app-obstacle>
+  <div *cdkDragPlaceholder class="border-none"></div>
+  </app-obstacle>
 </div>
 

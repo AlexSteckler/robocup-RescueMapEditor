@@ -2,9 +2,10 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Transform} from 'panzoom';
 import {Tile} from '../tile/dto/tile.dto';
-import {TilesService} from './tiles.service';
+import {TilesService} from '../tile/tiles.service';
 import {Obstacle} from "../obstacle/dto/obstacle.dto";
 import { ImageService } from 'src/app/shared/image.service';
+import { ObstacleService } from '../obstacle/obstacle.service';
 
 
 @Component({
@@ -15,6 +16,7 @@ import { ImageService } from 'src/app/shared/image.service';
 export class TileSelectionComponent implements OnInit{
   tiles: Tile[] = [];
   greenTiles: Tile[] = [];
+  obstacles: Obstacle[] = [];
 
   @Output() tileSelectionChange = new EventEmitter<Tile[]>();
 
@@ -25,46 +27,11 @@ export class TileSelectionComponent implements OnInit{
   @Input() evacuationExists: boolean = false;
 
   @Output() currentDraggedObstacle = new EventEmitter<Obstacle>;
-  obstacles: Obstacle[] = [
-    {
-      name: 'Obstacle 1',
-      id: '1',
-      x: 0,
-      y: 0,
-      layer: 0,
-    },
-    {
-      name: 'Obstacle 2',
-      id: '2',
-      x: 0,
-      y: 0,
-      layer: 0,
-    },
-    {
-      name: 'Obstacle 3',
-      id: '3',
-      x: 0,
-      y: 0,
-      layer: 0,
-    },
-    {
-      name: 'Obstacle 4',
-      id: '4',
-      x: 0,
-      y: 0,
-      layer: 0,
-    },
-    {
-      name: 'Obstacle 5',
-      id: '5',
-      x: 0,
-      y: 0,
-      layer: 0,
-    },
-  ];
+
 
   constructor(
     private tilesService: TilesService,
+    private obstacleService: ObstacleService,
     private imageService: ImageService,
     private sanitizer: DomSanitizer
   ) {
@@ -86,6 +53,23 @@ export class TileSelectionComponent implements OnInit{
           this.tiles.push(tile);
         });
 
+      });
+    });
+
+    this.obstacleService.getObstacles().subscribe((obstacles: Obstacle[]) => {
+      obstacles.forEach((obstacle: Obstacle) => {
+        let loaded = 0;
+        this.imageService.getImg(obstacle.imageId!).subscribe((blob: Blob) => {
+          let objectURL = URL.createObjectURL(blob);
+          let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+          obstacle.image = img;
+          obstacle.rotation = 0;
+          loaded++;
+          if (loaded === obstacles.length) {
+            this.tileSelectionChange.emit(this.tiles);
+          }
+          this.obstacles.push(obstacle);
+        });
       });
     });
   }

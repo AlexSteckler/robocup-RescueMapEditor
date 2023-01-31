@@ -3,7 +3,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { KeycloakService } from 'keycloak-angular';
 import { ToastrService } from 'ngx-toastr';
-import { TilesService } from 'src/app/create-edit/tile-selection/tiles.service';
+import { TilesService } from 'src/app/create-edit/tile/tiles.service';
 import { Tile } from 'src/app/create-edit/tile/dto/tile.dto';
 import { ImageService } from 'src/app/shared/image.service';
 
