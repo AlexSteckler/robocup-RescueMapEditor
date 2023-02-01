@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import {Schema as SchemaMongoose} from "mongoose";
 
 @Schema({ timestamps: true })
 export class Obstacle {
@@ -8,8 +9,8 @@ export class Obstacle {
   @Prop()
   value: number;
 
-  @Prop()
-  imageId: string;
+  @Prop({type: SchemaMongoose.Types.ObjectId})
+  imageId: {type: SchemaMongoose.Types.ObjectId, Ref: 'fs.file'};
 
   @Prop()
   location: string;

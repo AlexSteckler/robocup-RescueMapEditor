@@ -7,7 +7,7 @@
 <hr class="base-color"/>
 
 <div *ngIf="localObstacles.length > 0" class="d-flex flex-column">
-  <h3 class="text-black">Lokale Kacheln</h3>
+  <h3 class="text-black">Lokale Obstacles</h3>
   <div class="d-flex flew-row flex-wrap justify-content-center">
     <div *ngFor="let obstacle of localObstacles" class="d-flex flex-column p-3 text-black border align-items-center">
       <img [src]="obstacle.image" class="img-fluid" style="width: 100px;"/>
@@ -25,11 +25,8 @@
         <div class="d-flex justify-content-end w-100 fw-bold base-color">
           <span>{{obstacle.value}}</span>
         </div>
-        <div *ngIf="!roles.includes('admin')" class="d-flex justify-content-center w-100 h-100 float-left">
-          <img [src]="obstacle.image" class="img-fluid" style="width: 100px; height: 100px;"/>
-        </div>
-        <div *ngIf="roles.includes('admin')" (click)="updateObstacle(obstacle)" class="d-flex justify-content-center w-100 h-100 float-left">
-          <img [src]="obstacle.image" class="img-fluid" style="width: 100px; height: 100px;"/>
+        <div (click)="updateObstacle(obstacle)" class="d-flex justify-content-center w-100 h-100 float-left">
+          <img [src]="obstacle.image" class="img-fluid" style="width: 100px; height: 100px;" width="400" height="240"/>
         </div>
         <span class="text-center">{{obstacle.name}}</span>
 

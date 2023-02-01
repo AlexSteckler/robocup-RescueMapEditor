@@ -1,22 +1,50 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { CreateObstacleDto } from './dto/createObstacle.dto';
-import { Obstacle, ObstacleDocument } from './obstacle.schema';
+import {Injectable} from '@nestjs/common';
+import {InjectModel} from '@nestjs/mongoose';
+import {Model} from 'mongoose';
+import {CreateObstacleDto} from './dto/createObstacle.dto';
+import {Obstacle, ObstacleDocument} from './obstacle.schema';
 
 @Injectable()
 export class ObstacleService {
-    
-    
-    
-    constructor(@InjectModel(Obstacle.name) private obstacleModel: Model<ObstacleDocument>) {}
-    
-    async findAll(user: any):  Promise<Obstacle[]> {
+
+
+    constructor(@InjectModel(Obstacle.name) private obstacleModel: Model<ObstacleDocument>) {
+    }
+
+    async findAll(user: any): Promise<Obstacle[]> {
+        let aggregate = [
+            {
+                $lookup: {
+                    from: 'fs.files',
+                    localField: 'imageId',
+                    foreignField: '_id',
+                    as: 'imageInfo'
+                }
+            },
+            {
+                // get first element of imageInfo array
+                $addFields: {
+                    imageInfo: {$arrayElemAt: ['$imageInfo', 0]}
+                }
+
+            }
+        ];
+
         if (user.location) {
-            return this.obstacleModel.find({$or: [{location: user.location}, {location: null}]}).exec();
-          }
-          return this.obstacleModel.find().exec();
+            return this.obstacleModel.aggregate([
+                {
+                    $match: {
+                        $or: [
+                            {location: user.location},
+                            {location: null}
+                        ]
+                    }
+                },
+                ...aggregate
+            ]).exec();
+        }
+        return this.obstacleModel.aggregate([...aggregate]).exec()
     }
 
     async create(user: any, createObstacleDto: CreateObstacleDto): Promise<Obstacle> {
