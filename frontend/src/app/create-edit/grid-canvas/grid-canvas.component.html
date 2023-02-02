@@ -48,6 +48,7 @@
       >
       </app-obstacle>
   </div>
+</div>
 
 
 <div *ngIf="currentDraggedTile" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false"
@@ -65,8 +66,8 @@
   Gesamtpunktzahl: {{totalPoints}}
 </div>
 
-<div class="w-100 d-flex flex-column justify-content-end position-absolute">
-  <div class="p-3 base-color fs-5 ">
+<div class="float-right position-absolute">
+  <div class="p-3 base-color fs-5">
     Ebene: {{layer}}
   </div>
 </div>
