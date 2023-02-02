@@ -12,6 +12,17 @@ export interface Map {
     rotation: number;
   }[];
 
+  obstaclePosition: {
+    obstacleId: string;
+    imageId: string;
+    layer: number;
+    x: number;
+    y: number;
+    rotation: number;
+    width: number;
+    height: number;
+  }[];
+
   evacuationZonePosition: {
     layer: number;
     row: number;

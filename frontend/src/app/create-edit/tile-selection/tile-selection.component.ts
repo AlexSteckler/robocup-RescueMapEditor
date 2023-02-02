@@ -59,7 +59,6 @@ export class TileSelectionComponent implements OnInit{
     this.obstacleService.getObstacles().subscribe((obstacles: Obstacle[]) => {
 
       obstacles.forEach((obstacle: any) => {
-        console.log(obstacle.scale)
         let loaded = 0;
         this.imageService.getImg(obstacle.imageId!).subscribe((blob: Blob) => {
           if(obstacle.imageInfo) {

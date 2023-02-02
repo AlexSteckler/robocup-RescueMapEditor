@@ -112,13 +112,10 @@ export class CreateObstacleComponent {
                 } else {
                   this.globaleObstacles.unshift(resultObstacle);
                 }
-                console.log(resultObstacle);
                 this.toastr.success('Das Hindernis wurde erfolgreich erstellt');
               });
             });
           }
-
-          console.log(this.globaleObstacles);
         }, (reason) => {
           this.toastr.info('Der Vorgang wurde abgebrochen');
         }
@@ -131,7 +128,7 @@ export class CreateObstacleComponent {
     if (!this.roles.includes('admin')) return;
     this.modalHeader = 'Hindernis bearbeiten';
     this.selectedObstacle = selectedObstacle;
-    this.name = selectedObstacle.name;
+    this.name = selectedObstacle.name === undefined ? 'obstacle' : selectedObstacle.name;
     this.value = selectedObstacle.value ? selectedObstacle.value : 0;
     this.scale.x = selectedObstacle.width ? selectedObstacle.width : 100;
     this.scale.y = selectedObstacle.height ? selectedObstacle.height : 100;
@@ -213,7 +210,6 @@ export class CreateObstacleComponent {
 //--------------------------------------------------------------------------------
 
   readUrl(event: any) {
-    console.log(event);
     if (event.target.files && event.target.files[0]) {
       var reader = new FileReader();
       reader.onload = (event: any) => {

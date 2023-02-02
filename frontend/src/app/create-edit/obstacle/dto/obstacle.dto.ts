@@ -2,10 +2,10 @@ import { SafeUrl } from "@angular/platform-browser";
 
 export interface Obstacle {
   id: string;
-  name: string;
+  name?: string;
+  layer: number;
   x: number;
   y: number;
-  layer: number;
 
   value?: number;
   rotation?: number;

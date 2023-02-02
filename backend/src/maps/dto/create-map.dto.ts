@@ -20,6 +20,18 @@ export class CreateMapDto {
   }[];
 
   @IsOptional()
+  @IsArray()
+  obstaclePosition: {
+    obstacleId: string;
+    layer: number;
+    x: number;
+    y: number;
+    rotation: number;
+    width: number;
+    height: number;
+  }[];
+
+  @IsOptional()
   evacuationZonePosition: {
     layer: number;
     row: number;

@@ -235,9 +235,7 @@ export class EvacuationZoneGridCanvas {
           evacuationZone.exit.x
           ].border![evacuationZone.exit.position] = EXITCOLOR;
       }
-      console.log(evacuationZone);
       this.gridCanvasComponent.evacuation = evacuationZone;
-      console.log(this.gridCanvasComponent.evacuation);
     } else {
       this.gridCanvasComponent.evacuationExists.emit(false);
     }

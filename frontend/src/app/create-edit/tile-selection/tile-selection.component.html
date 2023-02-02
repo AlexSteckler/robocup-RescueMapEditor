@@ -67,9 +67,10 @@
     >
     <app-obstacle [obstacle]="obstacle" [ngStyle]="{'width.px': obstacle.width, 'height.px': obstacle.height}"></app-obstacle>
 
-    <app-obstacle *cdkDragPreview [obstacle]="obstacle"
+    <app-obstacle *cdkDragPreview
+                [obstacle]="obstacle"
                 [canvasValues]="canvasValues"
-                [ngStyle]="{'width.px': 100 * canvasValues!.scale, 'height.px': 100 * canvasValues!.scale}"
+                [ngStyle]="{'width.px': obstacle.width! * canvasValues!.scale, 'height.px': obstacle.height! * canvasValues!.scale}"
       ></app-obstacle>
     <div *cdkDragPlaceholder class="border-none"></div>
   </div>

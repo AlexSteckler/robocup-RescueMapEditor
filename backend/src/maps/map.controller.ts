@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Body,
   Controller,
@@ -8,12 +9,14 @@ import {
   Delete,
 } from '@nestjs/common';
 import { AuthenticatedUser } from 'nest-keycloak-connect';
-import { map } from 'rxjs';
+import { find, map } from 'rxjs';
 import { NotFound } from '../util/not-found.decorator';
 import { CreateMapDto } from './dto/create-map.dto';
 import { DeleteTileDto } from './dto/delete-tile.dto';
 import { FindMapDto } from './dto/find-map.dto';
+import { FindObstacleInMapDto } from './dto/find-obstacle-in-map.dto';
 import { UpdateEvacuationZoneDto } from './dto/update-evacuationzone.dto';
+import { UpdateObstacleDto } from './dto/update-obstacle.dto';
 import { UpdateTileDto } from './dto/update-tile.dto';
 import { MapService } from './map.service';
 
@@ -49,7 +52,7 @@ export class MapsController {
     return this.mapService.deleteMap(findMapDto.id);
   }
 
-  @Patch('tile/:id')
+  @Patch(':id/tile')
   async updateTile(
     @Body() updateTileDto: UpdateTileDto,
     @Param() findMapDto: FindMapDto,
@@ -74,6 +77,19 @@ export class MapsController {
       deleteTileDto.row,
       deleteTileDto.column,
     );
+  }
+
+  @Patch(':mapId/obstacle')
+  async updateObstacle(
+    @Body() updateObstacleDto: UpdateObstacleDto,
+    @Param() findMapDto: FindMapDto,
+  ) {
+    return this.mapService.addObstacle(findMapDto.id, updateObstacleDto);
+  }
+
+  @Delete(':mapId/obstacle/:obstacleId')
+  async deleteObstacle(@Param() findMapDto: FindObstacleInMapDto) {
+    return this.mapService.deleteObstacle(findMapDto.mapId, findMapDto.obstacleId);
   }
 
   @Patch('evacuation/:id')

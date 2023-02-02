@@ -100,6 +100,16 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         this.map = map;
         this.loading = false;
         this.tileServiceGridCanvas.loadTile();
+
+
+
+        map.obstaclePosition.forEach((obstacle) => {
+          console.log(obstacle.x, obstacle.y);
+          this.obstacles.push({id: obstacle.obstacleId, x: obstacle.x, y: obstacle.y, layer: obstacle.layer, rotation: obstacle.rotation, width: obstacle.width, height: obstacle.height});
+        });
+
+
+
         this.evacuationZoneGridCanvas.loadEvacuation(map.evacuationZonePosition);
         this.serviceGridCanvas.calcTotalPoints();
       });
@@ -128,24 +138,41 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
   //---------- Drag & Drop -----------//
   drop($event: CdkDragDrop<Tile[]>, layer: number, rowCount: number, colCount: number) {
-    console.log(this.currentObstacle)
     if (this.currentObstacle !== undefined) {
       let x = this.innerWidth - $event.dropPoint.x
       let y = $event.dropPoint.y - 160
       let scale = this.canvasValues!.scale;
       let top = (y - this.canvasValues!.y) / scale
       let left = (this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x - 5) / scale;
-      this.obstacles.push(
-        { name: this.currentObstacle.name,
+
+      let tmpId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+      let tmpObstacle = {
+          id: tmpId,
+          imageId: this.currentObstacle.imageId,
+          layer: this.layer,
           x: left,
           y: top,
-          id: this.currentObstacle.id,
-          image: this.currentObstacle.image,
+          rotation: 0,
           width: this.currentObstacle.width,
-          height: this.currentObstacle.height
-        } as Obstacle)
-      // generate unique id
-      this.currentObstacle.id = Math.random().toString(36).substr(2, 9);
+          height: this.currentObstacle.height,
+      }
+
+      console.log(tmpObstacle);
+
+      this.obstacles.push((tmpObstacle) as Obstacle);
+      this.gridCanvasService.updateObstacle(
+        this.map!.id,
+        tmpObstacle.id,
+        tmpObstacle.imageId!,
+        tmpObstacle.layer,
+        tmpObstacle.x,
+        tmpObstacle.y,
+        tmpObstacle.rotation,
+        tmpObstacle.width!,
+        tmpObstacle.height!
+      ).subscribe((map: Map) => this.map = map);
+        console.log(this.map);
 
       return;
     }
@@ -289,7 +316,6 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   dragConstrainPoint = (point: any, dragRef: any) => {
-    console.log(this.currentObstacle);
     let zoomMoveXDifference = 0;
     let zoomMoveYDifference = 0;
     let scale = this.canvasValues!.scale;
@@ -313,6 +339,13 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     let scale = this.canvasValues!.scale;
     obstacle.x += ($event.distance.x ) / scale;
     obstacle.y += ($event.distance.y ) / scale;
+
+    let centerObstacle = {x: obstacle.x + obstacle.width! / 2, y: obstacle.y + obstacle.height! / 2};
+
+    //check on which tile ist obstcle in grid
+    let colX = Math.floor(centerObstacle.x / 100);
+    let rowY = Math.floor(centerObstacle.y / 100);
+
     let newObstacle = {...obstacle};
     let index = this.obstacles.findIndex((obstacle) => obstacle.id === newObstacle.id);
     this.obstacles[index] = newObstacle;

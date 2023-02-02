@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateMapDto } from './dto/create-map.dto';
+import { FindObstacleInMapDto } from './dto/find-obstacle-in-map.dto';
 import { UpdateEvacuationZoneDto } from './dto/update-evacuationzone.dto';
+import { UpdateObstacleDto } from './dto/update-obstacle.dto';
 import { UpdateTileDto } from './dto/update-tile.dto';
 import { MapDocument } from './map.schema';
 
@@ -58,6 +60,33 @@ export class MapService {
           },
         },
         { $pull: { tilePosition: { layer: layer, row: row, column: column } } },
+        { new: true },
+      )
+      .exec();
+  }
+
+  addObstacle(id: string, updateObstacleDto: UpdateObstacleDto) {
+    return this.mapModel
+      .findOneAndUpdate(
+        { _id: id },
+        { $push: { tilePosition: updateObstacleDto.obstaclePosition } },
+        { new: true },
+      )
+      .exec();
+  }
+
+  deleteObstacle(mapId: string, obstacleId: string) {
+    return this.mapModel
+      .findOneAndUpdate(
+        {
+          _id: mapId,
+          tilePosition: {
+            $elemMatch: {
+              obstacleId: obstacleId,
+            },
+          },
+        },
+        { $pull: { obstaclePosition: { obstacleId: obstacleId } } },
         { new: true },
       )
       .exec();

@@ -117,7 +117,6 @@ export class CreateTileComponent {
       if(this.toUpload) {
         this.imageService.uploadImage(this.toUpload).subscribe((image) => {
 
-          console.log('create tile');
 
           let tileImage : any;
 
