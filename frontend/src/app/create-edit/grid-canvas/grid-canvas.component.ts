@@ -168,7 +168,6 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         tmpObstacle.width!,
         tmpObstacle.height!
       ).subscribe((map: Map) => this.map = map);
-        console.log(this.map);
 
       return;
     }
@@ -333,8 +332,15 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
   moveObstacleEnd(obstacle: Obstacle, $event: CdkDragEnd) {
     let scale = this.canvasValues!.scale;
-    obstacle.x += ($event.distance.x ) / scale;
-    obstacle.y += ($event.distance.y ) / scale;
+
+    if ((obstacle.x + ($event.distance.x ) / scale) > 0
+      && (obstacle.y + ($event.distance.y ) / scale) > 0
+      && (obstacle.x + ($event.distance.x ) / scale) < TileCount * 100 - obstacle.width!
+      && (obstacle.y + ($event.distance.y ) / scale) < TileCount * 100 - obstacle.height!
+      ) {
+      obstacle.x += ($event.distance.x) / scale;
+      obstacle.y += ($event.distance.y) / scale;
+    }
 
     let centerObstacle = {x: obstacle.x + obstacle.width! / 2, y: obstacle.y + obstacle.height! / 2};
 
@@ -345,8 +351,6 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     let newObstacle = {...obstacle};
     let index = this.obstacles.findIndex((obstacle) => obstacle.id === newObstacle.id);
     this.obstacles[index] = newObstacle;
-
-    console.log(newObstacle);
 
     this.gridCanvasService.updateObstacle(
       this.map!.id,

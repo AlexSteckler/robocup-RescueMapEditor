@@ -20,9 +20,10 @@
             class="form-control"
             placeholder="Name"
             [(ngModel)]="mapName"
+            (keydown.enter)="createMap()"
           />
           <button class="col-3 btn base-bg m-1" (click)="createMap()">
-            <i class="bi bi-plus-circle"></i> Karte Hinzufügen
+            <i class="bi bi-plus-circle"></i> <span class="ps-1">Karte erstellen</span>
           </button>
         </div>
 
