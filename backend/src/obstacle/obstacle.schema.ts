@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import {Schema as SchemaMongoose} from "mongoose";
+import { number } from 'joi';
+import { Schema as SchemaMongoose } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Obstacle {
@@ -9,11 +10,17 @@ export class Obstacle {
   @Prop()
   value: number;
 
-  @Prop({type: SchemaMongoose.Types.ObjectId})
-  imageId: {type: SchemaMongoose.Types.ObjectId, Ref: 'fs.file'};
+  @Prop({ type: SchemaMongoose.Types.ObjectId })
+  imageId: { type: SchemaMongoose.Types.ObjectId; Ref: 'fs.file' };
 
   @Prop()
   location: string;
+
+  @Prop()
+  width: number;
+
+  @Prop()
+  height: number;
 }
 
 export const ObstacleSchema = SchemaFactory.createForClass(Obstacle);

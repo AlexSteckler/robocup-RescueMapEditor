@@ -101,7 +101,8 @@ export class CreateObstacleComponent {
                 name: this.name,
                 value: this.value,
                 imageId: image.id,
-                scale: this.scale
+                width: this.scale.x,
+                height: this.scale.y
               }
 
               this.obstacleService.createObstacle(obstacleDto).subscribe((resultObstacle: Obstacle) => {
@@ -132,14 +133,16 @@ export class CreateObstacleComponent {
     this.selectedObstacle = selectedObstacle;
     this.name = selectedObstacle.name;
     this.value = selectedObstacle.value ? selectedObstacle.value : 0;
-    this.scale = selectedObstacle.scale ? selectedObstacle.scale : {x: 100, y: 100};
+    this.scale.x = selectedObstacle.width ? selectedObstacle.width : 100;
+    this.scale.y = selectedObstacle.height ? selectedObstacle.height : 100;
     this.obstacleImage = selectedObstacle.image;
     this.modalService.open(this.basicModal, {centered: true}).result.then((result) => {
         let obstacleDto: any = {
           name: this.name,
           value: this.value,
           imageId: selectedObstacle.imageId,
-          scale: this.scale
+          width: this.scale.x,
+          height: this.scale.y
         }
 
         if (this.toUpload) {

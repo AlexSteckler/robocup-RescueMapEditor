@@ -15,5 +15,6 @@ export interface Obstacle {
 
   location?: string;
 
-  scale?: { x: number; y: number}
+  width?: number;
+  height?: number;
 }

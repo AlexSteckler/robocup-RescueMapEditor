@@ -128,14 +128,22 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
   //---------- Drag & Drop -----------//
   drop($event: CdkDragDrop<Tile[]>, layer: number, rowCount: number, colCount: number) {
+    console.log(this.currentObstacle)
     if (this.currentObstacle !== undefined) {
-      console.log(this.currentObstacle);
       let x = this.innerWidth - $event.dropPoint.x
       let y = $event.dropPoint.y - 160
       let scale = this.canvasValues!.scale;
       let top = (y - this.canvasValues!.y) / scale
       let left = (this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x - 5) / scale;
-      this.obstacles.push({name: this.currentObstacle.name, x: left, y: top, id: this.currentObstacle.id, image: this.currentObstacle.image} as Obstacle)
+      this.obstacles.push(
+        { name: this.currentObstacle.name,
+          x: left,
+          y: top,
+          id: this.currentObstacle.id,
+          image: this.currentObstacle.image,
+          width: this.currentObstacle.width,
+          height: this.currentObstacle.height
+        } as Obstacle)
       // generate unique id
       this.currentObstacle.id = Math.random().toString(36).substr(2, 9);
 
@@ -281,7 +289,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   dragConstrainPoint = (point: any, dragRef: any) => {
-    console.log(point, dragRef.getFreeDragPosition());
+    console.log(this.currentObstacle);
     let zoomMoveXDifference = 0;
     let zoomMoveYDifference = 0;
     let scale = this.canvasValues!.scale;
@@ -291,12 +299,13 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       zoomMoveYDifference = (1 - scale) * dragRef.getFreeDragPosition().y;
     }
     return {
-      x: point.x + zoomMoveXDifference - scale * 50,
-      y: point.y + zoomMoveYDifference - scale * 50,
+      x: point.x + zoomMoveXDifference - scale * (this.currentObstacle === undefined ? 50 : this.currentObstacle.width! / 2 ),
+      y: point.y + zoomMoveYDifference - scale * (this.currentObstacle === undefined ? 50 : this.currentObstacle.height! / 2 ),
     };
   }
 
   moveObsStart(obstacle: Obstacle) {
+    this.currentObstacle = obstacle;
     this.panzoomCanvas.pause();
   }
 
@@ -307,6 +316,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     let newObstacle = {...obstacle};
     let index = this.obstacles.findIndex((obstacle) => obstacle.id === newObstacle.id);
     this.obstacles[index] = newObstacle;
+    this.currentObstacle = undefined;
     this.panzoomCanvas.resume();
   }
 }

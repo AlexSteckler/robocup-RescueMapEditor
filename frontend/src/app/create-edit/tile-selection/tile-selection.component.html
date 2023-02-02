@@ -58,19 +58,20 @@
 <div class="p-3 d-flex d-flex justify-content-around flex-wrap"
      cdkDropList
      cdkDropListSortingDisabled>
-  <app-obstacle
+  <div
         *ngFor="let obstacle of obstacles"
-        [obstacle]="obstacle"
         cdkDrag
         (cdkDragStarted)="draggedStartObstacle(obstacle)"
         (cdkDragEnded)="draggedEndObstacle(obstacle)"
-        class="borderObstacle"
-  >
-  <app-obstacle *cdkDragPreview [obstacle]="obstacle"
-              [canvasValues]="canvasValues"
-              [ngStyle]="{'width.px': 100 * canvasValues!.scale, 'height.px': 100 * canvasValues!.scale}"
-    ></app-obstacle>
-  <div *cdkDragPlaceholder class="border-none"></div>
-  </app-obstacle>
+        class="borderObstacle d-flex align-items-center justify-content-center"
+    >
+    <app-obstacle [obstacle]="obstacle" [ngStyle]="{'width.px': obstacle.width, 'height.px': obstacle.height}"></app-obstacle>
+
+    <app-obstacle *cdkDragPreview [obstacle]="obstacle"
+                [canvasValues]="canvasValues"
+                [ngStyle]="{'width.px': 100 * canvasValues!.scale, 'height.px': 100 * canvasValues!.scale}"
+      ></app-obstacle>
+    <div *cdkDragPlaceholder class="border-none"></div>
+  </div>
 </div>
 

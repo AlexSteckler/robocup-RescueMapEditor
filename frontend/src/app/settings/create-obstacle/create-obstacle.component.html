@@ -26,7 +26,7 @@
           <span>{{obstacle.value}}</span>
         </div>
         <div (click)="updateObstacle(obstacle)" class="d-flex justify-content-center w-100 h-100 float-left">
-          <img [src]="obstacle.image" class="img-fluid" [ngStyle]="{'width.px': obstacle?.scale?.x, 'height.px': obstacle?.scale?.y}" />
+          <img [src]="obstacle.image" class="img-fluid" [ngStyle]="{'width.px': obstacle?.width, 'height.px': obstacle?.height}" />
         </div>
         <span class="text-center">{{obstacle.name}}</span>
 

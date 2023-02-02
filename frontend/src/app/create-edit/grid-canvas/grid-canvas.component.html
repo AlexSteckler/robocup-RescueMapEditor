@@ -39,7 +39,7 @@
     </div>
     <app-obstacle *ngFor="let obstacle of obstacles"
          class="position-absolute"
-         [ngStyle]="{'top.px': obstacle.y, 'left.px': obstacle.x}"
+         [ngStyle]="{'top.px': obstacle.y, 'left.px': obstacle.x, 'width.px': obstacle.width, 'height.px': obstacle.height}"
          cdkDrag
          (cdkDragStarted)="moveObsStart(obstacle)"
          (cdkDragEnded)="moveObstacleEnd(obstacle, $event)"
