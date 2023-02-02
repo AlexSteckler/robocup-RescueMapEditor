@@ -12,4 +12,8 @@ export class CreateObstacleDto {
   @IsString()
   @IsNotEmpty()
   imageId: string;
+
+  //scale is x=width and y=height of the obstacle
+  @IsNotEmpty()
+  scale: { x: number; y: number };
 }

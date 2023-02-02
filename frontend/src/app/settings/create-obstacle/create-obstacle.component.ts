@@ -34,6 +34,10 @@ export class CreateObstacleComponent {
 
   name: string = '';
   value: number = 0;
+  scale: {x: number, y: number} = {x: 100, y: 100};
+
+  border: boolean = true;
+  rotate: boolean = true;
 
 //--------------------------------------------------------------------------------
 
@@ -91,13 +95,13 @@ export class CreateObstacleComponent {
               if (this.toUpload instanceof Blob) {
                 let objectURL = URL.createObjectURL(this.toUpload);
                 obstacleImage = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-                console.log(obstacleImage);
               }
 
               let obstacleDto: any = {
                 name: this.name,
                 value: this.value,
-                imageId: image.id
+                imageId: image.id,
+                scale: this.scale
               }
 
               this.obstacleService.createObstacle(obstacleDto).subscribe((resultObstacle: Obstacle) => {
@@ -128,12 +132,14 @@ export class CreateObstacleComponent {
     this.selectedObstacle = selectedObstacle;
     this.name = selectedObstacle.name;
     this.value = selectedObstacle.value ? selectedObstacle.value : 0;
+    this.scale = selectedObstacle.scale ? selectedObstacle.scale : {x: 100, y: 100};
     this.obstacleImage = selectedObstacle.image;
     this.modalService.open(this.basicModal, {centered: true}).result.then((result) => {
         let obstacleDto: any = {
           name: this.name,
           value: this.value,
-          imageId: selectedObstacle.imageId
+          imageId: selectedObstacle.imageId,
+          scale: this.scale
         }
 
         if (this.toUpload) {
@@ -181,6 +187,7 @@ export class CreateObstacleComponent {
       } else {
         this.globaleObstacles = this.globaleObstacles.filter((obstacleFilter: Obstacle) => obstacleFilter.id != obstacle.id);
       }
+      this.modalService.dismissAll();
       this.toastr.success('Das Hindernis wurde erfolgreich gelöscht');
     });
   }

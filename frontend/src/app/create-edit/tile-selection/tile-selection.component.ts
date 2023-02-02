@@ -57,9 +57,13 @@ export class TileSelectionComponent implements OnInit{
     });
 
     this.obstacleService.getObstacles().subscribe((obstacles: Obstacle[]) => {
-      obstacles.forEach((obstacle: Obstacle) => {
+      obstacles.forEach((obstacle: any) => {
         let loaded = 0;
         this.imageService.getImg(obstacle.imageId!).subscribe((blob: Blob) => {
+          if(obstacle.imageInfo) {
+            blob = new File([blob], "noMatter.svg", {type: obstacle.imageInfo.contentType});
+          }
+
           let objectURL = URL.createObjectURL(blob);
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           obstacle.image = img;

@@ -28,6 +28,16 @@ export class ObstacleService {
                     imageInfo: {$arrayElemAt: ['$imageInfo', 0]}
                 }
 
+            },
+            {
+                $addFields: {
+                    id: '$_id'
+                }
+            },
+            {
+                $project: {
+                    _id: 0
+                }
             }
         ];
 

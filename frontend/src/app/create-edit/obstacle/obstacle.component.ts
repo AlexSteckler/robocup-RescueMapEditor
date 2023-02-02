@@ -10,4 +10,6 @@ import { Obstacle } from './dto/obstacle.dto';
 export class ObstacleComponent {
   @Input() obstacle: Obstacle | undefined;
   @Input() canvasValues: Transform | undefined;
+
+  
 }

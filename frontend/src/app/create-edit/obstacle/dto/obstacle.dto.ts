@@ -14,4 +14,6 @@ export interface Obstacle {
   image?: SafeUrl | undefined;
 
   location?: string;
+
+  scale?: { x: number; y: number}
 }

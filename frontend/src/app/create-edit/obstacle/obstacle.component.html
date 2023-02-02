@@ -1,3 +1,2 @@
-<div class="obstacle">
-<img [src]="obstacle?.image"  class="w-100"/>
-</div>
+
+<img [src]="obstacle?.image" [ngStyle]="{'width.px': obstacle?.scale?.x, 'height.px': obstacle?.scale?.y}"/>

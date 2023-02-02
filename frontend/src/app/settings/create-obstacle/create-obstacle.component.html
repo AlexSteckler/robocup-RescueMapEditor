@@ -26,7 +26,7 @@
           <span>{{obstacle.value}}</span>
         </div>
         <div (click)="updateObstacle(obstacle)" class="d-flex justify-content-center w-100 h-100 float-left">
-          <img [src]="obstacle.image" class="img-fluid" style="width: 100px; height: 100px;" width="400" height="240"/>
+          <img [src]="obstacle.image" class="img-fluid" [ngStyle]="{'width.px': obstacle?.scale?.x, 'height.px': obstacle?.scale?.y}" />
         </div>
         <span class="text-center">{{obstacle.name}}</span>
 
@@ -61,10 +61,20 @@
       <input #fileChooser type="file" class="form-control dark-bg text-white" id="formFile" accept="image/*" (change)="onFileSelected($event); readUrl($event)" />
     </div>
 
-    <div *ngIf="obstacleImage" class="d-flex justify-content-center w-100">
-      <div style="width: 150px; height: 150px;">
-        <img [src]="obstacleImage"  class="img-fluid w-100"/>
+    <div class="d-flex justify-content-center w-100 h-auto p-3">
+      <img src="../assets/tiles/Example_Line.png" class="w-100">
+
+
+      <div class="position-absolute d-flex align-items-center justify-content-center w-100" style="height: 150px" [class.transform]="rotate">
+        <img *ngIf="obstacleImage" [src]="obstacleImage" [ngStyle]="{'width.px': scale.x, 'height.px': scale.y}"  class="img-fluid " [class.clickBorder]="border"/>
       </div>
+    </div>
+
+    <div class="d-flex flex-row justify-content-evenly">
+      <input type="number" [(ngModel)]="scale.x">
+      <input type="number" [(ngModel)]="scale.y">
+      <input type="checkbox" [(ngModel)]="border">
+      <input type="checkbox" [(ngModel)]="rotate">
     </div>
 
     <div class="p-3">
