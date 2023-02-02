@@ -1,9 +1,9 @@
 import {GridCanvasComponent} from "./grid-canvas.component";
 import {ToastrService} from "ngx-toastr";
 import {Tile} from "../tile/dto/tile.dto";
-import { ImageService } from "src/app/shared/image.service";
-import { Obstacle } from "../obstacle/dto/obstacle.dto";
-import { DomSanitizer } from "@angular/platform-browser";
+import {ImageService} from "src/app/shared/image.service";
+import {Obstacle} from "../obstacle/dto/obstacle.dto";
+import {DomSanitizer} from "@angular/platform-browser";
 
 export class TileObstacleServiceGridCanvas {
   constructor(
@@ -11,7 +11,8 @@ export class TileObstacleServiceGridCanvas {
     private imageService: ImageService,
     private toastr: ToastrService,
     private sanitizer: DomSanitizer
-  ) {}
+  ) {
+  }
 
   loadTile() {
     this.gridCanvasComponent.map!.tilePosition.forEach((tilePosition) => {
@@ -24,7 +25,11 @@ export class TileObstacleServiceGridCanvas {
       let tile = {...this.gridCanvasComponent.tileSelection.find((tile) => tile.id === tilePosition.tileId)} as Tile;
       if (tile != undefined) {
         if (tile.name.includes('start')) {
-          this.gridCanvasComponent.startPosition = {layer: tilePosition.layer, x: tilePosition.column, y: tilePosition.row};
+          this.gridCanvasComponent.startPosition = {
+            layer: tilePosition.layer,
+            x: tilePosition.column,
+            y: tilePosition.row
+          };
         }
         tile.rotation = tilePosition.rotation;
         this.gridCanvasComponent.grids[tilePosition.layer][tilePosition.row][tilePosition.column] = tile;
@@ -58,18 +63,10 @@ export class TileObstacleServiceGridCanvas {
 
   loadObstacle(obstacleSelection: Obstacle[]) {
     this.gridCanvasComponent.map!.obstaclePosition.forEach((obstaclePosition) => {
-      let obstacle = {...obstacleSelection.find((obstacle : Obstacle) => obstacle.imageId === obstaclePosition.imageId)} as Obstacle;
-
-      this.imageService.getImg(obstaclePosition.imageId).subscribe((blob) => {
-        let objectURL = URL.createObjectURL(blob);
-        let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-        obstacle.image = img;
-        obstacle.id = obstaclePosition.obstacleId;
-        obstacle.x = obstaclePosition.x;
-        obstacle.y = obstaclePosition.y;
+        let image = obstacleSelection.find((obstacle: Obstacle) => obstacle.imageId === obstaclePosition.imageId)?.image;
+        let obstacle = {...obstaclePosition, id: obstaclePosition.obstacleId, image};
         this.gridCanvasComponent.obstacles.push(obstacle);
       }
-    )}
     );
   }
 }

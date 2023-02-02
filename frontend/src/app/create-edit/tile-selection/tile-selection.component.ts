@@ -4,8 +4,8 @@ import {Transform} from 'panzoom';
 import {Tile} from '../tile/dto/tile.dto';
 import {TilesService} from '../tile/tiles.service';
 import {Obstacle} from "../obstacle/dto/obstacle.dto";
-import { ImageService } from 'src/app/shared/image.service';
-import { ObstacleService } from '../obstacle/obstacle.service';
+import {ImageService} from 'src/app/shared/image.service';
+import {ObstacleService} from '../obstacle/obstacle.service';
 
 
 @Component({
@@ -13,12 +13,12 @@ import { ObstacleService } from '../obstacle/obstacle.service';
   templateUrl: './tile-selection.component.html',
   styleUrls: ['./tile-selection.component.scss'],
 })
-export class TileSelectionComponent implements OnInit{
+export class TileSelectionComponent implements OnInit {
   tiles: Tile[] = [];
   greenTiles: Tile[] = [];
   obstacles: Obstacle[] = [];
 
-  @Output() tileObstacleSelectionChange = new EventEmitter<{tiles: Tile[], obstacles: Obstacle[]}>();
+  @Output() tileObstacleSelectionChange = new EventEmitter<{ tiles: Tile[], obstacles: Obstacle[] }>();
   @Output() obstacleSelectionChange = new EventEmitter<Obstacle[]>();
 
   @Input() canvasValues: Transform | undefined;
@@ -41,7 +41,7 @@ export class TileSelectionComponent implements OnInit{
   ngOnInit(): void {
 
     let loaded = 0;
-
+    let obstaclesCount: number = 0;
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
       tiles.forEach((tile: Tile) => {
         this.imageService.getImg(tile.imageId!).subscribe((blob: Blob) => {
@@ -50,7 +50,7 @@ export class TileSelectionComponent implements OnInit{
           tile.image = img;
           tile.rotation = 0;
           loaded++;
-          if (loaded === tiles.length + this.obstacles.length) {
+          if (loaded === tiles.length + obstaclesCount) {
             this.tileObstacleSelectionChange.emit({tiles: this.tiles, obstacles: this.obstacles});
           }
           this.tiles.push(tile);
@@ -58,7 +58,7 @@ export class TileSelectionComponent implements OnInit{
       });
 
       this.obstacleService.getObstacles().subscribe((obstacles: Obstacle[]) => {
-
+        obstaclesCount = obstacles.length;
         obstacles.forEach((obstacle: Obstacle) => {
           this.imageService.getImg(obstacle.imageId!).subscribe((blob: Blob) => {
 
@@ -67,7 +67,7 @@ export class TileSelectionComponent implements OnInit{
             obstacle.image = img;
             obstacle.rotation = 0;
             loaded++;
-            if (loaded === obstacles.length + this.obstacles.length) {
+            if (loaded === obstacles.length + obstaclesCount) {
               this.tileObstacleSelectionChange.emit({tiles: this.tiles, obstacles: this.obstacles});
             }
             this.obstacles.push(obstacle);
@@ -105,7 +105,7 @@ export class TileSelectionComponent implements OnInit{
   }
 
   draggedStartObstacle(obstacle: Obstacle) {
-     this.currentDraggedObstacle.emit(obstacle);
+    this.currentDraggedObstacle.emit(obstacle);
   }
 
   draggedEndObstacle(obstacle: Obstacle) {

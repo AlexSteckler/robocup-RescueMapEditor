@@ -338,7 +338,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
     let centerObstacle = {x: obstacle.x + obstacle.width! / 2, y: obstacle.y + obstacle.height! / 2};
 
-    //check on which tile ist obstcle in grid
+    //check on which tile ist obstacle in grid
     let colX = Math.floor(centerObstacle.x / 100);
     let rowY = Math.floor(centerObstacle.y / 100);
 
