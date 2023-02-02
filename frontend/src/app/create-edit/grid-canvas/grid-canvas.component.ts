@@ -156,8 +156,6 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
           image: this.currentObstacle.image
       }
 
-      console.log(tmpObstacle);
-
       this.obstacles.push((tmpObstacle) as Obstacle);
       this.gridCanvasService.updateObstacle(
         this.map!.id,
@@ -347,6 +345,21 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     let newObstacle = {...obstacle};
     let index = this.obstacles.findIndex((obstacle) => obstacle.id === newObstacle.id);
     this.obstacles[index] = newObstacle;
+
+    console.log(newObstacle);
+
+    this.gridCanvasService.updateObstacle(
+      this.map!.id,
+      newObstacle.id,
+      newObstacle.imageId!,
+      newObstacle.layer,
+      newObstacle.x,
+      newObstacle.y,
+      newObstacle.rotation!,
+      newObstacle.width!,
+      newObstacle.height!
+    ).subscribe((map: Map) => this.map = map);
+
     this.currentObstacle = undefined;
     this.panzoomCanvas.resume();
   }

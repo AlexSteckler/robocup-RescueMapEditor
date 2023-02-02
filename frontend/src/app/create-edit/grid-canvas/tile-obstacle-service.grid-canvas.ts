@@ -64,6 +64,7 @@ export class TileObstacleServiceGridCanvas {
         let objectURL = URL.createObjectURL(blob);
         let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
         obstacle.image = img;
+        obstacle.id = obstaclePosition.obstacleId;
         obstacle.x = obstaclePosition.x;
         obstacle.y = obstaclePosition.y;
         this.gridCanvasComponent.obstacles.push(obstacle);

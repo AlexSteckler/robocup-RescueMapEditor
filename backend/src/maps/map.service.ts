@@ -67,8 +67,15 @@ export class MapService {
 
   addObstacle(id: string, updateObstacleDto: UpdateObstacleDto) {
     return this.mapModel
-      .findOneAndUpdate(
-        { _id: id },
+      .findByIdAndUpdate(
+        {
+          _id: id,
+          obstaclePosition: {
+            $elemMatch: {
+              obstacleId: updateObstacleDto.obstaclePosition.obstacleId,
+            },
+          },
+        },
         { $push: { obstaclePosition: updateObstacleDto.obstaclePosition } },
         { new: true },
       )
