@@ -6,6 +6,7 @@ import {TilesService} from '../tile/tiles.service';
 import {Obstacle} from "../obstacle/dto/obstacle.dto";
 import {ImageService} from 'src/app/shared/image.service';
 import {ObstacleService} from '../obstacle/obstacle.service';
+import {firstValueFrom} from "rxjs";
 
 
 @Component({
@@ -38,40 +39,34 @@ export class TileSelectionComponent implements OnInit {
   ) {
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
 
     let loaded = 0;
-    let obstaclesCount: number = 0;
-    this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
-      tiles.forEach((tile: Tile) => {
-        this.imageService.getImg(tile.imageId!).subscribe((blob: Blob) => {
+    let tiles = await firstValueFrom(this.tilesService.getTiles());
+    let obstacles = await firstValueFrom(this.obstacleService.getObstacles());
+    tiles.forEach((tile: Tile) => {
+      this.imageService.getImg(tile.imageId!).subscribe((blob: Blob) => {
+        let objectURL = URL.createObjectURL(blob);
+        let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+        tile.image = img;
+        tile.rotation = 0;
+        if (++loaded >= tiles.length + obstacles.length) {
+          this.tileObstacleSelectionChange.emit({tiles: this.tiles, obstacles: this.obstacles});
+        }
+        this.tiles.push(tile);
+      });
+      obstacles.forEach((obstacle: Obstacle) => {
+
+        this.imageService.getImg(obstacle.imageId!).subscribe((blob: Blob) => {
           let objectURL = URL.createObjectURL(blob);
+
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-          tile.image = img;
-          tile.rotation = 0;
-          loaded++;
-          if (loaded === tiles.length + obstaclesCount) {
+          obstacle.image = img;
+          obstacle.rotation = 0;
+          if (++loaded >= tiles.length + obstacles.length) {
             this.tileObstacleSelectionChange.emit({tiles: this.tiles, obstacles: this.obstacles});
           }
-          this.tiles.push(tile);
-        });
-      });
-
-      this.obstacleService.getObstacles().subscribe((obstacles: Obstacle[]) => {
-        obstaclesCount = obstacles.length;
-        obstacles.forEach((obstacle: Obstacle) => {
-          this.imageService.getImg(obstacle.imageId!).subscribe((blob: Blob) => {
-
-            let objectURL = URL.createObjectURL(blob);
-            let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-            obstacle.image = img;
-            obstacle.rotation = 0;
-            loaded++;
-            if (loaded === obstacles.length + obstaclesCount) {
-              this.tileObstacleSelectionChange.emit({tiles: this.tiles, obstacles: this.obstacles});
-            }
-            this.obstacles.push(obstacle);
-          });
+          this.obstacles.push(obstacle);
         });
       });
     });
