@@ -156,6 +156,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
           rotation: 0,
           width: this.currentObstacle.width,
           height: this.currentObstacle.height,
+          image: this.currentObstacle.image
       }
 
       console.log(tmpObstacle);

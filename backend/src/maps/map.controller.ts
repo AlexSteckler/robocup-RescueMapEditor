@@ -79,7 +79,7 @@ export class MapsController {
     );
   }
 
-  @Patch(':mapId/obstacle')
+  @Patch(':id/obstacle')
   async updateObstacle(
     @Body() updateObstacleDto: UpdateObstacleDto,
     @Param() findMapDto: FindMapDto,
