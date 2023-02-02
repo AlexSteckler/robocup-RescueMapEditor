@@ -33,6 +33,19 @@ export class ImageService {
     return this.fileModel.openDownloadStream(doc._id);
   }
 
+  async getImageInformation(id: string): Promise<GridFSFile> {
+    const doc = await this.fileModel
+      .find({
+        _id: new ObjectId(id),
+      })
+      .tryNext();
+
+    if(doc == null) {
+      throw new BadRequestException('Image not found');
+    }
+    return doc;
+  }
+
   async deleteImage(id: string): Promise<GridFSFile> {
     const doc = await this.fileModel
       .find({

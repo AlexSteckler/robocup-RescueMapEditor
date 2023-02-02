@@ -15,6 +15,20 @@
 
         <app-create-tile></app-create-tile>
       </mat-expansion-panel>
+
+      <mat-expansion-panel [expanded]="panelOpenState">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="base-color p-2 m-0 fs-6">
+            Individuelles Hindernis hinzufügen
+          </mat-panel-title>
+          <mat-panel-description>
+            Hier können neue Hindernisse hinzugefügt werden.
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <app-create-obstacle></app-create-obstacle>
+      </mat-expansion-panel>
+
       <mat-expansion-panel class="m-0">
         <mat-expansion-panel-header>
           <mat-panel-title class="base-color p-2 m-0 fs-5">

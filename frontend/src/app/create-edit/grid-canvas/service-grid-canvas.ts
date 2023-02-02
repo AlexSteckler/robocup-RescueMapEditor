@@ -1,7 +1,6 @@
 import {Tile} from "../tile/dto/tile.dto";
 import {GridCanvasComponent, OutsideDrag, TileCount} from "./grid-canvas.component";
 import {ToastrService} from "ngx-toastr";
-import {ENTRANCECOLOR, EXITCOLOR} from "../tile/tile.component";
 
 export class ServiceGridCanvas {
   constructor(
@@ -120,17 +119,18 @@ export class ServiceGridCanvas {
 
   stopDragForFarAwayMoving() {
     this.gridCanvasComponent.panzoomCanvas.on('transform', (e: any) => {
-       this.gridCanvasComponent.canvasValues = this.gridCanvasComponent.panzoomCanvas.getTransform();
-       this.gridCanvasComponent.canvasValuesChange.emit( this.gridCanvasComponent.canvasValues);
+      //this.gridCanvasComponent.canvasDummyElement!.nativeElement.style.transform = e.transform;
+      this.gridCanvasComponent.canvasValues = this.gridCanvasComponent.panzoomCanvas.getTransform();
+      this.gridCanvasComponent.canvasValuesChange.emit(this.gridCanvasComponent.canvasValues);
 
       const nativeElement = this.gridCanvasComponent.canvasWrapperElement!.nativeElement;
-      const scale =  this.gridCanvasComponent.canvasValues!.scale;
-      const x =  this.gridCanvasComponent.canvasValues!.x;
-      const y =  this.gridCanvasComponent.canvasValues!.y;
+      const scale = this.gridCanvasComponent.canvasValues!.scale;
+      const x = this.gridCanvasComponent.canvasValues!.x;
+      const y = this.gridCanvasComponent.canvasValues!.y;
       const size = TileCount * 100;
 
-      if ( this.gridCanvasComponent.canvasValues != undefined) {
-        if ( this.gridCanvasComponent.canvasValues.scale >= 1) {
+      if (this.gridCanvasComponent.canvasValues != undefined) {
+        if (this.gridCanvasComponent.canvasValues.scale >= 1) {
           if (x > OutsideDrag) {
             this.gridCanvasComponent.panzoomCanvas.moveTo(OutsideDrag, y);
           }

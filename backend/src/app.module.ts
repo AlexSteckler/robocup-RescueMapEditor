@@ -13,6 +13,7 @@ import * as toJson from '@meanie/mongoose-to-json';
 import { APP_GUARD } from '@nestjs/core';
 import { TileModule } from './tiles/tile.module';
 import { MapModule } from './maps/map.module';
+import { ObstacleModule } from './obstacle/obstacle.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { MapModule } from './maps/map.module';
     }),
     TileModule,
     MapModule,
+    ObstacleModule,
   ],
   providers: [
     {

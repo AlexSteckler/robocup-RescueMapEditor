@@ -3,8 +3,9 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { KeycloakService } from 'keycloak-angular';
 import { ToastrService } from 'ngx-toastr';
-import { TilesService } from 'src/app/create-edit/tile-selection/tiles.service';
+import { TilesService } from 'src/app/create-edit/tile/tiles.service';
 import { Tile } from 'src/app/create-edit/tile/dto/tile.dto';
+import { ImageService } from 'src/app/shared/image.service';
 
 @Component({
   selector: 'app-create-tile',
@@ -13,7 +14,6 @@ import { Tile } from 'src/app/create-edit/tile/dto/tile.dto';
 })
 
 export class CreateTileComponent {
-  @ViewChild('fileChooser') private input!: ElementRef;
   @ViewChild('basicModal') basicModal: ElementRef | undefined;
   public toUpload!: File | null;
 
@@ -38,19 +38,18 @@ export class CreateTileComponent {
     private toastr : ToastrService,
     private modalService: NgbModal,
     private tilesService: TilesService,
+    private imageService: ImageService,
     private sanitizer: DomSanitizer,
     private keycloakService: KeycloakService) {}
 
   //--------------------------------------------------------------------------------
 
   ngOnInit(): void {
-
-    this.roles = this.keycloakService.getUserRoles()
-    console.log(this.roles);
+    this.roles = this.keycloakService.getUserRoles();
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
       let loaded = 0;
       tiles.forEach((tile: Tile) => {
-        this.tilesService.getTileImg(tile.imageId!).subscribe((blob: Blob) => {
+        this.imageService.getImg(tile.imageId!).subscribe((blob: Blob) => {
           let objectURL = URL.createObjectURL(blob);
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           tile.image = img;
@@ -116,9 +115,8 @@ export class CreateTileComponent {
     .then((result) => {
 
       if(this.toUpload) {
-        this.tilesService.uploadImage(this.toUpload).subscribe((image) => {
+        this.imageService.uploadImage(this.toUpload).subscribe((image) => {
 
-          console.log('create tile');
 
           let tileImage : any;
 
@@ -174,7 +172,7 @@ export class CreateTileComponent {
       }
 
       if (this.toUpload) {
-        this.tilesService.uploadImage(this.toUpload).subscribe((image) => {
+        this.imageService.uploadImage(this.toUpload).subscribe((image) => {
 
           tileDto.imageId = image.id;
 
@@ -204,7 +202,7 @@ export class CreateTileComponent {
     }
     this.toastr.success('Kachel wurde geupdated');
   }, (reason) => {
-    this.toastr.warning('Kachel wurde nicht geupdated');
+    this.toastr.info('Kachel wurde nicht geupdated');
   });
   }
 
@@ -216,5 +214,6 @@ export class CreateTileComponent {
       this.toastr.success('Kachel wurde gelöscht');
 
     });
-  this.modalService.dismissAll();  }
+  this.modalService.dismissAll();
+  }
 }

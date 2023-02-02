@@ -26,6 +26,18 @@ export class Map {
     rotation: number;
   }[];
 
+  @Prop()
+  obstaclePosition: {
+    obstacleId: string;
+    imageId: string;
+    layer: number;
+    x: number;
+    y: number;
+    rotation: number;
+    width: number;
+    height: number;
+  }[];
+
   @Prop(Evacuation)
   evacuationZonePosition: Evacuation;
 

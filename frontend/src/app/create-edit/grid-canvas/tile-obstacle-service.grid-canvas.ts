@@ -1,11 +1,16 @@
 import {GridCanvasComponent} from "./grid-canvas.component";
 import {ToastrService} from "ngx-toastr";
 import {Tile} from "../tile/dto/tile.dto";
+import {ImageService} from "src/app/shared/image.service";
+import {Obstacle} from "../obstacle/dto/obstacle.dto";
+import {DomSanitizer} from "@angular/platform-browser";
 
-export class TileServiceGridCanvas {
+export class TileObstacleServiceGridCanvas {
   constructor(
     private gridCanvasComponent: GridCanvasComponent,
+    private imageService: ImageService,
     private toastr: ToastrService,
+    private sanitizer: DomSanitizer
   ) {
   }
 
@@ -20,7 +25,11 @@ export class TileServiceGridCanvas {
       let tile = {...this.gridCanvasComponent.tileSelection.find((tile) => tile.id === tilePosition.tileId)} as Tile;
       if (tile != undefined) {
         if (tile.name.includes('start')) {
-          this.gridCanvasComponent.startPosition = {layer: tilePosition.layer, x: tilePosition.column, y: tilePosition.row};
+          this.gridCanvasComponent.startPosition = {
+            layer: tilePosition.layer,
+            x: tilePosition.column,
+            y: tilePosition.row
+          };
         }
         tile.rotation = tilePosition.rotation;
         this.gridCanvasComponent.grids[tilePosition.layer][tilePosition.row][tilePosition.column] = tile;
@@ -50,5 +59,14 @@ export class TileServiceGridCanvas {
         isPlaceholder: true,
       };
     }
+  }
+
+  loadObstacle(obstacleSelection: Obstacle[]) {
+    this.gridCanvasComponent.map!.obstaclePosition.forEach((obstaclePosition) => {
+        let image = obstacleSelection.find((obstacle: Obstacle) => obstacle.imageId === obstaclePosition.imageId)?.image;
+        let obstacle = {...obstaclePosition, id: obstaclePosition.obstacleId, image};
+        this.gridCanvasComponent.obstacles.push(obstacle);
+      }
+    );
   }
 }

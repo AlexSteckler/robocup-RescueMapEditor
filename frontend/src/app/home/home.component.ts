@@ -38,6 +38,8 @@ export class HomeComponent {
     if (this.mapName) {
       this.gridCanvasService.createMap(this.mapName).subscribe((map) => {
         this.maps.push(map);
+        this.toastr.success('Map erstellt');
+        this.router.navigate(['createEdit', map.id])
       });
     } else {
       this.toastr.error('Bitte einen Namen eingeben');

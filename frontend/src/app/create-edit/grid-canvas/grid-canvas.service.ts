@@ -36,7 +36,7 @@ export class GridCanvasService {
     tile: Tile
   ) {
     return this.httpClient.patch<Map>(
-      `${environment.baseUrlV1}/map/tile/${id}`,
+      `${environment.baseUrlV1}/map/${id}/tile/`,
       {
         tilePosition: {
           tileId: tile.id,
@@ -62,6 +62,38 @@ export class GridCanvasService {
         row: rowCount,
         column: colCount,
       }
+    );
+  }
+
+  updateObstacle(
+    mapId: string,
+    id: string,
+    imageId: string,
+    layer: number,
+    x: number,
+    y: number,
+    rotation: number,
+    width: number,
+    height: number,
+     ) {
+    return this.httpClient.patch<Map>(`${environment.baseUrlV1}/map/${mapId}/obstacle/`,
+    {
+      obstaclePosition: {
+        obstacleId: id,
+        imageId: imageId,
+        layer: layer,
+        x: x,
+        y: y,
+        rotation: rotation,
+        width: width,
+        height: height,
+      }
+    });
+  }
+
+  deleteObstacle(mapId: string, obstacleId: string) {
+    return this.httpClient.delete<Map>(
+      `${environment.baseUrlV1}/map/${mapId}/obstacle/${obstacleId}`,
     );
   }
 

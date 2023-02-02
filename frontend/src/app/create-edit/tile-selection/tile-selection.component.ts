@@ -1,19 +1,26 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Transform} from 'panzoom';
 import {Tile} from '../tile/dto/tile.dto';
-import {TilesService} from './tiles.service';
+import {TilesService} from '../tile/tiles.service';
+import {Obstacle} from "../obstacle/dto/obstacle.dto";
+import {ImageService} from 'src/app/shared/image.service';
+import {ObstacleService} from '../obstacle/obstacle.service';
+import {firstValueFrom} from "rxjs";
+
 
 @Component({
   selector: 'app-tile-selection',
   templateUrl: './tile-selection.component.html',
   styleUrls: ['./tile-selection.component.scss'],
 })
-export class TileSelectionComponent {
+export class TileSelectionComponent implements OnInit {
   tiles: Tile[] = [];
   greenTiles: Tile[] = [];
+  obstacles: Obstacle[] = [];
 
-  @Output() tileSelectionChange = new EventEmitter<Tile[]>();
+  @Output() tileObstacleSelectionChange = new EventEmitter<{ tiles: Tile[], obstacles: Obstacle[] }>();
+  @Output() obstacleSelectionChange = new EventEmitter<Obstacle[]>();
 
   @Input() canvasValues: Transform | undefined;
   @Input() innerHeight: number = 0;
@@ -21,30 +28,49 @@ export class TileSelectionComponent {
   @Input() currentDraggedTile: Tile | undefined;
   @Input() evacuationExists: boolean = false;
 
+  @Output() currentDraggedObstacle = new EventEmitter<Obstacle>;
+
+
   constructor(
     private tilesService: TilesService,
+    private obstacleService: ObstacleService,
+    private imageService: ImageService,
     private sanitizer: DomSanitizer
   ) {
   }
 
-  ngOnInit(): void {
-    this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
-      let loaded = 0;
-      tiles.forEach((tile: Tile) => {
-        this.tilesService.getTileImg(tile.imageId!).subscribe((blob: Blob) => {
-          let objectURL = URL.createObjectURL(blob);
-          let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-          tile.image = img;
-          tile.rotation = 0;
-          loaded++;
-          if (loaded === tiles.length) {
-            this.tileSelectionChange.emit(this.tiles);
-          }
-          this.tiles.push(tile);
-        });
+  async ngOnInit() {
 
+    let loaded = 0;
+    let tiles = await firstValueFrom(this.tilesService.getTiles());
+    let obstacles = await firstValueFrom(this.obstacleService.getObstacles());
+    console.log(obstacles.length);
+    tiles.forEach((tile: Tile) => {
+      this.imageService.getImg(tile.imageId!).subscribe((blob: Blob) => {
+        let objectURL = URL.createObjectURL(blob);
+        let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+        tile.image = img;
+        tile.rotation = 0;
+        if (++loaded >= tiles.length + obstacles.length) {
+          this.tileObstacleSelectionChange.emit({tiles: this.tiles, obstacles: this.obstacles});
+        }
+        this.tiles.push(tile);
       });
     });
+      obstacles.forEach((obstacle: Obstacle) => {
+
+        this.imageService.getImg(obstacle.imageId!).subscribe((blob: Blob) => {
+          let objectURL = URL.createObjectURL(blob);
+
+          let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+          obstacle.image = img;
+          obstacle.rotation = 0;
+          if (++loaded >= tiles.length + obstacles.length) {
+            this.tileObstacleSelectionChange.emit({tiles: this.tiles, obstacles: this.obstacles});
+          }
+          this.obstacles.push(obstacle);
+        });
+      });
   }
 
   exited() {
@@ -72,5 +98,13 @@ export class TileSelectionComponent {
 
   falseEnter() {
     return false;
+  }
+
+  draggedStartObstacle(obstacle: Obstacle) {
+    this.currentDraggedObstacle.emit(obstacle);
+  }
+
+  draggedEndObstacle(obstacle: Obstacle) {
+    this.currentDraggedObstacle.emit(undefined);
   }
 }

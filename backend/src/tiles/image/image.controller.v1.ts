@@ -17,7 +17,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { GridFSFile, ObjectId } from 'mongodb';
 import { Response } from 'express';
 import { AuthenticatedUser, Public, Roles } from 'nest-keycloak-connect';
-import { FindImagesParams } from './dto/find-images-params.dto';
 import { FindImageParamsDto } from './dto/find-image-params.dto';
 import { NotFound } from '../../util/not-found.decorator';
 @Controller({
@@ -46,6 +45,10 @@ export class ImageControllerV1 {
   @Get(':id')
   @NotFound()
   async getImage(@Param() params: FindImageParamsDto, @Res() res: Response) {
+    let contentType = (await this.imageService.getImageInformation(params.id)).contentType;
+    res.set({
+      'Content-Type': `${contentType}`,
+    });
     const file = await this.imageService.findImage(params.id);
     return file.pipe(res);
   }

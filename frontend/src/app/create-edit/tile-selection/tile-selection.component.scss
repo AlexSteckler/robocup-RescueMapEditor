@@ -32,3 +32,13 @@ app-tile {
   padding: 0;
   border: solid 0.1px grey;
 }
+
+.borderObstacle {
+  width: 100px;
+  height: 100px;
+  border: 1px solid black;
+}
+
+.border-none {
+  border: none !important;
+}

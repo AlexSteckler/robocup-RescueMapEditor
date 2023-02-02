@@ -1,3 +1,4 @@
+{{currentObstacle !== undefined}}
 <div class="pb-1 d-flex w-100 justify-content-between">
   <div class="base-color fw-bold"> {{map?.name}}</div>
   <div>
@@ -7,13 +8,13 @@
 </div>
 <div id="canvas-wrapper" #canvas_wrapper [ngStyle]=" {'height.px' : innerHeight }">
   <div #canvas>
-
     <div *ngFor="let layerOfGrids of grids; let layerCount = index" class="layer">
       <div *ngIf="layerCount == layer">
         <div *ngFor="let row of layerOfGrids; let rowCount = index" class="row d-flex flex-nowrap">
           <app-tile *ngFor="let tile of row; let colCount = index"
                     cdkDropList
                     cdkDrag
+                    cdkDropListSortingDisabled
 
                     [class.white]="tile.id"
                     [canvasValues]="canvasValues"
@@ -30,16 +31,29 @@
                     (cdkDropListDropped)="drop($event, layerCount, rowCount, colCount)"
                     (cdkDragStarted)="dragStartMovement(tile)"
                     (cdkDragEnded)="dragEndMovement(tile, $event,layerCount, rowCount, colCount )"
-                    >
+                    [cdkDropListDisabled]="true"
+          >
           </app-tile>
         </div>
       </div>
     </div>
+      <app-obstacle *ngFor="let obstacle of obstacles"
+          style="position:absolute"
+          cdkDrag
+          (cdkDragStarted)="moveObsStart(obstacle)"
+          (cdkDragEnded)="moveObstacleEnd(obstacle, $event)"
+          [cdkDragConstrainPosition]="dragConstrainPoint"
+          [obstacle]="obstacle"
+          [ngStyle]="{'top.px': obstacle.y, 'left.px': obstacle.x, 'width.px': obstacle.width, 'height.px': obstacle.height}"
+      >
+      </app-obstacle>
   </div>
 </div>
 
-<div *ngIf="currentDraggedTile" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false" class="position-absolute p-2" style="bottom: 50%;">
-  <div class="rounded border border-3 p-2 base-bg" >
+
+<div *ngIf="currentDraggedTile" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false"
+     class="position-absolute p-2" style="bottom: 50%;">
+  <div class="rounded border border-3 p-2 base-bg">
     <i class="bi bi-trash-fill"></i>
   </div>
 </div>
@@ -52,8 +66,8 @@
   Gesamtpunktzahl: {{totalPoints}}
 </div>
 
-<div class="w-100 d-flex justify-content-end position-absolute">
-  <div class="p-3 base-color fs-5 ">
+<div class="position-absolute" style="right: 0px">
+  <div class="p-3 base-color fs-5">
     Ebene: {{layer}}
   </div>
 </div>
@@ -63,11 +77,17 @@
     <i class="bi bi-info-circle-fill"></i>
   </div>
   <mat-menu #afterMenu="matMenu" xPosition="after">
-    <div class="p-2 d-flex flex-column"><span>Kachel verschieben</span><span class="base-color">'Linke Maustaste' auf Kachel halten</span></div>
-    <div class="p-2 d-flex flex-column"><span>Raster verschieben</span><span class="base-color">'Linke Maustaste' oder 'Mausrad drücken'</span></div>
-    <div class="p-2 d-flex flex-column"><span>Im Raster zoomen</span><span class="base-color">'Mausrad drehen'</span></div>
-    <div class="p-2 d-flex flex-column"><span>Kachel drehen</span><span class="base-color">'Rechtsklick' auf Kachel / Doppel-Tippen</span></div>
-    <div class="p-2 d-flex flex-column"><span>Kachel im Raster kopieren</span><span class="base-color">'STRG' beim absetzen halten</span></div>
-    <div class="p-2 d-flex flex-column"><span>Kachel löschen</span><span class="base-color">Kachel halten und in den Papierkorb schieben</span></div>
+    <div class="p-2 d-flex flex-column"><span>Kachel verschieben</span><span class="base-color">'Linke Maustaste' auf Kachel halten</span>
+    </div>
+    <div class="p-2 d-flex flex-column"><span>Raster verschieben</span><span class="base-color">'Linke Maustaste' oder 'Mausrad drücken'</span>
+    </div>
+    <div class="p-2 d-flex flex-column"><span>Im Raster zoomen</span><span class="base-color">'Mausrad drehen'</span>
+    </div>
+    <div class="p-2 d-flex flex-column"><span>Kachel drehen</span><span class="base-color">'Rechtsklick' auf Kachel / Doppel-Tippen</span>
+    </div>
+    <div class="p-2 d-flex flex-column"><span>Kachel im Raster kopieren</span><span class="base-color">'STRG' beim absetzen halten</span>
+    </div>
+    <div class="p-2 d-flex flex-column"><span>Kachel löschen</span><span class="base-color">Kachel halten und in den Papierkorb schieben</span>
+    </div>
   </mat-menu>
 </div>

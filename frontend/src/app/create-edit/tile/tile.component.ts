@@ -2,9 +2,7 @@ import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} f
 import {Tile} from "./dto/tile.dto";
 import {trigger, state, style} from '@angular/animations';
 import { Transform } from 'panzoom';
-import { MatMenuTrigger } from '@angular/material/menu';
-import { Evacuation } from './dto/evacuation.dto';
-import { GridCanvasService } from '../grid-canvas/grid-canvas.service';
+import { Evacuation } from '../dto/evacuation.dto';
 
 export const EXITCOLOR: string = 'green';
 export const ENTRANCECOLOR: string = '#f0f0f0';
@@ -37,7 +35,7 @@ export class TileComponent implements OnInit{
 
   state: string = '0';
 
-  constructor(private gridCanvasService : GridCanvasService) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.state = this.tile?.rotation?.toString()!;

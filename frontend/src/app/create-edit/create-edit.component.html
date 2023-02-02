@@ -5,7 +5,9 @@
       [canvasValues]="canvasValues"
       [currentDraggedTile]="currentDraggedTile"
       [evacuationExists]="evacuationExists"
-      (tileSelectionChange)="gridCanvas.loadGrid($event);"
+      (currentDraggedObstacle)="currentDraggedObstacle = $event"
+      (tileObstacleSelectionChange)="gridCanvas.loadGrid($event);"
+
     ></app-tile-selection>
   </div>
 
@@ -13,9 +15,11 @@
     <app-grid-canvas
       #gridCanvas
       [innerHeight]="innerHeight"
+      [innerWidth]="innerWidth"
       (canvasValuesChange)="canvasValues = $event"
       (currentDraggedTileChange)="currentDraggedTile = $event"
       [(isInTrash)]="isInTrash"
+      [currentObstacle]="currentDraggedObstacle"
       (evacuationExists)="evacuationExists = $event">
     </app-grid-canvas>
   </div>

@@ -1,6 +1,7 @@
 import { Component, HostListener } from '@angular/core';
 import { Transform } from 'panzoom';
 import { Tile } from './tile/dto/tile.dto';
+import {Obstacle} from "./obstacle/dto/obstacle.dto";
 
 @Component({
   selector: 'app-create-edit',
@@ -10,7 +11,8 @@ import { Tile } from './tile/dto/tile.dto';
 export class CreateEditComponent {
   @HostListener('window:resize', ['$event'])
   onResize() {
-    this.innerHeight = window.innerHeight - 300;
+    this.innerHeight = window.innerHeight - 240;
+    this.innerWidth = window.innerWidth;
   }
 
   isInTrash: boolean = false;
@@ -19,6 +21,7 @@ export class CreateEditComponent {
   evacuationExists: boolean = true;
   innerHeight: number = 0;
   innerWidth: number = 0;
+  currentDraggedObstacle: Obstacle | undefined;
 
   ngOnInit(): void {
     this.innerHeight = window.innerHeight - 240;
