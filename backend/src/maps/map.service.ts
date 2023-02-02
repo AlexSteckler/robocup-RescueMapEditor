@@ -69,7 +69,7 @@ export class MapService {
     return this.mapModel
       .findOneAndUpdate(
         { _id: id },
-        { $push: { tilePosition: updateObstacleDto.obstaclePosition } },
+        { $push: { obstaclePosition: updateObstacleDto.obstaclePosition } },
         { new: true },
       )
       .exec();
@@ -80,7 +80,7 @@ export class MapService {
       .findOneAndUpdate(
         {
           _id: mapId,
-          tilePosition: {
+          obstaclePosition: {
             $elemMatch: {
               obstacleId: obstacleId,
             },

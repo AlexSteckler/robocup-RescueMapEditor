@@ -1,13 +1,17 @@
 import {GridCanvasComponent} from "./grid-canvas.component";
 import {ToastrService} from "ngx-toastr";
 import {Tile} from "../tile/dto/tile.dto";
+import { ImageService } from "src/app/shared/image.service";
+import { Obstacle } from "../obstacle/dto/obstacle.dto";
+import { DomSanitizer } from "@angular/platform-browser";
 
-export class TileServiceGridCanvas {
+export class TileObstacleServiceGridCanvas {
   constructor(
     private gridCanvasComponent: GridCanvasComponent,
+    private imageService: ImageService,
     private toastr: ToastrService,
-  ) {
-  }
+    private sanitizer: DomSanitizer
+  ) {}
 
   loadTile() {
     this.gridCanvasComponent.map!.tilePosition.forEach((tilePosition) => {
@@ -50,5 +54,21 @@ export class TileServiceGridCanvas {
         isPlaceholder: true,
       };
     }
+  }
+
+  loadObstacle(obstacleSelection: Obstacle[]) {
+    this.gridCanvasComponent.map!.obstaclePosition.forEach((obstaclePosition) => {
+      let obstacle = {...obstacleSelection.find((obstacle : Obstacle) => obstacle.imageId === obstaclePosition.imageId)} as Obstacle;
+
+      this.imageService.getImg(obstaclePosition.imageId).subscribe((blob) => {
+        let objectURL = URL.createObjectURL(blob);
+        let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+        obstacle.image = img;
+        obstacle.x = obstaclePosition.x;
+        obstacle.y = obstaclePosition.y;
+        this.gridCanvasComponent.obstacles.push(obstacle);
+      }
+    )}
+    );
   }
 }

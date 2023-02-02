@@ -6,7 +6,8 @@
       [currentDraggedTile]="currentDraggedTile"
       [evacuationExists]="evacuationExists"
       (currentDraggedObstacle)="currentDraggedObstacle = $event"
-      (tileSelectionChange)="gridCanvas.loadGrid($event);"
+      (tileObstacleSelectionChange)="gridCanvas.loadGrid($event);"
+
     ></app-tile-selection>
   </div>
 

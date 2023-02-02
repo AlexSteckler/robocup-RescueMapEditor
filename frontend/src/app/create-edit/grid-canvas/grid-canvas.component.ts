@@ -9,8 +9,10 @@ import {GridCanvasService} from './grid-canvas.service';
 import {ActivatedRoute} from '@angular/router';
 import {EvacuationZoneGridCanvas} from "./evacuationZone-grid-canvas";
 import {ServiceGridCanvas} from "./service-grid-canvas";
-import {TileServiceGridCanvas} from "./tileService.grid-canvas";
+import {TileObstacleServiceGridCanvas} from "./tile-obstacle-service.grid-canvas";
 import {Obstacle} from "../obstacle/dto/obstacle.dto";
+import { ImageService } from 'src/app/shared/image.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 export const TileCount = 30;
 export const OutsideDrag = 100;
@@ -54,17 +56,19 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   totalPoints: string = '';
   loading: boolean = true;
   serviceGridCanvas: ServiceGridCanvas;
-  tileServiceGridCanvas: TileServiceGridCanvas;
+  tileObstacleServiceGridCanvas: TileObstacleServiceGridCanvas;
 
   constructor(
     private toastr: ToastrService,
     private gridCanvasService: GridCanvasService,
-    private route: ActivatedRoute
+    private imageService: ImageService,
+    private route: ActivatedRoute,
+    private sanitizer: DomSanitizer
   )
   {
     this.evacuationZoneGridCanvas = new EvacuationZoneGridCanvas(this, this.gridCanvasService, this.toastr);
     this.serviceGridCanvas = new ServiceGridCanvas(this, toastr);
-    this.tileServiceGridCanvas = new TileServiceGridCanvas(this, toastr);
+    this.tileObstacleServiceGridCanvas = new TileObstacleServiceGridCanvas(this, this.imageService, this.toastr, this.sanitizer);
     this.evacuation = this.evacuationZoneGridCanvas.getEvacuationDto(-1, -1, -1, true);
   }
 
@@ -93,22 +97,15 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     this.serviceGridCanvas.stopDragForFarAwayMoving();
   }
 
-  loadGrid(tileSelection: Tile[]) {
-    this.tileSelection = tileSelection;
+  loadGrid(tilesObstacle: {tiles: Tile[], obstacles: Obstacle[]}) {
+    this.tileSelection = tilesObstacle.tiles;
     this.route.params.subscribe((params) => {
       this.gridCanvasService.getMap(params['id']).subscribe((map) => {
         this.map = map;
         this.loading = false;
-        this.tileServiceGridCanvas.loadTile();
+        this.tileObstacleServiceGridCanvas.loadTile();
 
-
-
-        map.obstaclePosition.forEach((obstacle) => {
-          console.log(obstacle.x, obstacle.y);
-          this.obstacles.push({id: obstacle.obstacleId, x: obstacle.x, y: obstacle.y, layer: obstacle.layer, rotation: obstacle.rotation, width: obstacle.width, height: obstacle.height});
-        });
-
-
+        this.tileObstacleServiceGridCanvas.loadObstacle(tilesObstacle.obstacles);
 
         this.evacuationZoneGridCanvas.loadEvacuation(map.evacuationZonePosition);
         this.serviceGridCanvas.calcTotalPoints();
@@ -133,7 +130,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         .subscribe((map: Map) => this.map = map);
     }
     this.serviceGridCanvas.calcTotalPoints();
-    this.tileServiceGridCanvas.addPlaceholder(this.layer, rowCount, colCount, tile);
+    this.tileObstacleServiceGridCanvas.addPlaceholder(this.layer, rowCount, colCount, tile);
   }
 
   //---------- Drag & Drop -----------//
@@ -199,7 +196,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       //Normal Tile
       let tile = {...$event.previousContainer.data[$event.previousIndex]};
       this.grids[layer][rowCount][colCount] = tile;
-      this.tileServiceGridCanvas.addPlaceholder(layer, rowCount, colCount, tile);
+      this.tileObstacleServiceGridCanvas.addPlaceholder(layer, rowCount, colCount, tile);
       this.gridCanvasService
         .updateTile(this.map!.id, layer, rowCount, colCount, tile)
         .subscribe((map: Map) => this.map = map);
@@ -284,7 +281,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
           this.startPosition = {layer: layerCount, y: newY, x: newX};
         }
         this.grids[layerCount][newY][newX] = {...tile};
-        this.tileServiceGridCanvas.addPlaceholder(layerCount, newY, newX, this.grids[layerCount][newY][newX]);
+        this.tileObstacleServiceGridCanvas.addPlaceholder(layerCount, newY, newX, this.grids[layerCount][newY][newX]);
 
         this.gridCanvasService.updateTile(this.map!.id, this.layer, newY, newX, tile)
           .subscribe((map: Map) => this.map = map);

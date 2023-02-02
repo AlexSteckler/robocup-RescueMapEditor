@@ -14,7 +14,7 @@ import { environment } from 'src/environments/environment';
 import { CreateTileComponent } from './settings/create-tile/create-tile.component';
 import { FormsModule } from '@angular/forms';
 import { MatExpansionModule } from '@angular/material/expansion';
-import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatCheckboxModule} from '@angular/material/checkbox';
 import { CreateObstacleComponent } from './settings/create-obstacle/create-obstacle.component';
 
 function initializeKeycloak(keycloak: KeycloakService) {

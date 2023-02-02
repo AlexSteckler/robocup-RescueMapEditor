@@ -37,18 +37,17 @@
         </div>
       </div>
     </div>
-    <app-obstacle *ngFor="let obstacle of obstacles"
-         class="position-absolute"
-         [ngStyle]="{'top.px': obstacle.y, 'left.px': obstacle.x, 'width.px': obstacle.width, 'height.px': obstacle.height}"
-         cdkDrag
-         (cdkDragStarted)="moveObsStart(obstacle)"
-         (cdkDragEnded)="moveObstacleEnd(obstacle, $event)"
-         [cdkDragConstrainPosition]="dragConstrainPoint"
-         [obstacle]="obstacle"
-    >
-    </app-obstacle>
+      <app-obstacle *ngFor="let obstacle of obstacles"
+          style="position:absolute"
+          cdkDrag
+          (cdkDragStarted)="moveObsStart(obstacle)"
+          (cdkDragEnded)="moveObstacleEnd(obstacle, $event)"
+          [cdkDragConstrainPosition]="dragConstrainPoint"
+          [obstacle]="obstacle"
+          [ngStyle]="{'top.px': obstacle.y, 'left.px': obstacle.x, 'width.px': obstacle.width, 'height.px': obstacle.height}"
+      >
+      </app-obstacle>
   </div>
-</div>
 
 
 <div *ngIf="currentDraggedTile" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false"
@@ -66,7 +65,7 @@
   Gesamtpunktzahl: {{totalPoints}}
 </div>
 
-<div class="w-100 d-flex justify-content-end position-absolute">
+<div class="w-100 d-flex flex-column justify-content-end position-absolute">
   <div class="p-3 base-color fs-5 ">
     Ebene: {{layer}}
   </div>

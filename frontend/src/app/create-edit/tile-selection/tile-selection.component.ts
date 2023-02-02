@@ -18,7 +18,8 @@ export class TileSelectionComponent implements OnInit{
   greenTiles: Tile[] = [];
   obstacles: Obstacle[] = [];
 
-  @Output() tileSelectionChange = new EventEmitter<Tile[]>();
+  @Output() tileObstacleSelectionChange = new EventEmitter<{tiles: Tile[], obstacles: Obstacle[]}>();
+  @Output() obstacleSelectionChange = new EventEmitter<Obstacle[]>();
 
   @Input() canvasValues: Transform | undefined;
   @Input() innerHeight: number = 0;
@@ -38,8 +39,10 @@ export class TileSelectionComponent implements OnInit{
   }
 
   ngOnInit(): void {
+
+    let loaded = 0;
+
     this.tilesService.getTiles().subscribe((tiles: Tile[]) => {
-      let loaded = 0;
       tiles.forEach((tile: Tile) => {
         this.imageService.getImg(tile.imageId!).subscribe((blob: Blob) => {
           let objectURL = URL.createObjectURL(blob);
@@ -47,30 +50,28 @@ export class TileSelectionComponent implements OnInit{
           tile.image = img;
           tile.rotation = 0;
           loaded++;
-          if (loaded === tiles.length) {
-            this.tileSelectionChange.emit(this.tiles);
+          if (loaded === tiles.length + this.obstacles.length) {
+            this.tileObstacleSelectionChange.emit({tiles: this.tiles, obstacles: this.obstacles});
           }
           this.tiles.push(tile);
         });
-
       });
-    });
 
-    this.obstacleService.getObstacles().subscribe((obstacles: Obstacle[]) => {
+      this.obstacleService.getObstacles().subscribe((obstacles: Obstacle[]) => {
 
-      obstacles.forEach((obstacle: Obstacle) => {
-        let loaded = 0;
-        this.imageService.getImg(obstacle.imageId!).subscribe((blob: Blob) => {
+        obstacles.forEach((obstacle: Obstacle) => {
+          this.imageService.getImg(obstacle.imageId!).subscribe((blob: Blob) => {
 
-          let objectURL = URL.createObjectURL(blob);
-          let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-          obstacle.image = img;
-          obstacle.rotation = 0;
-          loaded++;
-          if (loaded === obstacles.length) {
-            this.tileSelectionChange.emit(this.tiles);
-          }
-          this.obstacles.push(obstacle);
+            let objectURL = URL.createObjectURL(blob);
+            let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+            obstacle.image = img;
+            obstacle.rotation = 0;
+            loaded++;
+            if (loaded === obstacles.length + this.obstacles.length) {
+              this.tileObstacleSelectionChange.emit({tiles: this.tiles, obstacles: this.obstacles});
+            }
+            this.obstacles.push(obstacle);
+          });
         });
       });
     });
