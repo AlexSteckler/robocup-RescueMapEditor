@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {KeycloakService} from 'keycloak-angular';
@@ -16,7 +16,7 @@ import {HttpClient} from "@angular/common/http";
 
 //--------------------------------------------------------------------------------
 
-export class CreateObstacleComponent {
+export class CreateObstacleComponent implements OnInit {
   @ViewChild('basicModal') basicModal: ElementRef | undefined;
 
   modalHeader: string = 'Neues Hindernis erstellen';
@@ -51,11 +51,8 @@ export class CreateObstacleComponent {
   ngOnInit(): void {
     this.roles = this.keycloakService.getUserRoles()
     this.obstacleService.getObstacles().subscribe((obstacles: Obstacle[]) => {
-      obstacles.forEach((obstacle: any) => {
+      obstacles.forEach((obstacle: Obstacle) => {
         this.imageService.getImg(obstacle.imageId!).subscribe((blob: Blob) => {
-          if(obstacle.imageInfo) {
-            blob = new File([blob], "noMatter.svg", {type: obstacle.imageInfo.contentType});
-          }
           let objectURL = URL.createObjectURL(blob);
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           obstacle.image = img;

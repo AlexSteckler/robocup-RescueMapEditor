@@ -13,38 +13,16 @@ export class ObstacleService {
     }
 
     async findAll(user: any): Promise<Obstacle[]> {
-        let aggregate = [
-            {
-                $lookup: {
-                    from: 'fs.files',
-                    localField: 'imageId',
-                    foreignField: '_id',
-                    as: 'imageInfo'
-                }
-            },
-            {
-                // get first element of imageInfo array
-                $addFields: {
-                    imageInfo: {$arrayElemAt: ['$imageInfo', 0]}
-                }
-
-            }
-        ];
 
         if (user.location) {
-            return this.obstacleModel.aggregate([
-                {
-                    $match: {
-                        $or: [
-                            {location: user.location},
-                            {location: null}
-                        ]
-                    }
-                },
-                ...aggregate
-            ]).exec();
+            return this.obstacleModel.find({
+                $or: [
+                    {location: user.location},
+                    {location: {$exists: false}}
+                ]
+            }).exec();
         }
-        return this.obstacleModel.aggregate([...aggregate]).exec()
+        return this.obstacleModel.find().exec()
     }
 
     async create(user: any, createObstacleDto: CreateObstacleDto): Promise<Obstacle> {

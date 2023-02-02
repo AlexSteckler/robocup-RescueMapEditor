@@ -45,6 +45,10 @@ export class ImageControllerV1 {
   @Get(':id')
   @NotFound()
   async getImage(@Param() params: FindImageParamsDto, @Res() res: Response) {
+    let contentType = (await this.imageService.getImageInformation(params.id)).contentType;
+    res.set({
+      'Content-Type': `${contentType}`,
+    });
     const file = await this.imageService.findImage(params.id);
     return file.pipe(res);
   }
