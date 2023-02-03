@@ -11,8 +11,8 @@ import {EvacuationZoneGridCanvas} from "./evacuationZone-grid-canvas";
 import {ServiceGridCanvas} from "./service-grid-canvas";
 import {TileObstacleServiceGridCanvas} from "./tile-obstacle-service.grid-canvas";
 import {Obstacle} from "../obstacle/dto/obstacle.dto";
-import { ImageService } from 'src/app/shared/image.service';
-import { DomSanitizer } from '@angular/platform-browser';
+import {ImageService} from 'src/app/shared/image.service';
+import {DomSanitizer} from '@angular/platform-browser';
 
 export const TileCount = 30;
 export const OutsideDrag = 100;
@@ -64,8 +64,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     private imageService: ImageService,
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer
-  )
-  {
+  ) {
     this.evacuationZoneGridCanvas = new EvacuationZoneGridCanvas(this, this.gridCanvasService, this.toastr);
     this.serviceGridCanvas = new ServiceGridCanvas(this, toastr);
     this.tileObstacleServiceGridCanvas = new TileObstacleServiceGridCanvas(this, this.imageService, this.toastr, this.sanitizer);
@@ -97,7 +96,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     this.serviceGridCanvas.stopDragForFarAwayMoving();
   }
 
-  loadGrid(tilesObstacle: {tiles: Tile[], obstacles: Obstacle[]}) {
+  loadGrid(tilesObstacle: { tiles: Tile[], obstacles: Obstacle[] }) {
     this.tileSelection = tilesObstacle.tiles;
     this.route.params.subscribe((params) => {
       this.gridCanvasService.getMap(params['id']).subscribe((map) => {
@@ -145,30 +144,24 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       let tmpId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
       let tmpObstacle = {
-          id: tmpId,
-          imageId: this.currentObstacle.imageId,
-          layer: this.layer,
-          x: left,
-          y: top,
-          rotation: 0,
-          width: this.currentObstacle.width,
-          height: this.currentObstacle.height,
-          image: this.currentObstacle.image
+        id: tmpId,
+        imageId: this.currentObstacle.imageId,
+        layer: this.layer,
+        x: left,
+        y: top,
+        rotation: 0,
+        width: this.currentObstacle.width,
+        height: this.currentObstacle.height,
+        image: this.currentObstacle.image,
+        value: this.currentObstacle.value,
       }
 
       this.obstacles.push((tmpObstacle) as Obstacle);
       this.gridCanvasService.updateObstacle(
         this.map!.id,
-        tmpObstacle.id,
-        tmpObstacle.imageId!,
-        tmpObstacle.layer,
-        tmpObstacle.x,
-        tmpObstacle.y,
-        tmpObstacle.rotation,
-        tmpObstacle.width!,
-        tmpObstacle.height!
+        tmpObstacle
       ).subscribe((map: Map) => this.map = map);
-
+      this.serviceGridCanvas.calcTotalPoints();
       return;
     }
     let tileToPlacedOn = this.grids[layer][rowCount][colCount];
@@ -192,6 +185,9 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     if ($event.previousContainer.data) {
       //Normal Tile
       let tile = {...$event.previousContainer.data[$event.previousIndex]};
+      if(this.grids[layer][rowCount][colCount].name.includes('start')){
+        this.startPosition = {layer: -1, y: -1, x: -1};
+      }
       this.grids[layer][rowCount][colCount] = tile;
       this.tileObstacleServiceGridCanvas.addPlaceholder(layer, rowCount, colCount, tile);
       this.gridCanvasService
@@ -274,6 +270,9 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         !this.grids[layerCount][newY][newX].name.includes('evacuationZone') &&
         !this.grids[this.layer][newY][newX].isPlaceholder
       ) {
+        if (this.grids[layerCount][newY][newX].name.includes('start')) {
+          this.startPosition = {layer: -1, x: -1, y: -1};
+        }
         if (this.grids[layerCount][rowCount][colCount].name.includes('start')) {
           this.startPosition = {layer: layerCount, y: newY, x: newX};
         }
@@ -320,8 +319,8 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       zoomMoveYDifference = (1 - scale) * dragRef.getFreeDragPosition().y;
     }
     return {
-      x: point.x + zoomMoveXDifference - scale * (this.currentObstacle === undefined ? 50 : this.currentObstacle.width! / 2 ),
-      y: point.y + zoomMoveYDifference - scale * (this.currentObstacle === undefined ? 50 : this.currentObstacle.height! / 2 ),
+      x: point.x + zoomMoveXDifference - scale * (this.currentObstacle === undefined ? 50 : this.currentObstacle.width! / 2),
+      y: point.y + zoomMoveYDifference - scale * (this.currentObstacle === undefined ? 50 : this.currentObstacle.height! / 2),
     };
   }
 
@@ -333,11 +332,11 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   moveObstacleEnd(obstacle: Obstacle, $event: CdkDragEnd) {
     let scale = this.canvasValues!.scale;
 
-    if ((obstacle.x + ($event.distance.x ) / scale) > 0
-      && (obstacle.y + ($event.distance.y ) / scale) > 0
-      && (obstacle.x + ($event.distance.x ) / scale) < TileCount * 100 - obstacle.width!
-      && (obstacle.y + ($event.distance.y ) / scale) < TileCount * 100 - obstacle.height!
-      ) {
+    if ((obstacle.x + ($event.distance.x) / scale) > 0
+      && (obstacle.y + ($event.distance.y) / scale) > 0
+      && (obstacle.x + ($event.distance.x) / scale) < TileCount * 100 - obstacle.width!
+      && (obstacle.y + ($event.distance.y) / scale) < TileCount * 100 - obstacle.height!
+    ) {
       obstacle.x += ($event.distance.x) / scale;
       obstacle.y += ($event.distance.y) / scale;
     }
@@ -354,17 +353,11 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
     this.gridCanvasService.updateObstacle(
       this.map!.id,
-      newObstacle.id,
-      newObstacle.imageId!,
-      newObstacle.layer,
-      newObstacle.x,
-      newObstacle.y,
-      newObstacle.rotation!,
-      newObstacle.width!,
-      newObstacle.height!
+      newObstacle
     ).subscribe((map: Map) => this.map = map);
 
     this.currentObstacle = undefined;
+    this.serviceGridCanvas.calcTotalPoints();
     this.panzoomCanvas.resume();
   }
 }

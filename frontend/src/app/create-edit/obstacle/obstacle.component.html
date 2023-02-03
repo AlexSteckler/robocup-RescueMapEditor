@@ -1,2 +1,2 @@
 
-<img [src]="obstacle?.image" [ngStyle]="{'width.px': obstacle?.width, 'height.px': obstacle?.height}"/>
+<img [src]="obstacle?.image" [ngStyle]="{'width.px': obstacle?.width, 'height.px': obstacle?.height}" [class.is-NotRated]="obstacle?.rated !== undefined && !obstacle?.rated!"/>

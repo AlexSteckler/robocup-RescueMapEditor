@@ -72,11 +72,11 @@ export class MapService {
           _id: id,
           obstaclePosition: {
             $elemMatch: {
-              obstacleId: updateObstacleDto.obstaclePosition.obstacleId,
+              obstacleId: updateObstacleDto.obstacleId,
             },
           },
         },
-        { $push: { obstaclePosition: updateObstacleDto.obstaclePosition } },
+        { $push: { obstaclePosition: updateObstacleDto } },
         { new: true },
       )
       .exec();

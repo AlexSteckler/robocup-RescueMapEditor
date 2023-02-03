@@ -1,6 +1,7 @@
 import {Tile} from "../tile/dto/tile.dto";
 import {GridCanvasComponent, OutsideDrag, TileCount} from "./grid-canvas.component";
 import {ToastrService} from "ngx-toastr";
+import {Obstacle} from "../obstacle/dto/obstacle.dto";
 
 export class ServiceGridCanvas {
   constructor(
@@ -11,6 +12,7 @@ export class ServiceGridCanvas {
 
   calcTotalPoints() {
     let loopCount = 0;
+    let positionList: { layer: number, x: number, y: number }[] = [];
     if (this.gridCanvasComponent.startPosition.x == -1) {
       this.gridCanvasComponent.totalPoints = 'Keine Startkachel gegeben';
       return;
@@ -33,7 +35,7 @@ export class ServiceGridCanvas {
 
     let multiplier: number = 1;
 
-    while (orientation != -1 && loopCount++ <= 1000) {
+    while (orientation >= 0 && loopCount++ <= 1000) {
       switch (orientation) {
         case 0:
           currentPosition.y += 1;
@@ -41,11 +43,9 @@ export class ServiceGridCanvas {
         case 1:
           currentPosition.x -= 1;
           break;
-
         case 2:
           currentPosition.y -= 1;
           break;
-
         case 3:
           currentPosition.x += 1;
           break;
@@ -54,14 +54,14 @@ export class ServiceGridCanvas {
       if (currentPosition.x < 0 || currentPosition.y < 0) {
         this.gridCanvasComponent.totalPoints = 'Pacours führt aus dem Spielfeld';
         this.toastr.warning('Pacours führt aus dem Spielfeld');
-        return;
+        orientation = -2;
+        continue;
       }
       let currentTile =
-        this.gridCanvasComponent.grids[currentPosition.layer][currentPosition.y][
-          currentPosition.x
-          ]!;
+        this.gridCanvasComponent.grids[currentPosition.layer][currentPosition.y][currentPosition.x]!;
       if (!currentTile!.name || currentTile.isPlaceholder) {
-        return;
+        orientation = -2;
+        continue;
       }
 
       if (currentTile.name.includes('evacuationZone')) {
@@ -71,10 +71,12 @@ export class ServiceGridCanvas {
           this.gridCanvasComponent.evacuation.entry.y != currentPosition.y ||
           this.gridCanvasComponent.evacuation.entry.position != orientation
         ) {
-          return;
+          orientation = -2;
+          continue;
         }
         if (this.gridCanvasComponent.evacuation.exit == undefined || this.gridCanvasComponent.evacuation.exit.x == -1) {
-          return;
+          orientation = -2;
+          continue;
         }
 
         currentPosition = {
@@ -87,7 +89,8 @@ export class ServiceGridCanvas {
         multiplier = 4.3904;
       } else {
         if (!currentTile.paths) {
-          return;
+          orientation = -2;
+          continue;
         }
 
         let tileRotation = currentTile.rotation!;
@@ -99,22 +102,42 @@ export class ServiceGridCanvas {
           currentPosition.layer += tileWay.layer;
           if (currentPosition.layer < 0) {
             this.toastr.warning('Rampe führt ins nichts!');
-            return;
+            orientation = -2;
+            continue;
           }
 
-          orientation = (tileRotation + tileWay.to + 2) % 4;
+          if (tileWay.to !== -1) {
+            orientation = (tileRotation + tileWay.to + 2) % 4;
+          } else {
+            orientation = -1;
+          }
+
+          positionList.push({...currentPosition});
           currentPoints += currentTile.value ? currentTile.value + 5 : 5;
-          this.gridCanvasComponent.totalPoints = Math.round(currentPoints * multiplier).toString();
         } else {
-          return;
+          orientation = -2;
+          continue;
         }
       }
     }
-
     if (loopCount >= 1000) {
       this.gridCanvasComponent.totalPoints =
         'Ihre Bahn erzeugt eine Schleife. Parkour nicht zugelassen!';
+      return;
     }
+    this.gridCanvasComponent.obstacles.forEach((obstacle: Obstacle) => {
+      if (positionList.find((position: { layer: number, x: number, y: number }) =>
+        position.layer == obstacle.layer
+        && position.x == Math.floor((obstacle.x + (obstacle.width/2)) / 100)
+        && position.y == Math.floor((obstacle.y + (obstacle.height/2)) / 100))) {
+        currentPoints += obstacle.value !== undefined ? obstacle.value : 0;
+        obstacle.rated = true;
+      } else {
+        obstacle.rated = false;
+      }
+    });
+    this.gridCanvasComponent.totalPoints = Math.round((currentPoints + (orientation === -1 ? 60 : 0)) * multiplier).toString();
+
   }
 
   stopDragForFarAwayMoving() {
@@ -173,16 +196,16 @@ export class ServiceGridCanvas {
   }
 
   addLayer() {
-    let tempgrid: Array<Array<Tile>> = [];
+    let tempGrid: Array<Array<Tile>> = [];
 
     for (let i = 0; i < TileCount; i++) {
       let row: Array<Tile> = [];
       for (let j = 0; j < TileCount; j++) {
         row.push(this.newTile());
       }
-      tempgrid.push(row);
+      tempGrid.push(row);
     }
-    this.gridCanvasComponent.grids.push(tempgrid);
+    this.gridCanvasComponent.grids.push(tempGrid);
   }
 
   newTile() {

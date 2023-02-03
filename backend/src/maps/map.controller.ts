@@ -84,7 +84,7 @@ export class MapsController {
     @Body() updateObstacleDto: UpdateObstacleDto,
     @Param() findMapDto: FindMapDto,
   ) {
-    await this.mapService.deleteObstacle(findMapDto.id, updateObstacleDto.obstaclePosition.obstacleId);
+    await this.mapService.deleteObstacle(findMapDto.id, updateObstacleDto.obstacleId);
     return this.mapService.addObstacle(findMapDto.id, updateObstacleDto);
   }
 
