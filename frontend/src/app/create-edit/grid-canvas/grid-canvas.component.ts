@@ -185,7 +185,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     if ($event.previousContainer.data) {
       //Normal Tile
       let tile = {...$event.previousContainer.data[$event.previousIndex]};
-      if(this.grids[layer][rowCount][colCount].name.includes('start')){
+      if (this.grids[layer][rowCount][colCount].name.includes('start')) {
         this.startPosition = {layer: -1, y: -1, x: -1};
       }
       this.grids[layer][rowCount][colCount] = tile;
@@ -330,6 +330,13 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   moveObstacleEnd(obstacle: Obstacle, $event: CdkDragEnd) {
+    if (this.isInTrash) {
+      this.gridCanvasService.deleteObstacle(this.map?.id!, obstacle.id).subscribe((map: Map) => {
+        this.map = map
+        this.obstacles = this.obstacles.filter(o => o.id !== obstacle.id);
+      });
+      return;
+    }
     let scale = this.canvasValues!.scale;
 
     if ((obstacle.x + ($event.distance.x) / scale) > 0

@@ -50,7 +50,7 @@
 </div>
 
 
-<div *ngIf="currentDraggedTile" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false"
+<div *ngIf="currentDraggedTile || currentObstacle" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false"
      class="position-absolute p-2" style="bottom: 50%;">
   <div class="rounded border border-3 p-2 base-bg">
     <i class="bi bi-trash-fill"></i>
