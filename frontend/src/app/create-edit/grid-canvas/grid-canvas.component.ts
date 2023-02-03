@@ -262,6 +262,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         }
         this.grids[layerCount][rowCount][colCount] = this.serviceGridCanvas.newTile();
         this.grids[layerCount + 1][rowCount][colCount] = this.serviceGridCanvas.newTile();
+        if(layerCount == 1) this.grids[layerCount - 1][rowCount][colCount] = this.serviceGridCanvas.newTile();
 
         this.gridCanvasService
           .deleteTile(this.map!.id, this.layer, rowCount, colCount).subscribe((map: Map) => this.map = map);
@@ -284,6 +285,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         if (!this.controlActive || this.grids[layerCount][rowCount][colCount].name.includes('start')) {
           this.grids[layerCount][rowCount][colCount] = this.serviceGridCanvas.newTile();
           this.grids[layerCount + 1][rowCount][colCount] = this.serviceGridCanvas.newTile();
+          if(layerCount == 1) this.grids[layerCount - 1][rowCount][colCount] = this.serviceGridCanvas.newTile();
 
           this.gridCanvasService.deleteTile(this.map!.id, this.layer, rowCount, colCount)
             .subscribe((map: Map) => this.map = map);

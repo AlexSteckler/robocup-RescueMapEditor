@@ -189,14 +189,14 @@ export class EvacuationZoneGridCanvas {
   getEvacuationDto(layer: number, row: number, column: number, across: boolean) {
     this.gridCanvasComponent.evacuationExists.emit(row == -1 ? false : true);
     return {
-      layer, column, row, across, exit: {x: -1, y: -1, position: -1}, entry: {x: -1, y: -1, position: -1},
+      layer, column, row, across, exit: {x: -1, y: -1, position: -1, layer: -1}, entry: {x: -1, y: -1, position: -1, layer: -1},
     };
   }
 
   loadEvacuation(evacuationZone: {
     layer: number, row: number, column: number,
-    entry: { x: number, y: number, position: number },
-    exit: { x: number, y: number, position: number }, across: boolean
+    entry: { x: number, y: number, position: number, layer: number },
+    exit: { x: number, y: number, position: number, layer: number }, across: boolean
   }) {
     if (evacuationZone != undefined) {
       this.gridCanvasComponent.evacuationExists.emit(true);

@@ -50,6 +50,7 @@ export class ServiceGridCanvas {
           currentPosition.x += 1;
           break;
       }
+      console.log(currentPosition);
 
       if (currentPosition.x < 0 || currentPosition.y < 0) {
         this.gridCanvasComponent.totalPoints = 'Pacours führt aus dem Spielfeld';
@@ -59,8 +60,9 @@ export class ServiceGridCanvas {
       }
       let currentTile =
         this.gridCanvasComponent.grids[currentPosition.layer][currentPosition.y][currentPosition.x]!;
+      console.log(currentTile);
       if (!currentTile!.name || currentTile.isPlaceholder) {
-        orientation = -2;
+        orientation = -3;
         continue;
       }
 
@@ -71,16 +73,16 @@ export class ServiceGridCanvas {
           this.gridCanvasComponent.evacuation.entry.y != currentPosition.y ||
           this.gridCanvasComponent.evacuation.entry.position != orientation
         ) {
-          orientation = -2;
+          orientation = -4;
           continue;
         }
         if (this.gridCanvasComponent.evacuation.exit == undefined || this.gridCanvasComponent.evacuation.exit.x == -1) {
-          orientation = -2;
+          orientation = -5;
           continue;
         }
 
         currentPosition = {
-          layer: this.gridCanvasComponent.layer,
+          layer: this.gridCanvasComponent.evacuation.exit.layer,
           x: this.gridCanvasComponent.evacuation.exit.x,
           y: this.gridCanvasComponent.evacuation.exit.y,
         };
@@ -89,7 +91,7 @@ export class ServiceGridCanvas {
         multiplier = 4.3904;
       } else {
         if (!currentTile.paths) {
-          orientation = -2;
+          orientation = -6;
           continue;
         }
 
@@ -102,7 +104,7 @@ export class ServiceGridCanvas {
           currentPosition.layer += tileWay.layer;
           if (currentPosition.layer < 0) {
             this.toastr.warning('Rampe führt ins nichts!');
-            orientation = -2;
+            orientation = -7;
             continue;
           }
 
@@ -115,11 +117,12 @@ export class ServiceGridCanvas {
           positionList.push({...currentPosition});
           currentPoints += currentTile.value ? currentTile.value + 5 : 5;
         } else {
-          orientation = -2;
+          orientation = -9;
           continue;
         }
       }
     }
+    console.log("Orientierung",orientation)
     if (loopCount >= 1000) {
       this.gridCanvasComponent.totalPoints =
         'Ihre Bahn erzeugt eine Schleife. Parkour nicht zugelassen!';
@@ -128,8 +131,8 @@ export class ServiceGridCanvas {
     this.gridCanvasComponent.obstacles.forEach((obstacle: Obstacle) => {
       if (positionList.find((position: { layer: number, x: number, y: number }) =>
         position.layer == obstacle.layer
-        && position.x == Math.floor((obstacle.x + (obstacle.width/2)) / 100)
-        && position.y == Math.floor((obstacle.y + (obstacle.height/2)) / 100))) {
+        && position.x == Math.floor((obstacle.x + (obstacle.width / 2)) / 100)
+        && position.y == Math.floor((obstacle.y + (obstacle.height / 2)) / 100))) {
         currentPoints += obstacle.value !== undefined ? obstacle.value : 0;
         obstacle.rated = true;
       } else {
