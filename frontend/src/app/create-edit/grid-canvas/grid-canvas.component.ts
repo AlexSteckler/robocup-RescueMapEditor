@@ -335,33 +335,34 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         this.map = map
         this.obstacles = this.obstacles.filter(o => o.id !== obstacle.id);
       });
-      return;
+    } else {
+      let scale = this.canvasValues!.scale;
+
+      if ((obstacle.x + ($event.distance.x) / scale) > 0
+        && (obstacle.y + ($event.distance.y) / scale) > 0
+        && (obstacle.x + ($event.distance.x) / scale) < TileCount * 100 - obstacle.width!
+        && (obstacle.y + ($event.distance.y) / scale) < TileCount * 100 - obstacle.height!
+      ) {
+        obstacle.x += ($event.distance.x) / scale;
+        obstacle.y += ($event.distance.y) / scale;
+      }
+
+      let centerObstacle = {x: obstacle.x + obstacle.width! / 2, y: obstacle.y + obstacle.height! / 2};
+
+      //check on which tile ist obstacle in grid
+      let colX = Math.floor(centerObstacle.x / 100);
+      let rowY = Math.floor(centerObstacle.y / 100);
+
+      let newObstacle = {...obstacle};
+      let index = this.obstacles.findIndex((obstacle) => obstacle.id === newObstacle.id);
+      this.obstacles[index] = newObstacle;
+
+      this.gridCanvasService.updateObstacle(
+        this.map!.id,
+        newObstacle
+      ).subscribe((map: Map) => this.map = map);
+
     }
-    let scale = this.canvasValues!.scale;
-
-    if ((obstacle.x + ($event.distance.x) / scale) > 0
-      && (obstacle.y + ($event.distance.y) / scale) > 0
-      && (obstacle.x + ($event.distance.x) / scale) < TileCount * 100 - obstacle.width!
-      && (obstacle.y + ($event.distance.y) / scale) < TileCount * 100 - obstacle.height!
-    ) {
-      obstacle.x += ($event.distance.x) / scale;
-      obstacle.y += ($event.distance.y) / scale;
-    }
-
-    let centerObstacle = {x: obstacle.x + obstacle.width! / 2, y: obstacle.y + obstacle.height! / 2};
-
-    //check on which tile ist obstacle in grid
-    let colX = Math.floor(centerObstacle.x / 100);
-    let rowY = Math.floor(centerObstacle.y / 100);
-
-    let newObstacle = {...obstacle};
-    let index = this.obstacles.findIndex((obstacle) => obstacle.id === newObstacle.id);
-    this.obstacles[index] = newObstacle;
-
-    this.gridCanvasService.updateObstacle(
-      this.map!.id,
-      newObstacle
-    ).subscribe((map: Map) => this.map = map);
 
     this.currentObstacle = undefined;
     this.serviceGridCanvas.calcTotalPoints();
