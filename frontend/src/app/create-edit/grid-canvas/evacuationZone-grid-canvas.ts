@@ -76,6 +76,10 @@ export class EvacuationZoneGridCanvas {
       if (this.gridCanvasComponent.grids[this.gridCanvasComponent.grids.length + layer] == undefined) {
         this.serverGridsCanvas.addLayer();
       }
+      if(layer + 1 == undefined) {
+        this.toastr.error('Layer up is undefined');
+        this.serverGridsCanvas.addLayer();
+      }
       this.addEvacuationZoneAcross(layer + 1, rowCount, colCount, true);
     }
 
@@ -149,7 +153,7 @@ export class EvacuationZoneGridCanvas {
   }
 
   checkIfEvacuationZoneIsPossible(layer: number, rowCount: number, colCount: number, isAcross: boolean) {
-    if (this.gridCanvasComponent.grids[layer].length + 1 != undefined) {
+    if (this.gridCanvasComponent.grids[layer + 1] != undefined) {
       for (let i = 0; i < (isAcross ? 4 : 3); i++) {
         for (let j = 0; j < (isAcross ? 3 : 4); j++) {
           if (

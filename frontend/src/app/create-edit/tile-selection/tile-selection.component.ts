@@ -44,7 +44,6 @@ export class TileSelectionComponent implements OnInit {
     let loaded = 0;
     let tiles = await firstValueFrom(this.tilesService.getTiles());
     let obstacles = await firstValueFrom(this.obstacleService.getObstacles());
-    console.log(obstacles.length);
     tiles.forEach((tile: Tile) => {
       this.imageService.getImg(tile.imageId!).subscribe((blob: Blob) => {
         let objectURL = URL.createObjectURL(blob);
@@ -58,10 +57,8 @@ export class TileSelectionComponent implements OnInit {
       });
     });
       obstacles.forEach((obstacle: Obstacle) => {
-
         this.imageService.getImg(obstacle.imageId!).subscribe((blob: Blob) => {
           let objectURL = URL.createObjectURL(blob);
-
           let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
           obstacle.image = img;
           obstacle.rotation = 0;

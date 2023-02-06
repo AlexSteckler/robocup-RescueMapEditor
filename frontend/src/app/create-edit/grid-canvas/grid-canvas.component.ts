@@ -154,6 +154,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         height: this.currentObstacle.height,
         image: this.currentObstacle.image,
         value: this.currentObstacle.value,
+        name: this.currentObstacle.name,
       }
 
       this.obstacles.push((tmpObstacle) as Obstacle);

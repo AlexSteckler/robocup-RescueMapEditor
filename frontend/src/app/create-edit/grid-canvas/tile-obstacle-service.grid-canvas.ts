@@ -64,7 +64,7 @@ export class TileObstacleServiceGridCanvas {
   loadObstacle(obstacleSelection: Obstacle[]) {
     this.gridCanvasComponent.map!.obstaclePosition.forEach((obstaclePosition) => {
         let image = obstacleSelection.find((obstacle: Obstacle) => obstacle.imageId === obstaclePosition.imageId)?.image;
-        let obstacle = {...obstaclePosition, id: obstaclePosition.obstacleId, image};
+        let obstacle = {...obstaclePosition, id: obstaclePosition.obstacleId, image, name: obstaclePosition.name} as Obstacle;
         this.gridCanvasComponent.obstacles.push(obstacle);
       }
     );

@@ -34,4 +34,8 @@ export class UpdateObstacleDto {
     @IsOptional()
     @IsNumber()
     value: number;
+
+    @IsOptional()
+    @IsString()
+    name: string;
 }

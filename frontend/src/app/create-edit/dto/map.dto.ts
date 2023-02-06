@@ -4,6 +4,10 @@ export interface Map {
   description: string;
   createdBy: string;
 
+  checkpoints: {
+    tileCount: number;
+  }[];
+
   tilePosition: {
     tileId: string;
     layer: number;
@@ -21,6 +25,7 @@ export interface Map {
     rotation: number;
     width: number;
     height: number;
+    name: string;
   }[];
 
   evacuationZonePosition: {

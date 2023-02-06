@@ -12,13 +12,14 @@ export class ServiceGridCanvas {
 
   calcTotalPoints() {
     let loopCount = 0;
-    let positionList: { layer: number, x: number, y: number }[] = [];
+    let tilePositionList: { layer: number, x: number, y: number }[] = [];
+    let checkpointPosition: { layer: number, x: number, y: number }[] = [];
     if (this.gridCanvasComponent.startPosition.x == -1) {
       this.gridCanvasComponent.totalPoints = 'Keine Startkachel gegeben';
       return;
     }
 
-    let currentPoints = 5;
+    let currentPoints = 0;
     let currentPosition = {...this.gridCanvasComponent.startPosition};
 
     let orientation =
@@ -50,7 +51,6 @@ export class ServiceGridCanvas {
           currentPosition.x += 1;
           break;
       }
-      console.log(currentPosition);
 
       if (currentPosition.x < 0 || currentPosition.y < 0) {
         this.gridCanvasComponent.totalPoints = 'Pacours führt aus dem Spielfeld';
@@ -60,7 +60,6 @@ export class ServiceGridCanvas {
       }
       let currentTile =
         this.gridCanvasComponent.grids[currentPosition.layer][currentPosition.y][currentPosition.x]!;
-      console.log(currentTile);
       if (!currentTile!.name || currentTile.isPlaceholder) {
         orientation = -3;
         continue;
@@ -114,33 +113,55 @@ export class ServiceGridCanvas {
             orientation = -1;
           }
 
-          positionList.push({...currentPosition});
-          currentPoints += currentTile.value ? currentTile.value + 5 : 5;
+          tilePositionList.push({...currentPosition});
+          currentPoints += currentTile.value ? currentTile.value : 0;
         } else {
           orientation = -9;
           continue;
         }
       }
     }
-    console.log("Orientierung",orientation)
     if (loopCount >= 1000) {
       this.gridCanvasComponent.totalPoints =
         'Ihre Bahn erzeugt eine Schleife. Parkour nicht zugelassen!';
       return;
     }
+
     this.gridCanvasComponent.obstacles.forEach((obstacle: Obstacle) => {
-      if (positionList.find((position: { layer: number, x: number, y: number }) =>
+      if (tilePositionList.find((position: { layer: number, x: number, y: number }) =>
         position.layer == obstacle.layer
         && position.x == Math.floor((obstacle.x + (obstacle.width / 2)) / 100)
         && position.y == Math.floor((obstacle.y + (obstacle.height / 2)) / 100))) {
-        currentPoints += obstacle.value !== undefined ? obstacle.value : 0;
-        obstacle.rated = true;
+          if (!obstacle.name?.includes('Checkpoint')) {
+            currentPoints += obstacle.value !== undefined ? obstacle.value : 0;
+            obstacle.rated = true;
+          } else {
+            checkpointPosition.push({ layer: obstacle.layer, x: Math.floor((obstacle.x + (obstacle.width / 2)) / 100), y: Math.floor((obstacle.y + (obstacle.height / 2)) / 100) });
+            obstacle.rated = true;
+          }
       } else {
         obstacle.rated = false;
       }
     });
-    this.gridCanvasComponent.totalPoints = Math.round((currentPoints + (orientation === -1 ? 60 : 0)) * multiplier).toString();
 
+    if (checkpointPosition.length > 0) {
+      let tileCount : number = 0;
+      for (let i = 0; i < tilePositionList.length; i++) {
+        tileCount++;
+        let checkpointPos = checkpointPosition.find((position: { layer: number, x: number, y: number }) =>
+          position.layer == tilePositionList[i].layer
+          && position.x == tilePositionList[i].x
+          && position.y == tilePositionList[i].y);
+        {
+          if(checkpointPos !== undefined)  {
+            currentPoints += 5 * tileCount;
+            tileCount = 0;
+          }
+        }
+    }
+  }
+
+    this.gridCanvasComponent.totalPoints = Math.round((currentPoints + (orientation === -1 ? 60 : 0)) * multiplier).toString();
   }
 
   stopDragForFarAwayMoving() {

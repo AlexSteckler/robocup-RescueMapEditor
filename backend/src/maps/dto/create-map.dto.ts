@@ -29,6 +29,7 @@ export class CreateMapDto {
     rotation: number;
     width: number;
     height: number;
+    name: string;
   }[];
 
   @IsOptional()
