@@ -1,19 +1,20 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Map } from '../dto/map.dto';
-import { Tile } from '../tile/dto/tile.dto';
-import { environment } from '../../../environments/environment';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
+import {Map} from '../dto/map.dto';
+import {Tile} from '../tile/dto/tile.dto';
+import {environment} from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GridCanvasService {
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) {
+  }
 
   createMap(name: string): Observable<Map> {
-    return this.httpClient.post<Map>(`${environment.baseUrlV1}/map`, { name });
+    return this.httpClient.post<Map>(`${environment.baseUrlV1}/map`, {name});
   }
 
   deleteMap(id: string) {
@@ -26,6 +27,10 @@ export class GridCanvasService {
 
   getMap(id: string) {
     return this.httpClient.get<Map>(`${environment.baseUrlV1}/map/${id}`);
+  }
+
+  updateMap(id: string, mapInfoDto: any) {
+    return this.httpClient.patch<Map>(`${environment.baseUrlV1}/map/${id}`, mapInfoDto);
   }
 
   updateTile(
@@ -67,28 +72,10 @@ export class GridCanvasService {
 
   updateObstacle(
     mapId: string,
-    id: string,
-    imageId: string,
-    layer: number,
-    x: number,
-    y: number,
-    rotation: number,
-    width: number,
-    height: number,
-     ) {
+    dto: any
+  ) {
     return this.httpClient.patch<Map>(`${environment.baseUrlV1}/map/${mapId}/obstacle/`,
-    {
-      obstaclePosition: {
-        obstacleId: id,
-        imageId: imageId,
-        layer: layer,
-        x: x,
-        y: y,
-        rotation: rotation,
-        width: width,
-        height: height,
-      }
-    });
+      {...dto, obstacleId: dto.id});
   }
 
   deleteObstacle(mapId: string, obstacleId: string) {

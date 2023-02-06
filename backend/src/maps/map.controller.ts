@@ -16,6 +16,7 @@ import { DeleteTileDto } from './dto/delete-tile.dto';
 import { FindMapDto } from './dto/find-map.dto';
 import { FindObstacleInMapDto } from './dto/find-obstacle-in-map.dto';
 import { UpdateEvacuationZoneDto } from './dto/update-evacuationzone.dto';
+import { UpdateMapInfoDto } from './dto/update-map-info.dto';
 import { UpdateObstacleDto } from './dto/update-obstacle.dto';
 import { UpdateTileDto } from './dto/update-tile.dto';
 import { MapService } from './map.service';
@@ -52,6 +53,14 @@ export class MapsController {
     return this.mapService.deleteMap(findMapDto.id);
   }
 
+  @Patch(':id')
+  async updateMap(
+    @Body() updateMapInfoDto: UpdateMapInfoDto,
+    @Param() findMapDto: FindMapDto,
+    ) {
+      return this.mapService.updateMap(findMapDto.id, updateMapInfoDto);
+    }
+
   @Patch(':id/tile')
   async updateTile(
     @Body() updateTileDto: UpdateTileDto,
@@ -84,7 +93,7 @@ export class MapsController {
     @Body() updateObstacleDto: UpdateObstacleDto,
     @Param() findMapDto: FindMapDto,
   ) {
-    await this.mapService.deleteObstacle(findMapDto.id, updateObstacleDto.obstaclePosition.obstacleId);
+    await this.mapService.deleteObstacle(findMapDto.id, updateObstacleDto.obstacleId);
     return this.mapService.addObstacle(findMapDto.id, updateObstacleDto);
   }
 

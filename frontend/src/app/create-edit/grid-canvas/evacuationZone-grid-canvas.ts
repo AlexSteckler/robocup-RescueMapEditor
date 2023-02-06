@@ -13,7 +13,7 @@ export class EvacuationZoneGridCanvas {
     private gridCanvasService: GridCanvasService,
     private toastr: ToastrService,
   ) {
-    this.serverGridsCanvas = new ServiceGridCanvas(gridCanvasComponent, toastr);
+    this.serverGridsCanvas = new ServiceGridCanvas(gridCanvasComponent, this.gridCanvasService, toastr);
   }
 
   addEvacuationZoneAcross(
@@ -74,6 +74,10 @@ export class EvacuationZoneGridCanvas {
 
     if (isPlaceholder == false) {
       if (this.gridCanvasComponent.grids[this.gridCanvasComponent.grids.length + layer] == undefined) {
+        this.serverGridsCanvas.addLayer();
+      }
+      if(layer + 1 == undefined) {
+        this.toastr.error('Layer up is undefined');
         this.serverGridsCanvas.addLayer();
       }
       this.addEvacuationZoneAcross(layer + 1, rowCount, colCount, true);
@@ -149,7 +153,7 @@ export class EvacuationZoneGridCanvas {
   }
 
   checkIfEvacuationZoneIsPossible(layer: number, rowCount: number, colCount: number, isAcross: boolean) {
-    if (this.gridCanvasComponent.grids[layer].length + 1 != undefined) {
+    if (this.gridCanvasComponent.grids[layer + 1] != undefined) {
       for (let i = 0; i < (isAcross ? 4 : 3); i++) {
         for (let j = 0; j < (isAcross ? 3 : 4); j++) {
           if (
@@ -189,14 +193,14 @@ export class EvacuationZoneGridCanvas {
   getEvacuationDto(layer: number, row: number, column: number, across: boolean) {
     this.gridCanvasComponent.evacuationExists.emit(row == -1 ? false : true);
     return {
-      layer, column, row, across, exit: {x: -1, y: -1, position: -1}, entry: {x: -1, y: -1, position: -1},
+      layer, column, row, across, exit: {x: -1, y: -1, position: -1, layer: -1}, entry: {x: -1, y: -1, position: -1, layer: -1},
     };
   }
 
   loadEvacuation(evacuationZone: {
     layer: number, row: number, column: number,
-    entry: { x: number, y: number, position: number },
-    exit: { x: number, y: number, position: number }, across: boolean
+    entry: { x: number, y: number, position: number, layer: number },
+    exit: { x: number, y: number, position: number, layer: number }, across: boolean
   }) {
     if (evacuationZone != undefined) {
       this.gridCanvasComponent.evacuationExists.emit(true);

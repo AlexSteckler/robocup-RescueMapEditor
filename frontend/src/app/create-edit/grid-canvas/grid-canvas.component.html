@@ -1,4 +1,3 @@
-{{currentObstacle !== undefined}}
 <div class="pb-1 d-flex w-100 justify-content-between">
   <div class="base-color fw-bold"> {{map?.name}}</div>
   <div>
@@ -44,14 +43,14 @@
           (cdkDragEnded)="moveObstacleEnd(obstacle, $event)"
           [cdkDragConstrainPosition]="dragConstrainPoint"
           [obstacle]="obstacle"
-          [ngStyle]="{'top.px': obstacle.y, 'left.px': obstacle.x, 'width.px': obstacle.width, 'height.px': obstacle.height}"
+          [ngStyle]="{'top.px': obstacle.y, 'left.px': obstacle.x, 'width.px': obstacle.width, 'height.px': obstacle.height, 'display': + obstacle.layer == layer ? 'block' : 'none'}"
       >
       </app-obstacle>
   </div>
 </div>
 
 
-<div *ngIf="currentDraggedTile" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false"
+<div *ngIf="currentDraggedTile || currentObstacle" (mouseover)="isInTrash = true" (mouseleave)="isInTrash = false"
      class="position-absolute p-2" style="bottom: 50%;">
   <div class="rounded border border-3 p-2 base-bg">
     <i class="bi bi-trash-fill"></i>

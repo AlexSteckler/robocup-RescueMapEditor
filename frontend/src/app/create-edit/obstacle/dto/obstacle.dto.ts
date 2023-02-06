@@ -15,6 +15,8 @@ export interface Obstacle {
 
   location?: string;
 
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
+
+  rated?: boolean;
 }

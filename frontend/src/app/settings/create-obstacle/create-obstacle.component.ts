@@ -215,4 +215,16 @@ export class CreateObstacleComponent implements OnInit {
       reader.readAsDataURL(event.target.files[0]);
     }
   }
+
+  checkObstacle(modal: any) {
+    if(this.toUpload && this.toUpload.size > 5000000) {
+      this.toastr.error('Die Datei darf nicht größer als 5MB sein');
+      return;
+    }
+    if(this.scale.x > 100 || this.scale.y > 100) {
+      this.toastr.error('Die Größe darf nicht größer als 100x100 sein');
+      return;
+    }
+    modal.close();
+  }
 }

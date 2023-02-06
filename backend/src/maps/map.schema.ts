@@ -4,8 +4,8 @@ class Evacuation {
   layer: number;
   row: number;
   column: number;
-  entry: { x: number; y: number; position: number };
-  exit: { x: number; y: number; position: number };
+  entry: { x: number; y: number; position: number, layer: number };
+  exit: { x: number; y: number; position: number, layer: number };
   across: boolean;
 }
 
@@ -40,6 +40,12 @@ export class Map {
 
   @Prop(Evacuation)
   evacuationZonePosition: Evacuation;
+
+  @Prop()
+  scoreCount: number;
+
+  @Prop()
+  sections: number[];
 
   @Prop()
   createdBy: string;

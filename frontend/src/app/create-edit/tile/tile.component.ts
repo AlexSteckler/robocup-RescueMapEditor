@@ -57,20 +57,20 @@ export class TileComponent implements OnInit{
     if (this.evacuationZone && this.position) {
       if (this.tile!.border![index] == ENTRANCECOLOR) {
         this.tile!.border![index] = 'black';
-        this.evacuationZone.entry = {x: -1, y : -1, position: -1};
+        this.evacuationZone.entry = {x: -1, y : -1, position: -1, layer: -1};
       }
       else if (this.tile!.border![index] == EXITCOLOR) {
         this.tile!.border![index] = 'black';
-        this.evacuationZone.exit = {x: -1, y : -1, position: -1};
+        this.evacuationZone.exit = {x: -1, y : -1, position: -1, layer: -1};
       }
       else {
         if (this.evacuationZone!.entry == undefined || this.evacuationZone!.entry.x == -1) {
         this.tile!.border![index] = ENTRANCECOLOR;
-        this.evacuationZone.entry = {x: this.position.x, y : this.position.y, position: index};
+        this.evacuationZone.entry = {x: this.position.x, y : this.position.y, position: index, layer: this.position.layer};
         }
         else if (this.evacuationZone!.exit == undefined || this.evacuationZone!.exit.x == -1) {
           this.tile!.border![index] =  EXITCOLOR;
-          this.evacuationZone.exit = {x: this.position.x, y : this.position.y, position: index};
+          this.evacuationZone.exit = {x: this.position.x, y : this.position.y, position: index, layer: this.position.layer};
         }
       }
       this.evacuationZoneChange.emit(this.evacuationZone);

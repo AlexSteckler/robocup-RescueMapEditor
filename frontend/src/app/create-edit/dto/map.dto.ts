@@ -2,7 +2,13 @@ export interface Map {
   id: string;
   name: string;
   description: string;
+  scoreCount: number;
+  sections: number[];
   createdBy: string;
+
+  checkpoints: {
+    tileCount: number;
+  }[];
 
   tilePosition: {
     tileId: string;
@@ -21,14 +27,15 @@ export interface Map {
     rotation: number;
     width: number;
     height: number;
+    name: string;
   }[];
 
   evacuationZonePosition: {
     layer: number;
     row: number;
     column: number;
-    entry: { x: number; y: number; position: number };
-    exit: { x: number; y: number; position: number };
+    entry: { x: number; y: number; position: number, layer: number };
+    exit: { x: number; y: number; position: number, layer: number };
     across: boolean;
   };
 }
