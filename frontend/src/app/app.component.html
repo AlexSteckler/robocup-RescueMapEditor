@@ -1,11 +1,12 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg fixed-top bg-dark text-light p-0">
   <div class="container-fluid navbar-brand p-0">
-    <a routerLink="home">
+    <a class="text-decoration-none d-flex align-items-center" routerLink="home" >
       <img
         src="../assets/resources/rc_logo.png"
         style="height: 60px; padding-left: 20px; padding-right: 20px"
       />
+      <span class="navbar-brand text-light" routerLink="/">MapEditor</span>
     </a>
     <button
       class="navbar-toggler second-button navbar-dark"
@@ -82,32 +83,9 @@
     </div>
   </div>
 </nav>
-<div *ngIf="authenticated === true">
-  <router-outlet></router-outlet>
-</div>
 
-<div *ngIf="authenticated === false" class="d-flex flex-column justify-content-center p-3">
-  <div class="card card-color p-3">
-    <div class="d-flex justify-content-center">
-      <h1 class="p-3">Willkommen beim Rescue MapEditor</h1>
-    </div>
-    <hr class="base-color">
-    <div class="d-flex flex-column justify-content-center">
-      <p class="text-center text-white">
-        Bitte melde dich an, um Karten zu erstellen!
-      </p>
-      <div class="d-flex justify-content-center">
-      <a *ngIf="authenticated === false"
-          class="btn button-link text-center"
-          style="cursor: pointer"
-          (click)="login()"
-          >Anmelden
-        </a>
-      </div>
-    </div>
-  </div>
-
-</div>
+<!--Main Content-->
+    <router-outlet></router-outlet>
 
 <!--Footer-->
 <footer class="dark-bg mt-auto">
