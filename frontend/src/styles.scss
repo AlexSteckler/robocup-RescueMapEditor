@@ -122,3 +122,19 @@ body {
   border-width: 100% !important;
   border-color: $base-color !important;
 }
+
+.link-base-reverse {
+  cursor: pointer;
+  color: $base-color !important;
+  transition-duration: 0.15s, 0.15s, 0.15s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  text-decoration: none;
+}
+
+.link-base-reverse:hover {
+  transition-duration: 0.15s, 0.15s, 0.15s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  color: $base-blue !important;
+}

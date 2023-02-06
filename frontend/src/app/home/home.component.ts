@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { KeycloakService } from 'keycloak-angular';
 import { ToastrService } from 'ngx-toastr';
 import { Map } from '../create-edit/dto/map.dto';
 import { GridCanvasService } from '../create-edit/grid-canvas/grid-canvas.service';
@@ -12,6 +13,8 @@ import { GridCanvasService } from '../create-edit/grid-canvas/grid-canvas.servic
 })
 export class HomeComponent {
   @ViewChild('basicModal') basicModal: ElementRef | undefined;
+
+  authenticated : boolean = false;
 
   maps: Map[] = [];
 
@@ -26,9 +29,11 @@ export class HomeComponent {
     private toastr: ToastrService,
     private router: Router,
     private modalService: NgbModal,
+    private keycloakService: KeycloakService,
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.authenticated = await this.keycloakService.isLoggedIn();
     this.gridCanvasService.getMaps().subscribe((maps) => {
       this.maps = maps;
     });
@@ -65,5 +70,13 @@ export class HomeComponent {
 
   checkOutMap(map: Map) {
     this.router.navigate(['createEdit', map.id]);
+  }
+
+  login() {
+    this.keycloakService.login();
+  }
+
+  register() {
+    this.keycloakService.register();
   }
 }
