@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateMapDto {
   @IsString()
@@ -41,4 +41,12 @@ export class CreateMapDto {
     exit: { x: number; y: number; rotation: number };
     across: boolean;
   };
+
+  @IsOptional()
+  @IsNumber()
+  scoreCount: number;
+
+  @IsOptional()
+  @IsArray()
+  sections: number[];
 }

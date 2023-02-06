@@ -13,7 +13,7 @@ export class EvacuationZoneGridCanvas {
     private gridCanvasService: GridCanvasService,
     private toastr: ToastrService,
   ) {
-    this.serverGridsCanvas = new ServiceGridCanvas(gridCanvasComponent, toastr);
+    this.serverGridsCanvas = new ServiceGridCanvas(gridCanvasComponent, this.gridCanvasService, toastr);
   }
 
   addEvacuationZoneAcross(

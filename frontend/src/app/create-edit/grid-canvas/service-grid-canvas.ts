@@ -2,16 +2,19 @@ import {Tile} from "../tile/dto/tile.dto";
 import {GridCanvasComponent, OutsideDrag, TileCount} from "./grid-canvas.component";
 import {ToastrService} from "ngx-toastr";
 import {Obstacle} from "../obstacle/dto/obstacle.dto";
+import { GridCanvasService } from "./grid-canvas.service";
 
 export class ServiceGridCanvas {
   constructor(
     private gridCanvasComponent: GridCanvasComponent,
+    private gridCanvasSercive: GridCanvasService,
     private toastr: ToastrService,
   ) {
   }
 
   calcTotalPoints() {
     let loopCount = 0;
+    let tileCountToCheckpoints: number[] = [];
     let tilePositionList: { layer: number, x: number, y: number }[] = [];
     let checkpointPosition: { layer: number, x: number, y: number }[] = [];
     if (this.gridCanvasComponent.startPosition.x == -1) {
@@ -155,13 +158,20 @@ export class ServiceGridCanvas {
         {
           if (checkpointPos !== undefined)  {
             currentPoints += 5 * tileCount;
+            tileCountToCheckpoints.push(tileCount);
             tileCount = 0;
           }
         }
+      }
     }
-  }
 
     this.gridCanvasComponent.totalPoints = Math.round((currentPoints + (orientation === -1 ? 60 : 0)) * multiplier).toString();
+    let mapInfo = {
+      scoreCount: +this.gridCanvasComponent.totalPoints,
+      sections: tileCountToCheckpoints
+    };
+
+    this.gridCanvasSercive.updateMap(this.gridCanvasComponent.map?.id!, mapInfo).subscribe((response: any) => {});
   }
 
   stopDragForFarAwayMoving() {

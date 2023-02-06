@@ -2,6 +2,8 @@ export interface Map {
   id: string;
   name: string;
   description: string;
+  scoreCount: number;
+  sections: number[];
   createdBy: string;
 
   checkpoints: {

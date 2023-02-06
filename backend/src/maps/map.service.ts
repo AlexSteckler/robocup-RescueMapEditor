@@ -2,8 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateMapDto } from './dto/create-map.dto';
+import { FindMapDto } from './dto/find-map.dto';
 import { FindObstacleInMapDto } from './dto/find-obstacle-in-map.dto';
 import { UpdateEvacuationZoneDto } from './dto/update-evacuationzone.dto';
+import { UpdateMapInfoDto } from './dto/update-map-info.dto';
 import { UpdateObstacleDto } from './dto/update-obstacle.dto';
 import { UpdateTileDto } from './dto/update-tile.dto';
 import { MapDocument } from './map.schema';
@@ -34,6 +36,12 @@ export class MapService {
     } else {
       return this.mapModel.findOne({ _id: id, createdBy: user.sub }).exec();
     }
+  }
+
+  updateMap(id: string, updateMapInfoDto: UpdateMapInfoDto) {
+    return this.mapModel
+      .findByIdAndUpdate(id, updateMapInfoDto, { new: true })
+      .exec();
   }
 
   addTile(updateTileDto: UpdateTileDto, id: string) {

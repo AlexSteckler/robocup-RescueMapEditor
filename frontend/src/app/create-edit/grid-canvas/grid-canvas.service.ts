@@ -29,6 +29,10 @@ export class GridCanvasService {
     return this.httpClient.get<Map>(`${environment.baseUrlV1}/map/${id}`);
   }
 
+  updateMap(id: string, mapInfoDto: any) {
+    return this.httpClient.patch<Map>(`${environment.baseUrlV1}/map/${id}`, mapInfoDto);
+  }
+
   updateTile(
     id: string,
     layer: number,

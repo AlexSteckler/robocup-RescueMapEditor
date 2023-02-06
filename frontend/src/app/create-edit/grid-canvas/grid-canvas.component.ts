@@ -66,7 +66,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     private sanitizer: DomSanitizer
   ) {
     this.evacuationZoneGridCanvas = new EvacuationZoneGridCanvas(this, this.gridCanvasService, this.toastr);
-    this.serviceGridCanvas = new ServiceGridCanvas(this, toastr);
+    this.serviceGridCanvas = new ServiceGridCanvas(this,  this.gridCanvasService, toastr);
     this.tileObstacleServiceGridCanvas = new TileObstacleServiceGridCanvas(this, this.imageService, this.toastr, this.sanitizer);
     this.evacuation = this.evacuationZoneGridCanvas.getEvacuationDto(-1, -1, -1, true);
   }
@@ -111,7 +111,6 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       });
     });
   }
-
 
   buttonLayerChange(isUp: boolean) {
     if (isUp && this.layer < 5) {

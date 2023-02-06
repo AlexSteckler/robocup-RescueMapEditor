@@ -42,6 +42,12 @@ export class Map {
   evacuationZonePosition: Evacuation;
 
   @Prop()
+  scoreCount: number;
+
+  @Prop()
+  sections: number[];
+
+  @Prop()
   createdBy: string;
 }
 
