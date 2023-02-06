@@ -19,7 +19,7 @@ export class ServiceGridCanvas {
       return;
     }
 
-    let currentPoints = 0;
+    let currentPoints = 5;
     let currentPosition = {...this.gridCanvasComponent.startPosition};
 
     let orientation =
@@ -153,7 +153,7 @@ export class ServiceGridCanvas {
           && position.x == tilePositionList[i].x
           && position.y == tilePositionList[i].y);
         {
-          if(checkpointPos !== undefined)  {
+          if (checkpointPos !== undefined)  {
             currentPoints += 5 * tileCount;
             tileCount = 0;
           }
@@ -238,6 +238,7 @@ export class ServiceGridCanvas {
       name: '',
       imageId: '',
       image: undefined,
+      value: 0,
       paths: undefined,
       rotation: 0,
       isPlaceholder: false,

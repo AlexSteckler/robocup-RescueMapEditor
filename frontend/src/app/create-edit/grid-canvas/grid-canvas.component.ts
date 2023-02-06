@@ -356,6 +356,12 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       let colX = Math.floor(centerObstacle.x / 100);
       let rowY = Math.floor(centerObstacle.y / 100);
 
+      if (obstacle.name?.includes('Checkpoint') && this.grids[this.layer][rowY][colX].value && (this.grids[this.layer][rowY][colX].value! > 0)) {
+        obstacle.x -= ($event.distance.x) / scale;
+        obstacle.y -= ($event.distance.y) / scale;
+        this.toastr.info('Checkpoints dürfen sich nicht auf Kachlen mit Wertungselementen befinden')
+      }
+
       let newObstacle = {...obstacle};
       let index = this.obstacles.findIndex((obstacle) => obstacle.id === newObstacle.id);
       this.obstacles[index] = newObstacle;
