@@ -127,7 +127,7 @@
         </button>
 
         <div *ngIf="selectedTile" class="d-flex flex-row justify-content-between">
-          <button class="btn text-danger fs-5" (click)="deleteTile(selectedTile)">
+          <button class="btn text-danger fs-5" (click)="modal.close('delete')">
             <i class="bi bi-trash3-fill"></i>
           </button>
           <button class="btn button-link p-1" [class.disabled]="!name" (click)="modal.close()">

@@ -164,56 +164,55 @@ export class CreateTileComponent {
 
     this.modalService.open(this.basicModal, {centered: true}).result
     .then((result) => {
-      let tileDto = {
-        name: this.name,
-        value: this.value,
-        paths: this.paths,
-        imageId: selectedTile.imageId
-      }
+      if (result == 'delete') {
+        this.tilesService.deleteTile(selectedTile.id!).subscribe(() => {
+          this.tiles = this.tiles.filter((tile) => tile.id != selectedTile.id);
+          this.toastr.success('Kachel wurde gelöscht');
+        });
+      } else {
 
-      if (this.toUpload) {
-        this.imageService.uploadImage(this.toUpload).subscribe((image) => {
-
-          tileDto.imageId = image.id;
-
-          this.tilesService.updateTile(selectedTile.id!, tileDto).subscribe((returnTile: Tile) => {
-
-              if (this.toUpload instanceof Blob) {
-                let objectURL = URL.createObjectURL(this.toUpload);
-                returnTile.image = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-              }
-
-              let tileIndex = this.tiles.findIndex((tile) => tile.id == returnTile.id);
-              this.tiles[tileIndex] = returnTile;
-          });
-      });
-    } else {
-      this.tilesService.updateTile(selectedTile.id!, tileDto).subscribe((returnTile: Tile) => {
-        returnTile.image = selectedTile.image;
-
-        if (returnTile.location) {
-          let tileIndex = this.locationTiles.findIndex((tile) => tile.id == returnTile.id);
-           this.locationTiles[tileIndex] = returnTile;
-        } else {
-          let tileIndex = this.tiles.findIndex((tile) => tile.id == returnTile.id);
-          this.tiles[tileIndex] = returnTile;
+        let tileDto = {
+          name: this.name,
+          value: this.value,
+          paths: this.paths,
+          imageId: selectedTile.imageId
         }
-      });
+
+        if (this.toUpload) {
+          this.imageService.uploadImage(this.toUpload).subscribe((image) => {
+
+            tileDto.imageId = image.id;
+
+            this.tilesService.updateTile(selectedTile.id!, tileDto).subscribe((returnTile: Tile) => {
+
+                if (this.toUpload instanceof Blob) {
+                  let objectURL = URL.createObjectURL(this.toUpload);
+                  returnTile.image = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+                }
+
+                let tileIndex = this.tiles.findIndex((tile) => tile.id == returnTile.id);
+                this.tiles[tileIndex] = returnTile;
+            });
+        });
+      } else {
+        this.tilesService.updateTile(selectedTile.id!, tileDto).subscribe((returnTile: Tile) => {
+          returnTile.image = selectedTile.image;
+
+          if (returnTile.location) {
+            let tileIndex = this.locationTiles.findIndex((tile) => tile.id == returnTile.id);
+            this.locationTiles[tileIndex] = returnTile;
+          } else {
+            let tileIndex = this.tiles.findIndex((tile) => tile.id == returnTile.id);
+            this.tiles[tileIndex] = returnTile;
+          }
+        });
+      }
+      this.toastr.success('Kachel wurde geupdated');
+
     }
-    this.toastr.success('Kachel wurde geupdated');
   }, (reason) => {
     this.toastr.info('Kachel wurde nicht geupdated');
   });
   }
 
-  //--------------------------------------------------------------------------------
-
-  deleteTile(selectedTile: Tile) {
-    this.tilesService.deleteTile(selectedTile.id!).subscribe(() => {
-      this.tiles = this.tiles.filter((tile) => tile.id != selectedTile.id);
-      this.toastr.success('Kachel wurde gelöscht');
-
-    });
-  this.modalService.dismissAll();
-  }
 }
