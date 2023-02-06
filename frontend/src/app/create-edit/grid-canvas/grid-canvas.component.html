@@ -43,7 +43,7 @@
           (cdkDragEnded)="moveObstacleEnd(obstacle, $event)"
           [cdkDragConstrainPosition]="dragConstrainPoint"
           [obstacle]="obstacle"
-          [ngStyle]="{'top.px': obstacle.y, 'left.px': obstacle.x, 'width.px': obstacle.width, 'height.px': obstacle.height}"
+          [ngStyle]="{'top.px': obstacle.y, 'left.px': obstacle.x, 'width.px': obstacle.width, 'height.px': obstacle.height, 'display': + obstacle.layer == layer ? 'block' : 'none'}"
       >
       </app-obstacle>
   </div>
