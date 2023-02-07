@@ -1,6 +1,9 @@
+import {SafeUrl} from "@angular/platform-browser";
+
 export interface Map {
   id: string;
   name: string;
+  imageId: string;
   description: string;
   scoreCount: number;
   sections: number[];
@@ -38,4 +41,6 @@ export interface Map {
     exit: { x: number; y: number; position: number, layer: number };
     across: boolean;
   };
+
+  image?: SafeUrl | undefined;
 }

@@ -5,6 +5,8 @@ import { KeycloakService } from 'keycloak-angular';
 import { ToastrService } from 'ngx-toastr';
 import { Map } from '../create-edit/dto/map.dto';
 import { GridCanvasService } from '../create-edit/grid-canvas/grid-canvas.service';
+import {ImageService} from "../shared/image.service";
+import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-home',
@@ -30,12 +32,20 @@ export class HomeComponent {
     private router: Router,
     private modalService: NgbModal,
     private keycloakService: KeycloakService,
+    private imageService: ImageService,
+    private sanitizer: DomSanitizer
   ) {}
 
   async ngOnInit() {
     this.authenticated = await this.keycloakService.isLoggedIn();
     this.gridCanvasService.getMaps().subscribe((maps) => {
       this.maps = maps;
+      maps.forEach((map) => {
+        this.imageService.getImg(map.imageId).subscribe((image) => {
+          let objectURL = URL.createObjectURL(image);
+          map.image = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+        })
+      })
     });
   }
 

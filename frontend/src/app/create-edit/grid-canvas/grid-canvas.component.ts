@@ -377,12 +377,4 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     this.serviceGridCanvas.calcTotalPoints();
     this.panzoomCanvas.resume();
   }
-
-  screenshot() {
-    this.imageService.screenshot(this.map!.id)
-      .subscribe((blob) => {
-      const url = window.URL.createObjectURL(blob);
-      window.open(url);
-    });
-  }
 }

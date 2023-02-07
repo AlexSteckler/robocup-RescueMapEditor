@@ -26,7 +26,8 @@ import { NotFound } from '../../util/not-found.decorator';
 export class ImageControllerV1 {
   private logger = new Logger(ImageControllerV1.name);
 
-  constructor(private imageService: ImageService) {}
+  constructor(private imageService: ImageService) {
+  }
 
   @Post()
   @UseInterceptors(FileInterceptor('image'))

@@ -30,7 +30,7 @@
         <div class="row d-flex align-items-center flex-row">
           <div *ngFor="let map of maps" class="col-4 p-2">
             <div class="card-color rounded">
-              <img (click)="checkOutMap(map)"  class="w-100 p-2 cursor-pointer" src="https://picsum.photos/200/200" alt="" />
+              <img (click)="checkOutMap(map)"  class="w-100 p-2 cursor-pointer" [src]="map.image" alt="" />
               <div class="d-flex flex-column justify-content-center">
                 <div (click)="checkOutMap(map)" class="d-flex justify-content-center p-2 text-white fs-5 fw-bold">
                   <span class="cursor-pointer">{{ map.name }}</span>
