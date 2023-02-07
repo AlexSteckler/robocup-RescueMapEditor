@@ -1,7 +1,6 @@
 <div style="margin-top: -60px; padding: 5px">
-  <h5 style="position: absolute; z-index: 10; box-shadow: #212529" class="ps-1 base-color">Max Punkte: {{map?.scoreCount}}</h5>
-  <div *ngFor="let row of grid; let rowCount = index" class="row d-flex flex-nowrap">
-    <app-tile *ngFor="let tile of row; let colCount = index"
+  <div *ngFor="let row of grid;" class="row d-flex flex-nowrap">
+    <app-tile *ngFor="let tile of row"
               [class.white]="tile.id"
               [tile]="tile">
     </app-tile>

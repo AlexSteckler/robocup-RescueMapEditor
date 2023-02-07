@@ -48,29 +48,41 @@ export class ImageService {
                 _id: new ObjectId(id),
             })
             .tryNext();
-        if (doc == null) {
-            await this.fileModel.delete(doc._id);
-        }
+        await this.fileModel.delete(doc._id);
         return doc;
     }
 
     async updateImage(id: string, imageBuffer: any) {
-        let file = await this.connection.db
-            .collection('fs.files').updateOne({}, {
-                _id: new ObjectId(),
-                filename: "test.png",
-                contentType: 'image/png',
+        await this.connection.db.collection('fs.files').updateOne({
+            _id: new ObjectId(id),
+        }, {
+            $set: {
                 length: imageBuffer.length,
                 chunkSize: 261120,
                 uploadDate: new Date(),
+                filename: "map_" + id + ".png",
+                contentType: 'image/png',
+            }
+        }, {
+            upsert: true,
+        });
+        await this.connection.db.collection('fs.chunks').updateOne({
+                files_id: new ObjectId(id),
+            }, {
+                $set: {
+                    data: imageBuffer,
+                }
+            },
+            {
+                upsert: true,
             });
     }
 
-    async createImage(imageBuffer: any) {
+    async createImage(mapId: string, imageBuffer: any) {
         let file = await this.connection.db
             .collection('fs.files').insertOne({
                 _id: new ObjectId(),
-                filename: "test.png",
+                filename: "map_" + mapId + ".png",
                 contentType: 'image/png',
                 length: imageBuffer.length,
                 chunkSize: 261120,

@@ -51,14 +51,15 @@ export class MapsController {
         const content = await page.$("body");
         const imageBuffer = await content.screenshot({omitBackground: true});
 
-        let imageId = await this.imageService.createImage(imageBuffer);
-        if (map.imageId !== undefined) {
-            try {
-                await this.imageService.deleteImage(map.imageId);
-            } catch (e) {
+        if(imageBuffer) {
+            if (map.imageId !== undefined) {
+                await this.imageService.updateImage(map.imageId, imageBuffer);
+            } else {
+                let imageId = await this.imageService.createImage(map.id, imageBuffer);
+                await this.mapService.updateImageId(createImgDto.id, imageId);
             }
         }
-        await this.mapService.updateImageId(createImgDto.id, imageId);
+
 
         await browser.close();
     }
@@ -126,12 +127,14 @@ export class MapsController {
         @AuthenticatedUser() user: any,
     ) {
         let map = await this.mapService.create(user, createMapDto);
+        console.log("Created map");
         this.generatePreviewImage({id: map.id});
         return map;
     }
 
     @Delete(':id')
     async deleteMap(@Param() findMapDto: FindMapDto) {
+        console.log("Delete map");
         let newVar = await this.mapService.deleteMap(findMapDto.id);
         if (newVar.imageId !== undefined) {
             await this.imageService.deleteImage(newVar.imageId);
@@ -144,9 +147,7 @@ export class MapsController {
         @Body() updateMapInfoDto: UpdateMapInfoDto,
         @Param() findMapDto: FindMapDto,
     ) {
-        let newVar = await this.mapService.updateMap(findMapDto.id, updateMapInfoDto);
-        this.generatePreviewImage({id: findMapDto.id});
-        return newVar;
+        return this.mapService.updateMap(findMapDto.id, updateMapInfoDto);
     }
 
     @Patch(':id/tile')
@@ -154,6 +155,7 @@ export class MapsController {
         @Body() updateTileDto: UpdateTileDto,
         @Param() findMapDto: FindMapDto,
     ) {
+        console.log("Update tile");
         await this.mapService.deleteTile(
             findMapDto.id,
             updateTileDto.tilePosition.layer,
@@ -170,6 +172,7 @@ export class MapsController {
         @Body() deleteTileDto: DeleteTileDto,
         @Param() findMapDto: FindMapDto,
     ) {
+        console.log("Delete tile");
         let newVar = await this.mapService.deleteTile(
             findMapDto.id,
             deleteTileDto.layer,
@@ -185,6 +188,7 @@ export class MapsController {
         @Body() updateObstacleDto: UpdateObstacleDto,
         @Param() findMapDto: FindMapDto,
     ) {
+        console.log("Update obstacle");
         await this.mapService.deleteObstacle(findMapDto.id, updateObstacleDto.obstacleId);
         let newVar = await this.mapService.addObstacle(findMapDto.id, updateObstacleDto);
         this.generatePreviewImage({id: findMapDto.id});
@@ -193,6 +197,7 @@ export class MapsController {
 
     @Delete(':mapId/obstacle/:obstacleId')
     async deleteObstacle(@Param() findMapDto: FindObstacleInMapDto) {
+        console.log("Delete obstacle");
         let newVar = await this.mapService.deleteObstacle(findMapDto.mapId, findMapDto.obstacleId);
         this.generatePreviewImage({id: findMapDto.mapId});
         return newVar;
@@ -203,6 +208,7 @@ export class MapsController {
         @Body() updateEvacuationZoneDto: UpdateEvacuationZoneDto,
         @Param() findMapDto: FindMapDto,
     ) {
+        console.log("Update evacuation");
         let newVar = await this.mapService.addEvacuationZone(
             updateEvacuationZoneDto,
             findMapDto.id,
@@ -213,6 +219,7 @@ export class MapsController {
 
     @Delete('evacuation/:id')
     async deleteEvacuation(@Param() findMapDto: FindMapDto) {
+        console.log("Delete evacuation");
         let newVar = await this.mapService.deleteEvacuationZone(findMapDto.id);
         this.generatePreviewImage({id: findMapDto.id});
         return newVar;
