@@ -24,6 +24,8 @@ export class ShowComponent implements OnInit {
   grid: Array<Array<Tile>> = [];
   obstacles: Obstacle[] = [];
 
+  overflowTiles: { tile: Tile, x: number, y: number }[] = [];
+
   constructor(
     private mapService: GridCanvasService,
     private activatedRoute: ActivatedRoute,
@@ -63,7 +65,6 @@ export class ShowComponent implements OnInit {
       }
       await this.loadTile(tilePosition.tileId, tiles);
     }
-    console.log(leftUpperCorner);
     await this.loadObstacle(map.obstaclePosition, obstacles);
     if (map.evacuationZonePosition !== undefined) {
       let x = map.evacuationZonePosition.across ? 4 : 3;
@@ -93,8 +94,7 @@ export class ShowComponent implements OnInit {
       let rowArray = [];
       for (let col = 0; col <= rightLowerCorner.x - leftUpperCorner.x; col++) {
         let tile = map.tilePosition.find((tilePosition) =>
-          tilePosition.row === row + leftUpperCorner.y && tilePosition.column === col + leftUpperCorner.x && tilePosition.layer === 0
-        );
+          tilePosition.row === row + leftUpperCorner.y && tilePosition.column === col + leftUpperCorner.x && tilePosition.layer <= 1);
         try {
           let completeTile = tiles.find((searchedTile) => searchedTile.id === tile!.tileId);
           rowArray.push({...completeTile!, rotation: tile!.rotation});
@@ -104,6 +104,25 @@ export class ShowComponent implements OnInit {
       }
       this.grid.push(rowArray);
     }
+
+    map.tilePosition.filter((tilePosition) => tilePosition.layer > 1).forEach((tilePosition) => {
+      let completeTile = tiles.find((searchedTile) => searchedTile.id === tilePosition!.tileId);
+      let tile = this.grid[tilePosition.row - leftUpperCorner.y][tilePosition.column - leftUpperCorner.x];
+      if (tile === undefined || !tile.name) {
+        this.grid[tilePosition.row - leftUpperCorner.y][tilePosition.column - leftUpperCorner.x] = {
+          ...completeTile!,
+          rotation: tilePosition!.rotation
+        }
+      } else {
+        this.overflowTiles.push({
+          tile: {
+            ...completeTile!, rotation: tilePosition!.rotation, isPlaceholder: false
+          },
+          x: tilePosition.column - leftUpperCorner.x,
+          y: tilePosition.row - leftUpperCorner.y
+        });
+      }
+    });
   }
 
   private drawEvacuationZone(evacuationZonePosition: Evacuation, leftUpperCorner: { x: number; y: number }, rightLowerCorner: { x: number; y: number }) {
@@ -161,22 +180,21 @@ export class ShowComponent implements OnInit {
   }
 
   private drawObstacles(obstacles: any[], obstaclesOriginal: Obstacle[], leftUpperCorner: { x: number; y: number }, rightLowerCorner: { x: number; y: number }) {
-    console.log(leftUpperCorner, rightLowerCorner);
     obstacles.forEach((obstacle) => {
-      console.log(obstacle)
       let obstacleOriginal = obstaclesOriginal.find((obstacleOriginal) => obstacleOriginal.imageId === obstacle.imageId);
       if (
         obstacleOriginal !== undefined
         && (obstacle.x - (leftUpperCorner.x * 100) + obstacle.width) > 0
         && (obstacle.y - (leftUpperCorner.y * 100) + obstacle.height) > 0
-        && (obstacle.x - (leftUpperCorner.x * 100) - obstacle.width) < (rightLowerCorner.x - leftUpperCorner.x + 1) * 100
+        && (obstacle.x) < (rightLowerCorner.x + 1) * 100
+        && (obstacle.y) < (rightLowerCorner.y + 1) * 100
       ) {
         this.obstacles.push({
           id: obstacle.obstacleId,
           imageId: obstacleOriginal.imageId,
           layer: obstacle.layer,
-          x: obstacle.x - (leftUpperCorner.x * 100),
-          y: obstacle.y - (leftUpperCorner.y * 100) + 60,
+          x: obstacle.x - (leftUpperCorner.x * 100) + 5,
+          y: obstacle.y - (leftUpperCorner.y * 100) + 5,
           rotation: obstacle.rotation,
           width: obstacle.width,
           height: obstacle.height,
@@ -188,7 +206,6 @@ export class ShowComponent implements OnInit {
 
   private async loadObstacle(obstaclePosition: { obstacleId: string; imageId: string; layer: number; x: number; y: number; rotation: number; width: number; height: number; name: string }[], obstacles: Obstacle[]) {
     for (let obstacle of obstaclePosition) {
-      console.log(obstacle)
       let obstacleData = obstacles.find((obstacleData) => obstacleData.imageId === obstacle.imageId);
       if (obstacleData !== undefined) {
         let image = await firstValueFrom(this.imageService.getImg(obstacle.imageId));
