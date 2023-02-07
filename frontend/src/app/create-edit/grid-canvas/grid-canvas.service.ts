@@ -114,4 +114,7 @@ export class GridCanvasService {
   }
 
 
+  getSize(id: string): Observable<any> {
+    return this.httpClient.get(`${environment.baseUrlV1}/map/${id}/size`);
+  }
 }

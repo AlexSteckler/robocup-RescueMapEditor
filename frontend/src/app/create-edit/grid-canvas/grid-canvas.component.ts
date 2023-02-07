@@ -379,33 +379,8 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   screenshot() {
-    let leftUpperCorner = {x: TileCount, y: TileCount};
-    let rightLowerCorner = {x: 0, y: 0};
-    this.map?.tilePosition.forEach((tilePosition) => {
-      if (tilePosition.column < leftUpperCorner.x) {
-        leftUpperCorner.x = tilePosition.column;
-      }
-      if (tilePosition.row < leftUpperCorner.y) {
-        leftUpperCorner.y = tilePosition.row;
-      }
-      if (tilePosition.column > rightLowerCorner.x) {
-        rightLowerCorner.x = tilePosition.column;
-      }
-      if (tilePosition.row > rightLowerCorner.y) {
-        rightLowerCorner.y = tilePosition.row;
-      }
-    });
-    if (this.map?.evacuationZonePosition) {
-      if (this.map?.evacuationZonePosition.column < leftUpperCorner.x) leftUpperCorner.x = this.map?.evacuationZonePosition.column;
-      if (this.map?.evacuationZonePosition.row < leftUpperCorner.y) leftUpperCorner.y = this.map?.evacuationZonePosition.row;
-      if ((this.map?.evacuationZonePosition.column + (this.map.evacuationZonePosition.across ? 4 : 3)) > rightLowerCorner.x) rightLowerCorner.x
-        = this.map?.evacuationZonePosition.column + (this.map.evacuationZonePosition.across ? 3 : 2);
-      if (this.map?.evacuationZonePosition.row + (this.map.evacuationZonePosition.across ? 3 : 4) > rightLowerCorner.y) rightLowerCorner.y
-        = this.map?.evacuationZonePosition.row + (this.map.evacuationZonePosition.across ? 2 : 3);
-    }
-    this.imageService.screenshot(this.map!.id,
-      (rightLowerCorner.x - leftUpperCorner.x + 1) * 100,
-      (rightLowerCorner.y - leftUpperCorner.y + 1) * 100 ).subscribe((blob) => {
+    this.imageService.screenshot(this.map!.id)
+      .subscribe((blob) => {
       const url = window.URL.createObjectURL(blob);
       window.open(url);
     });

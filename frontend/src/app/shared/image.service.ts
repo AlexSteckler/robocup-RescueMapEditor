@@ -22,9 +22,9 @@ export class ImageService {
     return this.httpClient.post<Image>(`${environment.baseUrlV1}/tile/image`, formData);
   }
 
-  screenshot(id: string, width: number, height: number): Observable<Blob> {
+  screenshot(id: string): Observable<Blob> {
     return this.httpClient.patch(`http://localhost:3002/api/v1/map/pdf`,
-      {id, width, height},
+      {id},
       {responseType: 'blob'});
   }
 }

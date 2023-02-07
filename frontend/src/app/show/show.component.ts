@@ -48,40 +48,13 @@ export class ShowComponent implements OnInit {
     this.map = map;
     let tiles = await firstValueFrom(this.tilesService.getTiles());
     let obstacles = await firstValueFrom(this.obstacleService.getObstacles());
-    let leftUpperCorner: { x: number, y: number } = {x: 30, y: 30};
-    let rightLowerCorner: { x: number, y: number } = {x: 0, y: 0};
+    let size = await firstValueFrom(this.mapService.getSize(map.id));
+    let leftUpperCorner: { x: number, y: number } = size.leftUpperCorner;
+    let rightLowerCorner: { x: number, y: number } = size.rightLowerCorner;
     for (const tilePosition of map.tilePosition) {
-      if (tilePosition.column < leftUpperCorner.x) {
-        leftUpperCorner.x = tilePosition.column;
-      }
-      if (tilePosition.row < leftUpperCorner.y) {
-        leftUpperCorner.y = tilePosition.row;
-      }
-      if (tilePosition.column > rightLowerCorner.x) {
-        rightLowerCorner.x = tilePosition.column;
-      }
-      if (tilePosition.row > rightLowerCorner.y) {
-        rightLowerCorner.y = tilePosition.row;
-      }
       await this.loadTile(tilePosition.tileId, tiles);
     }
     await this.loadObstacle(map.obstaclePosition, obstacles);
-    if (map.evacuationZonePosition !== undefined) {
-      let x = map.evacuationZonePosition.across ? 4 : 3;
-      let y = map.evacuationZonePosition.across ? 3 : 4;
-      if (map.evacuationZonePosition.row < leftUpperCorner.y) {
-        leftUpperCorner.y = map.evacuationZonePosition.row;
-      }
-      if (map.evacuationZonePosition.column < leftUpperCorner.x) {
-        leftUpperCorner.x = map.evacuationZonePosition.column;
-      }
-      if (map.evacuationZonePosition.row + y > rightLowerCorner.y) {
-        rightLowerCorner.y = map.evacuationZonePosition.row + y - 1;
-      }
-      if (map.evacuationZonePosition.column + x > rightLowerCorner.x) {
-        rightLowerCorner.x = map.evacuationZonePosition.column + x - 1;
-      }
-    }
     this.drawTiles(rightLowerCorner, leftUpperCorner, map, tiles);
 
     this.drawEvacuationZone(map.evacuationZonePosition, leftUpperCorner, rightLowerCorner);

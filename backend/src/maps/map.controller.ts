@@ -24,6 +24,7 @@ export class MapsController {
     @Patch('pdf')
     async getPdfTest(@Body() createImgDto: CreateImgDto, @Res() res: Response, @AuthenticatedUser() user: any, @Req() req: Request): Promise<any> {
         // Create a browser instance
+        let size = await this.getMapSize(user, createImgDto.id);
         let browser;
         if (!process.env.LOCAL) {
             browser = await puppeteer.launch({
@@ -40,7 +41,7 @@ export class MapsController {
         const page = await browser.newPage();
 
 
-        await page.setViewport({width: createImgDto.width + 10, height: createImgDto.height + 10})
+        await page.setViewport({width: (size.width * 100) + 10, height: (size.height * 100) + 10})
 
         await page.goto(`http://localhost:4401/show/${createImgDto.id}`, {waitUntil: 'networkidle2'});
 
@@ -55,6 +56,47 @@ export class MapsController {
 
 
         await browser.close();
+    }
+
+    @Get(':id/size')
+    @Public()
+    async getSize(@Param() findMapDto: FindMapDto, @AuthenticatedUser() user: any) {
+        return this.getMapSize(user, findMapDto.id);
+    }
+
+    async getMapSize(user, id) {
+        let map = await this.mapService.findOne(user, id);
+
+        let leftUpperCorner = {x: 30, y: 30};
+        let rightLowerCorner = {x: 0, y: 0};
+        map?.tilePosition.forEach((tilePosition) => {
+            if (tilePosition.column < leftUpperCorner.x) {
+                leftUpperCorner.x = tilePosition.column;
+            }
+            if (tilePosition.row < leftUpperCorner.y) {
+                leftUpperCorner.y = tilePosition.row;
+            }
+            if (tilePosition.column > rightLowerCorner.x) {
+                rightLowerCorner.x = tilePosition.column;
+            }
+            if (tilePosition.row > rightLowerCorner.y) {
+                rightLowerCorner.y = tilePosition.row;
+            }
+        });
+        if (map?.evacuationZonePosition) {
+            if (map?.evacuationZonePosition.column < leftUpperCorner.x) leftUpperCorner.x = map?.evacuationZonePosition.column;
+            if (map?.evacuationZonePosition.row < leftUpperCorner.y) leftUpperCorner.y = map?.evacuationZonePosition.row;
+            if ((map?.evacuationZonePosition.column + (map.evacuationZonePosition.across ? 4 : 3)) > rightLowerCorner.x) rightLowerCorner.x
+                = map?.evacuationZonePosition.column + (map.evacuationZonePosition.across ? 3 : 2);
+            if (map?.evacuationZonePosition.row + (map.evacuationZonePosition.across ? 3 : 4) > rightLowerCorner.y) rightLowerCorner.y
+                = map?.evacuationZonePosition.row + (map.evacuationZonePosition.across ? 2 : 3);
+        }
+        return {
+            width: rightLowerCorner.x - leftUpperCorner.x + 1,
+            height: rightLowerCorner.y - leftUpperCorner.y + 1,
+            leftUpperCorner: leftUpperCorner,
+            rightLowerCorner: rightLowerCorner
+        }
     }
 
     @Get(':id')
