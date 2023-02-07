@@ -6,10 +6,9 @@ import {
   Param,
   Post,
   Patch,
-  Delete,
+  Delete, Res, Req,
 } from '@nestjs/common';
-import { AuthenticatedUser } from 'nest-keycloak-connect';
-import { find, map } from 'rxjs';
+import {AuthenticatedUser, Public} from 'nest-keycloak-connect';
 import { NotFound } from '../util/not-found.decorator';
 import { CreateMapDto } from './dto/create-map.dto';
 import { DeleteTileDto } from './dto/delete-tile.dto';
@@ -20,24 +19,65 @@ import { UpdateMapInfoDto } from './dto/update-map-info.dto';
 import { UpdateObstacleDto } from './dto/update-obstacle.dto';
 import { UpdateTileDto } from './dto/update-tile.dto';
 import { MapService } from './map.service';
+import {Response, Request} from "express";
+import puppeteer from "puppeteer";
 
 @Controller({ path: 'map', version: '1' })
 export class MapsController {
   constructor(private readonly mapService: MapService) {}
 
-  @Get()
-  @NotFound()
-  async getAll(@AuthenticatedUser() user: any) {
-    return this.mapService.findAll(user);
+
+  @Get('pdf')
+  async getPdfTest(@Res() res: Response, @AuthenticatedUser() user:any, @Req() req: Request): Promise<any> {
+    console.log("PDF")
+
+    // Create a browser instance
+    let browser;
+    if (!process.env.LOCAL) {
+      browser = await puppeteer.launch({
+        args: ['--no-sandbox'],
+        executablePath: '/usr/bin/google-chrome'
+      });
+    } else {
+      browser = await puppeteer.launch({
+        args: ['--no-sandbox'],
+      });
+    }
+
+    // Create a new page
+    const page = await browser.newPage();
+
+
+    await page.setViewport({width: 1920, height: 1080})
+
+    await page.goto("http://localhost:4401/show/63e18611da193ccc0ea75750", {waitUntil: 'networkidle2'});
+
+    await page.emulateMediaType('screen');
+
+    const content = await page.$("body");
+    const imageBuffer = await content.screenshot({ omitBackground: true });
+
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Disposition', 'attachment; filename=result.png');
+    res.send(imageBuffer);
+
+
+    await browser.close();
   }
 
   @Get(':id')
   @NotFound()
+  @Public()
   async getOne(
     @Param() findMapDto: FindMapDto,
     @AuthenticatedUser() user: any,
   ) {
     return this.mapService.findOne(user, findMapDto.id);
+  }
+  @Get()
+  @NotFound()
+  async getAll(@AuthenticatedUser() user: any) {
+    return this.mapService.findAll(user);
   }
 
   @Post()
@@ -117,4 +157,6 @@ export class MapsController {
   async deleteEvacuation(@Param() findMapDto: FindMapDto) {
     return this.mapService.deleteEvacuationZone(findMapDto.id);
   }
+
+
 }

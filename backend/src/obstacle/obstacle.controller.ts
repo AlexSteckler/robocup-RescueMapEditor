@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
-import { AuthenticatedUser } from 'nest-keycloak-connect';
+import {AuthenticatedUser, Public} from 'nest-keycloak-connect';
 import { CreateObstacleDto } from './dto/createObstacle.dto';
 import { FindObstacleDto } from './dto/findObstacle.dto';
 import { Obstacle } from './obstacle.schema';
@@ -12,6 +12,7 @@ export class ObstacleController {
     constructor(private readonly obstacleService: ObstacleService) {}
 
     @Get()
+    @Public()
     async getAll(
         @AuthenticatedUser() user: any): Promise<Obstacle[]> {
         return this.obstacleService.findAll(user);

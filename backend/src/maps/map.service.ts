@@ -31,11 +31,7 @@ export class MapService {
   }
 
   findOne(user: any, id: string) {
-    if (user.realm_access.roles.includes('admin')) {
       return this.mapModel.findOne({ _id: id }).exec();
-    } else {
-      return this.mapModel.findOne({ _id: id, createdBy: user.sub }).exec();
-    }
   }
 
   updateMap(id: string, updateMapInfoDto: UpdateMapInfoDto) {

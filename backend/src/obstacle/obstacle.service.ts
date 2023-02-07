@@ -14,7 +14,7 @@ export class ObstacleService {
 
     async findAll(user: any): Promise<Obstacle[]> {
 
-        if (user.location) {
+        if ( user !== undefined && user.location) {
             return this.obstacleModel.find({
                 $or: [
                     {location: user.location},

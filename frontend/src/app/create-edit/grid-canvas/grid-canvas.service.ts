@@ -112,4 +112,9 @@ export class GridCanvasService {
       `${environment.baseUrlV1}/map/evacuation/${id}`
     );
   }
+
+  screenshot(id: string): Observable<Blob> {
+    return this.httpClient.get(`http://localhost:3002/api/v1/map/pdf`, {responseType: 'blob'});
+  }
+
 }

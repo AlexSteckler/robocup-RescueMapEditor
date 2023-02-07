@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Controller } from '@nestjs/common';
-import { AuthenticatedUser } from 'nest-keycloak-connect';
+import {AuthenticatedUser, Public} from 'nest-keycloak-connect';
 import { Body, Get, Param } from '@nestjs/common/decorators';
 import { Delete, Patch, Post } from '@nestjs/common/decorators/http/request-mapping.decorator';
 import { NotFound } from '../util/not-found.decorator';
@@ -16,6 +16,7 @@ export class TilesController {
     
     @Get()
     @NotFound()
+    @Public()
     async getAll(
         @AuthenticatedUser() user: any) : Promise<Tile[]>  {
         return this.tileService.findAll(user);
