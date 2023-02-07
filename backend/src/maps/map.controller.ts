@@ -53,7 +53,10 @@ export class MapsController {
 
         let imageId = await this.imageService.createImage(imageBuffer);
         if (map.imageId !== undefined) {
-            //await this.imageService.deleteImage(map.imageId);
+            try {
+                await this.imageService.deleteImage(map.imageId);
+            } catch (e) {
+            }
         }
         await this.mapService.updateImageId(createImgDto.id, imageId);
 
