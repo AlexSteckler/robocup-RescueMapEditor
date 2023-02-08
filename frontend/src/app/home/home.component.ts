@@ -7,6 +7,7 @@ import { Map } from '../create-edit/dto/map.dto';
 import { GridCanvasService } from '../create-edit/grid-canvas/grid-canvas.service';
 import {ImageService} from "../shared/image.service";
 import {DomSanitizer} from "@angular/platform-browser";
+import {SendFileToUser} from "../shared/sendFileToUser";
 
 @Component({
   selector: 'app-home',
@@ -33,7 +34,7 @@ export class HomeComponent {
     private modalService: NgbModal,
     private keycloakService: KeycloakService,
     private imageService: ImageService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {}
 
   async ngOnInit() {
@@ -90,5 +91,11 @@ export class HomeComponent {
 
   register() {
     this.keycloakService.register();
+  }
+
+  async sendMap(map: Map) {
+    this.imageService.getImg(map.imageId).subscribe((image) => {
+      SendFileToUser.send(image, map.name + '.png');
+    })
   }
 }
