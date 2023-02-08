@@ -89,6 +89,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     this.panzoomCanvas = panzoom(this.canvasElement!.nativeElement, {
       maxZoom: 2,
       minZoom: 0.5,
+      zoomDoubleClickSpeed: 1,
     });
 
     this.panzoomCanvas.setZoomSpeed(0.05);
