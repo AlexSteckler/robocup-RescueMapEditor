@@ -12,7 +12,7 @@ import {ToastrModule, ToastrService} from 'ngx-toastr';
 import {KeycloakAngularModule, KeycloakService} from 'keycloak-angular';
 import {environment} from 'src/environments/environment';
 import {CreateTileComponent} from './settings/create-tile/create-tile.component';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {CreateObstacleComponent} from './settings/create-obstacle/create-obstacle.component';
@@ -66,7 +66,8 @@ function initializeKeycloak(keycloak: KeycloakService) {
     ToastrModule.forRoot(),
     FormsModule,
     MatExpansionModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    ReactiveFormsModule
   ]
 })
 export class AppModule {

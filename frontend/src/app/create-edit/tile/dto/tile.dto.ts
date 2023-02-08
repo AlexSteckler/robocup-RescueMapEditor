@@ -16,4 +16,6 @@ export interface Tile {
    isPlaceholder?: boolean;
 
    location?: string;
+
+   disciplines?: string[];
 }

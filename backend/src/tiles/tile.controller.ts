@@ -8,6 +8,7 @@ import { CreateTileDto } from './dto/create-tile.dto';
 import { Tile } from './tile.schema';
 import { FindTileDto } from './dto/find-tile.dto';
 import { TileService } from './tile.service';
+import { FindTileByDisciplineDto } from './dto/find-tile-by-discipline.dto';
 
 @Controller({path:'tile', version: '1'})
 export class TilesController {
@@ -39,5 +40,12 @@ export class TilesController {
     @Delete(':id')
     async deleteTile(@Param() findTileDto: FindTileDto) : Promise<Tile> {
         return this.tileService.deleteTile(findTileDto.id);
+    }
+
+    @Get(':discipline')
+    @NotFound()
+    async getTilesByDiscipline(
+        @Param() findTileByDisciplineDto: FindTileByDisciplineDto) : Promise<Tile[]> {
+        return this.tileService.findByDiscipline(findTileByDisciplineDto);
     }
 }

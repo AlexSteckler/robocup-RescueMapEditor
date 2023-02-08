@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateTileDto } from './dto/create-tile.dto';
+import { FindTileByDisciplineDto } from './dto/find-tile-by-discipline.dto';
 import { Tile, TileDocument } from './tile.schema';
 
 @Injectable()
@@ -29,5 +30,10 @@ export class TileService {
 
   async deleteTile(id: string): Promise<Tile> {
     return this.tileModel.findByIdAndDelete(id);
-}
+  }
+
+  findByDiscipline(findTileByDisciplineDto: FindTileByDisciplineDto): Promise<Tile[]> {
+    return this.tileModel.find({disciplines: findTileByDisciplineDto}).exec();
+  }
+
 }
