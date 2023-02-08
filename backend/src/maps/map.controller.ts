@@ -126,10 +126,7 @@ export class MapsController {
         @Body() createMapDto: CreateMapDto,
         @AuthenticatedUser() user: any,
     ) {
-        let map = await this.mapService.create(user, createMapDto);
-        console.log("Created map");
-        this.generatePreviewImage({id: map.id});
-        return map;
+        return  this.mapService.create(user, createMapDto);
     }
 
     @Delete(':id')

@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {KeycloakService} from 'keycloak-angular';
 import {NavigationEnd, Router} from "@angular/router";
+import {GlobalErrorHandler} from "./shared/GlobalErrorHandler";
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-root',
@@ -20,8 +22,10 @@ export class AppComponent implements OnInit {
   constructor(
     private keycloakService: KeycloakService,
     private window: Window,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {
+    GlobalErrorHandler.toastr = toastr;
   }
 
   async ngOnInit() {
