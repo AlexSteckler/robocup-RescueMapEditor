@@ -9,5 +9,6 @@ export const validationSchema = Joi.object({
   KEYCLOAK_SECRET: Joi.string().default('secret'),
   KEYCLOAK_USER: Joi.string().default('admin'),
   KEYCLOAK_PASSWORD: Joi.string().default('KeycloakPassword'),
+  URI: Joi.string().default('https://mapeditor.robocupjunior.de'),
   LOCAL: Joi.boolean().default(false),
 });
