@@ -2,3 +2,11 @@
   border: 3px solid red;
   border-radius: 5px;
 }
+
+@media screen and (min-width: 1200px) {
+
+  .col-xxxl-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+}

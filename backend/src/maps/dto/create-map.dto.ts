@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateMapDto {
   @IsString()
@@ -9,8 +9,7 @@ export class CreateMapDto {
   @IsNotEmpty()
   discipline: string;
 
-  @IsOptional()
-  @IsNotEmpty()
+  @IsMongoId()
   category: string;
 
   @IsOptional()

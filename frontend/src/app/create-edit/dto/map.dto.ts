@@ -4,7 +4,7 @@ export interface Map {
   id: string;
   name: string;
   discipline: string;
-  categorie: string;
+  category: string;
   imageId: string;
   description: string;
   scoreCount: number;
