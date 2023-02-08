@@ -41,10 +41,12 @@ export class HomeComponent {
     this.gridCanvasService.getMaps().subscribe((maps) => {
       this.maps = maps;
       maps.forEach((map) => {
-        this.imageService.getImg(map.imageId).subscribe((image) => {
-          let objectURL = URL.createObjectURL(image);
-          map.image = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-        })
+        if ( map.imageId != undefined) {
+          this.imageService.getImg(map.imageId).subscribe((image) => {
+            let objectURL = URL.createObjectURL(image);
+            map.image = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+          })
+        }
       })
     });
   }
