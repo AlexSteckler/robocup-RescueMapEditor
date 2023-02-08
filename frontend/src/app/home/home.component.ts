@@ -7,6 +7,9 @@ import { Map } from '../create-edit/dto/map.dto';
 import { GridCanvasService } from '../create-edit/grid-canvas/grid-canvas.service';
 import {ImageService} from "../shared/image.service";
 import {DomSanitizer} from "@angular/platform-browser";
+import {SendFileToUser} from "../shared/sendFileToUser";
+import { Category } from './dto/category.dto';
+import { HomeService } from './home.service';
 
 @Component({
   selector: 'app-home',
@@ -18,13 +21,21 @@ export class HomeComponent {
 
   authenticated : boolean = false;
 
-  maps: Map[] = [];
-
   mapName: string = '';
+  selectedDiscipline: string = '';
+  selectedCategory: string = '';
+
+  maps: Map[] = [];
+  disciplines: string[] = ['Line', 'Line Entry'];
+  categories: Category[] = [];
 
   header: string = '';
 
   panelOpenState = true;
+
+  categoryName: string = '';
+  categoryDiscipline: string[] = [];
+  categoryDiscription: string = '';
 
   constructor(
     private gridCanvasService: GridCanvasService,
@@ -33,33 +44,51 @@ export class HomeComponent {
     private modalService: NgbModal,
     private keycloakService: KeycloakService,
     private imageService: ImageService,
-    private sanitizer: DomSanitizer
+    private homeService: HomeService,
+    private sanitizer: DomSanitizer,
   ) {}
 
   async ngOnInit() {
     this.authenticated = await this.keycloakService.isLoggedIn();
-    this.gridCanvasService.getMaps().subscribe((maps) => {
-      this.maps = maps;
-      maps.forEach((map) => {
-        if ( map.imageId != undefined) {
-          this.imageService.getImg(map.imageId).subscribe((image) => {
-            let objectURL = URL.createObjectURL(image);
-            map.image = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-          })
-        }
-      })
+
+    this.homeService.getAllCategorys().subscribe((categories) => {
+      this.categories = categories;
+
+      this.gridCanvasService.getMaps().subscribe((maps) => {
+        this.maps = maps;
+
+        maps.forEach((map) => {
+          if ( map.imageId != undefined) {
+            this.imageService.getImg(map.imageId).subscribe((image) => {
+              let objectURL = URL.createObjectURL(image);
+              map.image = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+            })
+          }
+        })
+      });
     });
   }
 
-  createMap() {
-    if (this.mapName) {
-      this.gridCanvasService.createMap(this.mapName).subscribe((map) => {
+  createMap(category: Category) {
+
+    if (this.mapName && this.selectedDiscipline) {
+      let mapDto = {
+        name: this.mapName,
+        discipline: this.selectedDiscipline,
+        category: category.id,
+      }
+
+      this.gridCanvasService.createMap(mapDto).subscribe((map) => {
         this.maps.push(map);
         this.toastr.success('Map erstellt');
         this.router.navigate(['createEdit', map.id])
       });
     } else {
-      this.toastr.error('Bitte einen Namen eingeben');
+      if (!this.selectedDiscipline) {
+        this.toastr.error('Bitte eine Disziplin auswählen');
+      } else {
+        this.toastr.error('Bitte einen Namen eingeben');
+      }
     }
   }
 
@@ -84,11 +113,30 @@ export class HomeComponent {
     this.router.navigate(['createEdit', map.id]);
   }
 
+  createCategory() {
+    let categoryDto = {
+      name: this.categoryName,
+      discription: this.categoryDiscription,
+      createdBy : this.keycloakService.getUsername(),
+    }
+
+    this.homeService.createCategory(categoryDto).subscribe((category) => {
+      this.categories.push(category);
+      this.toastr.success('Kategorie erstellt');
+    });
+  }
+
   login() {
     this.keycloakService.login();
   }
 
   register() {
     this.keycloakService.register();
+  }
+
+  async sendMap(map: Map) {
+    this.imageService.getImg(map.imageId).subscribe((image) => {
+      SendFileToUser.send(image, map.name + '.png');
+    })
   }
 }

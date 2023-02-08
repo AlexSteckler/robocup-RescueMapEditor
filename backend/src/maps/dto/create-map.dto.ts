@@ -1,9 +1,16 @@
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateMapDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  discipline: string;
+
+  @IsMongoId()
+  category: string;
 
   @IsOptional()
   @IsString()

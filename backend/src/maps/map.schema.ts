@@ -15,6 +15,12 @@ export class Map {
     name: string;
 
     @Prop()
+    category: string;
+
+    @Prop()
+    discipline: string;
+
+    @Prop()
     description: string;
 
     @Prop()
