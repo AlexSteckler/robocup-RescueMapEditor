@@ -19,9 +19,13 @@ export class HomeComponent {
 
   authenticated : boolean = false;
 
-  maps: Map[] = [];
-
   mapName: string = '';
+  selectedDiscipline: string = '';
+  selectedCategorie: string = '';
+
+  maps: Map[] = [];
+  disciplines: string[] = ['Line', 'Line Entry'];
+  categories: string[] = [];
 
   header: string = '';
 
@@ -42,6 +46,11 @@ export class HomeComponent {
     this.gridCanvasService.getMaps().subscribe((maps) => {
       this.maps = maps;
       maps.forEach((map) => {
+        if (map.categorie != undefined) {
+          if (!this.categories.includes(map.categorie)) {
+            this.categories.push(map.categorie);
+          }
+        }
         if ( map.imageId != undefined) {
           this.imageService.getImg(map.imageId).subscribe((image) => {
             let objectURL = URL.createObjectURL(image);
@@ -53,14 +62,24 @@ export class HomeComponent {
   }
 
   createMap() {
-    if (this.mapName) {
-      this.gridCanvasService.createMap(this.mapName).subscribe((map) => {
+    if (this.mapName && this.selectedDiscipline) {
+      let mapDto = {
+        name: this.mapName,
+        discipline: this.selectedDiscipline,
+        categorie: this.selectedCategorie,
+      }
+
+      this.gridCanvasService.createMap(mapDto).subscribe((map) => {
         this.maps.push(map);
         this.toastr.success('Map erstellt');
         this.router.navigate(['createEdit', map.id])
       });
     } else {
-      this.toastr.error('Bitte einen Namen eingeben');
+      if (!this.selectedDiscipline) {
+        this.toastr.error('Bitte eine Disziplin auswählen');
+      } else {
+        this.toastr.error('Bitte einen Namen eingeben');
+      }
     }
   }
 

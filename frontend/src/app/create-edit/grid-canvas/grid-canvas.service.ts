@@ -13,8 +13,8 @@ export class GridCanvasService {
   constructor(private httpClient: HttpClient) {
   }
 
-  createMap(name: string): Observable<Map> {
-    return this.httpClient.post<Map>(`${environment.baseUrlV1}/map`, {name});
+  createMap(mapDto: any): Observable<Map> {
+    return this.httpClient.post<Map>(`${environment.baseUrlV1}/map`, mapDto);
   }
 
   deleteMap(id: string) {

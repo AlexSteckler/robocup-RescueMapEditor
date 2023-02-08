@@ -14,6 +14,7 @@ import {MapService} from './map.service';
 import puppeteer from "puppeteer";
 import {CreateImgDto} from "./dto/create-img.dto";
 import {ImageService} from "../tiles/image/image.service";
+import { FindMapByDisciplineDto } from './dto/find-map-by-discipline.dto';
 
 @Controller({path: 'map', version: '1'})
 export class MapsController {
@@ -119,6 +120,15 @@ export class MapsController {
     @NotFound()
     async getAll(@AuthenticatedUser() user: any) {
         return this.mapService.findAll(user);
+    }
+
+    @Get(':discipline')
+    @NotFound()
+    async getMapByDiscipline(
+        @Body() findMapByDisciplineDto: FindMapByDisciplineDto,
+        @AuthenticatedUser() user: any,
+        ) {
+        return this.mapService.findMapsInDiscipline(user, findMapByDisciplineDto);
     }
 
     @Post()

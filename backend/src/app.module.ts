@@ -14,6 +14,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { TileModule } from './tiles/tile.module';
 import { MapModule } from './maps/map.module';
 import { ObstacleModule } from './obstacle/obstacle.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { ObstacleModule } from './obstacle/obstacle.module';
     TileModule,
     MapModule,
     ObstacleModule,
+    CategoryModule
   ],
   providers: [
     {

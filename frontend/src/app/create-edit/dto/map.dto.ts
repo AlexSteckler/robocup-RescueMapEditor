@@ -3,6 +3,8 @@ import {SafeUrl} from "@angular/platform-browser";
 export interface Map {
   id: string;
   name: string;
+  discipline: string;
+  categorie: string;
   imageId: string;
   description: string;
   scoreCount: number;

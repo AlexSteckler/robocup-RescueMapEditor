@@ -14,15 +14,25 @@
           </mat-panel-description>
         </mat-expansion-panel-header>
         <div class="d-flex justify-content-center p-2 pt-3 flex-row">
-          <input
-            [class.isInvalid]="!mapName"
-            type="text"
-            class="form-control"
-            placeholder="Name"
-            [(ngModel)]="mapName"
-            (keydown.enter)="createMap()"
-          />
-          <button class="col-3 btn base-bg m-1" (click)="createMap()">
+          <div class="w-100 p-1 align-items-center">
+            <label class="text-dark">Name<p style="display:inline; color:red"> *</p></label>
+            <input
+              [class.isInvalid]="!mapName"
+              type="text"
+              class="form-control"
+              placeholder="Name"
+              [(ngModel)]="mapName"
+              (keydown.enter)="createMap()"
+            />
+          </div>
+          <div class="d-flex flex-column justify-content-center ps-2 pe-2">
+            <label class="text-dark">Disziplin<p style="display:inline; color:red"> *</p></label>
+            <select [class.isInvalid]="!selectedDiscipline" class="w-auto" [(ngModel)]="selectedDiscipline">
+              <option value="" selected disabled >- Bitte wählen -</option>
+              <option *ngFor="let discipline of disciplines" value="{{discipline}}">{{discipline}}</option>
+            </select>
+          </div>
+          <button class="col-3 btn base-bg m-1" [class.disabled]="!selectedDiscipline || !mapName" (click)="createMap()">
             <i class="bi bi-plus-circle"></i> <span class="ps-1">Karte erstellen</span>
           </button>
         </div>

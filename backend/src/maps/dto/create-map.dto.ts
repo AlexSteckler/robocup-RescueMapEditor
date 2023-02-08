@@ -5,6 +5,14 @@ export class CreateMapDto {
   @IsNotEmpty()
   name: string;
 
+  @IsString()
+  @IsNotEmpty()
+  discipline: string;
+
+  @IsOptional()
+  @IsNotEmpty()
+  category: string;
+
   @IsOptional()
   @IsString()
   description: string;
