@@ -9,4 +9,5 @@ export const validationSchema = Joi.object({
   KEYCLOAK_SECRET: Joi.string().default('secret'),
   KEYCLOAK_USER: Joi.string().default('admin'),
   KEYCLOAK_PASSWORD: Joi.string().default('KeycloakPassword'),
+  LOCAL: Joi.boolean().default(false),
 });

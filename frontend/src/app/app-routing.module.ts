@@ -32,6 +32,14 @@ const routes: Routes = [
     },
   },
   {
+    path: 'show',
+    loadChildren: () => import('./show/show.module').then((m) => m.ShowModule),
+    canActivate: [AuthGuard],
+    data: {
+      public: true,
+    }
+  },
+  {
     path: '**',
     redirectTo: 'home',
   },

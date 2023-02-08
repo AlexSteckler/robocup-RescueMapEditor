@@ -1,54 +1,57 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 
 class Evacuation {
-  layer: number;
-  row: number;
-  column: number;
-  entry: { x: number; y: number; position: number, layer: number };
-  exit: { x: number; y: number; position: number, layer: number };
-  across: boolean;
-}
-
-@Schema({ timestamps: true })
-export class Map {
-  @Prop()
-  name: string;
-
-  @Prop()
-  description: string;
-
-  @Prop()
-  tilePosition: {
-    tileId: string;
     layer: number;
     row: number;
     column: number;
-    rotation: number;
-  }[];
+    entry: { x: number; y: number; position: number, layer: number };
+    exit: { x: number; y: number; position: number, layer: number };
+    across: boolean;
+}
 
-  @Prop()
-  obstaclePosition: {
-    obstacleId: string;
+@Schema({timestamps: true})
+export class Map {
+    @Prop()
+    name: string;
+
+    @Prop()
+    description: string;
+
+    @Prop()
     imageId: string;
-    layer: number;
-    x: number;
-    y: number;
-    rotation: number;
-    width: number;
-    height: number;
-  }[];
 
-  @Prop(Evacuation)
-  evacuationZonePosition: Evacuation;
+    @Prop()
+    tilePosition: {
+        tileId: string;
+        layer: number;
+        row: number;
+        column: number;
+        rotation: number;
+    }[];
 
-  @Prop()
-  scoreCount: number;
+    @Prop()
+    obstaclePosition: {
+        obstacleId: string;
+        imageId: string;
+        layer: number;
+        x: number;
+        y: number;
+        rotation: number;
+        width: number;
+        height: number;
+    }[];
 
-  @Prop()
-  sections: number[];
+    @Prop(Evacuation)
+    evacuationZonePosition: Evacuation;
 
-  @Prop()
-  createdBy: string;
+    @Prop()
+    scoreCount: number;
+
+    @Prop()
+    sections: number[];
+
+    @Prop()
+    createdBy: string;
 }
 
 export const MapSchema = SchemaFactory.createForClass(Map);

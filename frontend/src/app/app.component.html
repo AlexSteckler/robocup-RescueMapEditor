@@ -1,5 +1,5 @@
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg fixed-top bg-dark text-light p-0">
+<nav class="navbar navbar-expand-lg fixed-top bg-dark text-light p-0" *ngIf="!showMode">
   <div class="container-fluid navbar-brand p-0">
     <a class="text-decoration-none d-flex align-items-center" routerLink="home" >
       <img
@@ -88,7 +88,7 @@
     <router-outlet></router-outlet>
 
 <!--Footer-->
-<footer class="dark-bg mt-auto">
+<footer class="dark-bg mt-auto" *ngIf="!showMode">
   <div
     class="d-flex flex-sm-row flex-column justify-content-center align-items-center"
   >

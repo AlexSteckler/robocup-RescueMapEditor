@@ -10,17 +10,21 @@ import { ObstacleComponent } from './obstacle/obstacle.component';
 
 
 @NgModule({
-  declarations: [
-    TileComponent,
-    CreateEditComponent,
-    GridCanvasComponent,
-    TileSelectionComponent,
-    ObstacleComponent,
-  ],
-  imports: [
-    CommonModule,
-    MatMenuModule,
-    DragDropModule,
-  ]
+    declarations: [
+        TileComponent,
+        CreateEditComponent,
+        GridCanvasComponent,
+        TileSelectionComponent,
+        ObstacleComponent,
+    ],
+    exports: [
+        TileComponent,
+        ObstacleComponent
+    ],
+    imports: [
+        CommonModule,
+        MatMenuModule,
+        DragDropModule,
+    ]
 })
 export class CreateEditModule { }

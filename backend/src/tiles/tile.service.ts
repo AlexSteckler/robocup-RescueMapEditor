@@ -11,8 +11,7 @@ export class TileService {
   constructor(@InjectModel(Tile.name) private tileModel: Model<TileDocument>) {}
 
   async findAll(user: any) : Promise<Tile[]>  {
-    
-    if (user.location) {
+    if (user !== undefined && user.location) {
       return this.tileModel.find({$or: [{location: user.location}, {location: null}]}).exec();
     }
     return this.tileModel.find().exec();

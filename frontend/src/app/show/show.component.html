@@ -1,0 +1,21 @@
+<div style="margin-top: -60px; padding: 5px">
+  <div *ngFor="let row of grid;" class="row d-flex flex-nowrap">
+    <app-tile *ngFor="let tile of row"
+              [class.white]="tile.id"
+              [tile]="tile">
+    </app-tile>
+  </div>
+  <app-tile *ngFor="let tile of overflowTiles"
+            style="position:absolute; background: transparent; opacity: 0.6"
+            [class.white]="tile.tile.id"
+            [tile]="tile.tile"
+            [ngStyle]="{'top.px': tile.y * 100 +5, 'left.px': tile.x * 100+5}">
+  </app-tile>
+
+  <app-obstacle *ngFor="let obstacle of obstacles"
+                style="position:absolute"
+                [obstacle]="obstacle"
+                [ngStyle]="{'top.px': obstacle.y, 'left.px': obstacle.x, 'width.px': obstacle.width, 'height.px': obstacle.height }"
+  >
+  </app-obstacle>
+</div>

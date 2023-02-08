@@ -37,6 +37,7 @@
     "mongoose": "^6.5.4",
     "multer-gridfs-storage": "^5.0.2",
     "nest-keycloak-connect": "^1.9.0",
+    "puppeteer": "^19.4.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
