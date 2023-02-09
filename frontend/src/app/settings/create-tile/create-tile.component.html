@@ -44,7 +44,7 @@
 <!-- Modal -->
 <ng-template #basicModal let-modal>
   <div class="modal-header base-bg">
-    <h4 class="text-white">Kachel hinzufügen</h4>
+    <h4 class="text-white m-0">Kachel hinzufügen</h4>
     <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
   <div class="modal-body bg-dark text-white text-center p-3 pt-0">
@@ -52,11 +52,17 @@
       <div class="d-flex flex-column p-3">
         <div class="row justify-content-between">
           <div class="col-8 d-flex flex-column align-items-start">
-            <span><p class="pe-1" style="display:inline; color:red"> *</p>Name:</span>
+            <div class="d-flex flex-row">
+              <i class="bi bi-info-circle-fill info base-color pe-1" placement="bottom" [ngbTooltip]="'Der Name darf nicht -start- oder -ziel- beinhalten '"></i>
+              <span><p class="pe-1" style="display:inline; color:red"> *</p>Name:</span>
+            </div>
             <input type="text" class="form-control" placeholder="Name" [(ngModel)]="name"/>
           </div>
           <div class="col-3 d-flex flex-column align-items-start">
-            <span>Punktzahl:</span>
+            <div class="d-flex flex-row">
+              <i class="bi bi-info-circle-fill info base-color pe-1" placement="bottom" [ngbTooltip]="'Die 5 Punkte fürs Erreichen einer Kachel sind in der Anwendung bereits kalkuliert.'"></i>
+              <span>Punktzahl:</span>
+            </div>
             <input type="number" class="form-control" placeholder="Value" [(ngModel)]="value"/>
           </div>
         </div>
