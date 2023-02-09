@@ -15,7 +15,7 @@
     </div>
 
     <mat-accordion>
-      <mat-expansion-panel *ngFor="let category of categories" class="mb-2" style="border-radius: 4px !important;">
+      <mat-expansion-panel *ngFor="let category of categories" class="mb-2" style="border-radius: 4px !important;" [expanded]="category.expanded">
         <mat-expansion-panel-header>
           <mat-panel-title>
             <h4 class="base-color p-2 m-0">{{category.name}}</h4>

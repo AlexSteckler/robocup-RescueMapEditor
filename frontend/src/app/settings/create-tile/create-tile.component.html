@@ -5,15 +5,21 @@
   </button>
 </div>
 
-<div *ngIf="locationTiles.length > 0" class="d-flex flex-column">
+<div class="d-flex flex-column">
   <h3 class="text-black">Lokale Kacheln</h3>
-  <div class="d-flex flew-row flex-wrap justify-content-center">
+  <div *ngIf="locationTiles.length > 0" class="d-flex flew-row flex-wrap justify-content-center">
     <div *ngFor="let tile of locationTiles" class="d-flex flex-column p-3 text-black border align-items-center" (click)="updateTile(tile)">
       <img [src]="tile.image" class="img-fluid" style="width: 100px;"/>
       <span class="text-center">{{tile.name}}</span>
     </div>
   </div>
 </div>
+
+<div class="text-center text-dark" *ngIf="locationTiles.length == 0" >
+  -- Keine lokalen Kacheln angelegt. --
+</div>
+
+<hr class="base-color w-100" />
 
 <div class="d-flex flex-column">
   <h3 class="text-black">Globale Kacheln</h3>
@@ -46,7 +52,7 @@
       <div class="d-flex flex-column p-3">
         <div class="row justify-content-between">
           <div class="col-8 d-flex flex-column align-items-start">
-            <span>Name:</span>
+            <span><p class="pe-1" style="display:inline; color:red"> *</p>Name:</span>
             <input type="text" class="form-control" placeholder="Name" [(ngModel)]="name"/>
           </div>
           <div class="col-3 d-flex flex-column align-items-start">
@@ -57,7 +63,7 @@
 
         <section class="d-flex flex-row pt-3" [formGroup]="disciplines">
           <div class="d-flex align-items-center">
-            <span>Disziplin/en:</span>
+            <span><p class="pe-1" style="display:inline; color:red">*</p>Disziplin/en:</span>
           </div>
           <div class="d-flex flex-column align-items-start">
             <mat-checkbox [(ngModel)]="line" value="'Line Entry'" formControlName="line">Line</mat-checkbox>
@@ -68,6 +74,7 @@
 
 
         <div class="input-group d-flex p-3 ps-0 pe-0 text-white">
+          <p class="pe-1" style="display:inline; color:red">*</p>
           <input #fileChooser type="file" class="form-control dark-bg text-white" id="formFile" accept="image/*" (change)="onFileSelected($event); readUrl($event)" />
         </div>
 
@@ -79,7 +86,7 @@
               </div>
               <div class="d-flex flex-column">
                 <span>Oben</span>
-                <img [src]="tileImage" class="img-fluid" style="width: 100%;" style="min-width: 100px; min-height: 100px;"/>
+                <img [src]="tileImage" class="img-fluid bg-white" style="width: 100%;" style="min-width: 100px; min-height: 100px;"/>
                 <span>Unten</span>
               </div>
               <div class="d-flex align-items-center">
@@ -136,7 +143,7 @@
       </div>
 
       <div class="p-3">
-        <button *ngIf="!selectedTile" class="btn btn-primary p-1" [class.disabled]="!toUpload || !name" (click)="modal.close()">
+        <button *ngIf="!selectedTile" class="btn btn-primary p-1" [class.disabled]="!toUpload || !name || name.includes('start') || (!line && !lineEntry)" (click)="modal.close()">
           Erstellen
         </button>
 
@@ -144,7 +151,7 @@
           <button class="btn text-danger fs-5" (click)="modal.close('delete')">
             <i class="bi bi-trash3-fill"></i>
           </button>
-          <button class="btn button-link p-1" [class.disabled]="!name" (click)="modal.close()">
+          <button class="btn button-link p-1" [class.disabled]="!name || name.includes('start') || (!line && !lineEntry) " (click)="modal.close()">
             Update
           </button>
         </div>

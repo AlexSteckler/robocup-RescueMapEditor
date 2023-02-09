@@ -4,17 +4,21 @@
   </button>
 </div>
 
-<hr class="base-color"/>
-
-<div *ngIf="localObstacles.length > 0" class="d-flex flex-column">
+<div class="d-flex flex-column">
   <h3 class="text-black">Lokale Obstacles</h3>
-  <div class="d-flex flew-row flex-wrap justify-content-center">
+  <div *ngIf="localObstacles.length > 0"  class="d-flex flew-row flex-wrap justify-content-center">
     <div *ngFor="let obstacle of localObstacles" class="d-flex flex-column p-3 text-black border align-items-center">
       <img [src]="obstacle.image" class="img-fluid" style="width: 100px;"/>
       <span class="text-center">{{obstacle.name}}</span>
     </div>
   </div>
+
+  <div class="text-center text-dark" *ngIf="localObstacles.length == 0">
+    -- Keine lokalen Hindernisse angelegt. --
+  </div>
 </div>
+
+<hr class="base-color w-100" />
 
 <div class="d-flex flex-column">
   <h3 class="text-black">Globale Obstacles</h3>
@@ -48,7 +52,7 @@
   <div class="modal-body bg-dark text-white text-center p-3 pt-0">
     <div class="row justify-content-between p-3">
       <div class="col-8 d-flex flex-column align-items-start">
-        <span>Name:</span>
+        <span><p class="pe-1" style="display:inline; color:red">*</p>Name:</span>
         <input type="text" class="form-control" placeholder="Name" [(ngModel)]="name"/>
       </div>
       <div class="col-3 d-flex flex-column align-items-start">
@@ -58,6 +62,7 @@
     </div>
 
     <div class="input-group d-flex p-3 text-white">
+      <p class="pe-1" style="display:inline; color:red">*</p>
       <input #fileChooser type="file" class="form-control dark-bg text-white" id="formFile" accept="image/*" (change)="onFileSelected($event); readUrl($event)" />
     </div>
 
@@ -78,7 +83,7 @@
     </div>
 
     <div class="p-3">
-      <button *ngIf="!selectedObstacle" class="btn btn-primary p-1" [class.disabled]="!toUpload || !name" (click)="checkObstacle(modal)">
+      <button *ngIf="!selectedObstacle" class="btn btn-primary p-1" [class.disabled]="!toUpload || !name || name.includes('checkpoint')" (click)="checkObstacle(modal)">
         Erstellen
       </button>
 
@@ -86,7 +91,7 @@
         <button class="btn text-danger fs-5" (click)="deleteObstacle(selectedObstacle)">
           <i class="bi bi-trash3-fill"></i>
         </button>
-        <button class="btn button-link p-1" [class.disabled]="!name" (click)="checkObstacle(modal)">
+        <button class="btn button-link p-1" [class.disabled]="!name || name.includes('checkpoint')" (click)="checkObstacle(modal)">
           Update
         </button>
       </div>

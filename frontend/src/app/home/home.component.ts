@@ -51,22 +51,28 @@ export class HomeComponent {
   async ngOnInit() {
     this.authenticated = await this.keycloakService.isLoggedIn();
 
-    this.homeService.getAllCategorys().subscribe((categories) => {
-      this.categories = categories;
+    if (this.authenticated) {
+      this.homeService.getAllCategorys().subscribe((categories) => {
+        let first = true;
+        categories.forEach((category) => {
+          this.categories.push({...category, expanded: first });
+          first = false;
+        } );
 
-      this.gridCanvasService.getMaps().subscribe((maps) => {
-        this.maps = maps;
+        this.gridCanvasService.getMaps().subscribe((maps) => {
+          this.maps = maps;
 
-        maps.forEach((map) => {
-          if ( map.imageId != undefined) {
-            this.imageService.getImg(map.imageId).subscribe((image) => {
-              let objectURL = URL.createObjectURL(image);
-              map.image = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-            })
-          }
-        })
+          maps.forEach((map) => {
+            if ( map.imageId != undefined) {
+              this.imageService.getImg(map.imageId).subscribe((image) => {
+                let objectURL = URL.createObjectURL(image);
+                map.image = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+              })
+            }
+          })
+        });
       });
-    });
+  }
   }
 
   createMap(category: Category) {
