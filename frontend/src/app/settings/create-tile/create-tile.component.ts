@@ -36,12 +36,12 @@ export class CreateTileComponent {
 
   rampChecked: boolean = false;
 
-  line: boolean = true;
-  lineEntry: boolean = true;
+  line: boolean = false;
+  lineEntry: boolean = false;
 
   disciplines = this._formBuilder.group({
-    line: true,
-    lineEntry: true
+    line: false,
+    lineEntry: false
   });
 
   constructor(
@@ -183,10 +183,8 @@ export class CreateTileComponent {
     this.value = selectedTile.value!;
     this.paths = selectedTile.paths!;
 
-    this.disciplines.setValue({
-      line: selectedTile.disciplines!.includes('line'),
-      lineEntry: selectedTile.disciplines!.includes('line entry')
-    });
+    this.line = selectedTile.disciplines!.includes('line');
+    this.lineEntry = selectedTile.disciplines!.includes('line entry');
 
     this.modalService.open(this.basicModal, {centered: true}).result
     .then((result) => {
@@ -205,6 +203,8 @@ export class CreateTileComponent {
           if (this.disciplines.value.lineEntry) {
             activeDisciplines.push('line entry');
           }
+
+        console.log(activeDisciplines);
 
         let tileDto = {
           name: this.name,

@@ -13,6 +13,7 @@ import {TileObstacleServiceGridCanvas} from "./tile-obstacle-service.grid-canvas
 import {Obstacle} from "../obstacle/dto/obstacle.dto";
 import {ImageService} from 'src/app/shared/image.service';
 import {DomSanitizer} from '@angular/platform-browser';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 export const TileCount = 30;
 export const OutsideDrag = 100;
@@ -25,6 +26,7 @@ export const OutsideDrag = 100;
 export class GridCanvasComponent implements OnInit, AfterViewInit {
   @ViewChild('canvas') canvasElement: ElementRef | undefined;
   @ViewChild('canvas_wrapper') canvasWrapperElement: ElementRef | undefined;
+  @ViewChild('basicModal') basicModal: ElementRef | undefined;
 
   @Output() canvasValuesChange = new EventEmitter<Transform>();
   @Output() currentDraggedTileChange = new EventEmitter<Tile>();
@@ -66,11 +68,12 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     private imageService: ImageService,
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
-    private router: Router
+    private router: Router,
+    private modalService: NgbModal,
   ) {
     this.evacuationZoneGridCanvas = new EvacuationZoneGridCanvas(this, this.gridCanvasService, this.toastr);
     this.serviceGridCanvas = new ServiceGridCanvas(this, this.gridCanvasService, toastr);
-    this.tileObstacleServiceGridCanvas = new TileObstacleServiceGridCanvas(this, this.imageService, this.toastr, this.sanitizer);
+    this.tileObstacleServiceGridCanvas = new TileObstacleServiceGridCanvas(this, this.toastr, modalService, this.gridCanvasService);
     this.evacuation = this.evacuationZoneGridCanvas.getEvacuationDto(-1, -1, -1, true);
   }
 
@@ -85,7 +88,6 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       if (event.key === 'Control') this.controlActive = false;
       if (event.key === 'Delete') this.deleteActive = false;
     });
-
   }
 
   ngAfterViewInit() {
@@ -163,12 +165,35 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         name: this.currentObstacle.name,
       }
 
-      this.obstacles.push((tmpObstacle) as Obstacle);
-      this.gridCanvasService.updateObstacle(
-        this.map!.id,
-        tmpObstacle
-      ).subscribe((map: Map) => this.map = map);
-      this.serviceGridCanvas.calcTotalPoints();
+      let centerObstacle = {x: tmpObstacle.x + tmpObstacle.width! / 2, y: tmpObstacle.y + tmpObstacle.height! / 2};
+
+      //check on which tile ist obstacle in grid
+      let colX = Math.floor(centerObstacle.x / 100);
+      let rowY = Math.floor(centerObstacle.y / 100);
+      console.log();
+
+      if (((this.grids[this.layer][rowY][colX].value
+          && this.grids[this.layer][rowY][colX].value! > 0)
+          || this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
+                            && Math.floor(obstacleFind.y / 100) == rowY
+                            && obstacleFind.name?.includes('Checkpoint')
+                            && tmpObstacle.id != obstacleFind.id) != undefined
+          || tmpObstacle.name?.includes('Checkpoint')
+          && this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
+                            && Math.floor(obstacleFind.y / 100) == rowY
+                            && tmpObstacle.id != obstacleFind.id) != undefined
+      )
+      ) {
+        this.toastr.info('Checkpoints dürfen sich nicht auf Kacheln mit Wertungselementen befinden')
+      } else {
+
+        this.obstacles.push((tmpObstacle) as Obstacle);
+        this.gridCanvasService.updateObstacle(
+          this.map!.id,
+          tmpObstacle
+        ).subscribe((map: Map) => this.map = map);
+        this.serviceGridCanvas.calcTotalPoints();
+      }
       return;
     }
     let tileToPlacedOn = this.grids[layer][rowCount][colCount];
@@ -296,6 +321,8 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
           this.gridCanvasService.deleteTile(this.map!.id, this.layer, rowCount, colCount)
             .subscribe((map: Map) => this.map = map);
+        } else {
+          this.grids[layerCount][rowCount][colCount].rotation! =  (this.grids[layerCount][rowCount][colCount].rotation! - 1) % 4;
         }
       }
     }
@@ -362,10 +389,17 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       let colX = Math.floor(centerObstacle.x / 100);
       let rowY = Math.floor(centerObstacle.y / 100);
 
-      if (obstacle.name?.includes('Checkpoint')
-        && ((this.grids[this.layer][rowY][colX].value
+      if (((this.grids[this.layer][rowY][colX].value
             && this.grids[this.layer][rowY][colX].value! > 0)
-          || this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX && Math.floor(obstacleFind.y / 100) == rowY && obstacle.id != obstacleFind.id) != undefined)
+          || (this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
+                              && Math.floor(obstacleFind.y / 100) == rowY
+                              && obstacleFind.name?.includes('Checkpoint')
+                              && obstacle.id != obstacleFind.id) != undefined)
+          || obstacle.name?.includes('Checkpoint')
+            && (this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
+                              && Math.floor(obstacleFind.y / 100) == rowY
+                              && obstacle.id != obstacleFind.id) != undefined)
+      )
       ) {
         obstacle.x -= ($event.distance.x) / scale;
         obstacle.y -= ($event.distance.y) / scale;

@@ -56,8 +56,8 @@ export class ServiceGridCanvas {
       }
 
       if (currentPosition.x < 0 || currentPosition.y < 0) {
-        this.gridCanvasComponent.totalPoints = 'Pacours führt aus dem Spielfeld';
-        this.toastr.warning('Pacours führt aus dem Spielfeld');
+        this.gridCanvasComponent.totalPoints = 'Weg führt aus dem Spielfeld';
+        this.toastr.warning('Weg führt aus dem Spielfeld');
         orientation = -2;
         continue;
       }

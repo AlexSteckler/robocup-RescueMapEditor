@@ -100,3 +100,17 @@
     </div>
   </mat-menu>
 </div>
+
+<!-- Modal -->
+
+<ng-template #basicModal let-modal>
+  <div class="modal-header base-bg">
+    <h4 class="text-white">Kacheln nicht gefunden</h4>
+  </div>
+  <div class="modal-body bg-dark text-white text-center p-3 pt-0">
+    <div class="pt-3">
+      <p>Es wurden Kacheln gefunden die nicht mehr existieren oder gelöscht wurden. Diese Kacheln werden aus der Karte entfernt.</p>
+      <button type="button" class="btn button-link" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+</ng-template>

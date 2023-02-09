@@ -8,6 +8,7 @@ import { GridCanvasComponent } from './grid-canvas/grid-canvas.component';
 import { TileSelectionComponent } from './tile-selection/tile-selection.component';
 import { ObstacleComponent } from './obstacle/obstacle.component';
 import { ToogleComponent } from '../shared/toogle/toogle.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 
@@ -28,6 +29,7 @@ import { ToogleComponent } from '../shared/toogle/toogle.component';
         CommonModule,
         MatMenuModule,
         DragDropModule,
+        NgbModalModule
     ]
 })
 export class CreateEditModule { }
