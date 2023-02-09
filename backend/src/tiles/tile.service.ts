@@ -29,5 +29,16 @@ export class TileService {
 
   async deleteTile(id: string): Promise<Tile> {
     return this.tileModel.findByIdAndDelete(id);
-}
+  }
+
+  async findTilesByDiscipline(user: any, discipline: string): Promise<Tile[]> {
+    if (user !== undefined && user.location) {
+      return this.tileModel.find({$or: [{location: user.location}, {location: null}], disciplines: { $in: discipline.toLowerCase() }}).exec();
+    }
+    return this.tileModel.find(
+      { 
+        disciplines: { $in: discipline.toLowerCase() }
+      }).exec();
+  }
+
 }

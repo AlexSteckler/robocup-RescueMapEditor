@@ -7,6 +7,7 @@ import {Obstacle} from "../obstacle/dto/obstacle.dto";
 import {ImageService} from 'src/app/shared/image.service';
 import {ObstacleService} from '../obstacle/obstacle.service';
 import {firstValueFrom} from "rxjs";
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -35,27 +36,33 @@ export class TileSelectionComponent implements OnInit {
     private tilesService: TilesService,
     private obstacleService: ObstacleService,
     private imageService: ImageService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private route: ActivatedRoute,
   ) {
   }
 
   async ngOnInit() {
 
-    let loaded = 0;
-    let tiles = await firstValueFrom(this.tilesService.getTiles());
-    let obstacles = await firstValueFrom(this.obstacleService.getObstacles());
-    tiles.forEach((tile: Tile) => {
-      this.imageService.getImg(tile.imageId!).subscribe((blob: Blob) => {
-        let objectURL = URL.createObjectURL(blob);
-        let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-        tile.image = img;
-        tile.rotation = 0;
-        if (++loaded >= tiles.length + obstacles.length) {
-          this.tileObstacleSelectionChange.emit({tiles: this.tiles, obstacles: this.obstacles});
-        }
-        this.tiles.push(tile);
+    this.route.params.subscribe(async (params) => {
+
+      let loaded = 0;
+      let tiles = await firstValueFrom(this.tilesService.getTilesByMapId(params['id']));
+
+      let obstacles = await firstValueFrom(this.obstacleService.getObstacles());
+
+      tiles.forEach((tile: Tile) => {
+        this.imageService.getImg(tile.imageId!).subscribe((blob: Blob) => {
+          let objectURL = URL.createObjectURL(blob);
+          let img = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+          tile.image = img;
+          tile.rotation = 0;
+          if (++loaded >= tiles.length + obstacles.length) {
+            this.tileObstacleSelectionChange.emit({tiles: this.tiles, obstacles: this.obstacles});
+          }
+          this.tiles.push(tile);
+        });
       });
-    });
+
       obstacles.forEach((obstacle: Obstacle) => {
         this.imageService.getImg(obstacle.imageId!).subscribe((blob: Blob) => {
           let objectURL = URL.createObjectURL(blob);
@@ -68,6 +75,8 @@ export class TileSelectionComponent implements OnInit {
           this.obstacles.push(obstacle);
         });
       });
+
+    });
   }
 
   exited() {

@@ -5,6 +5,10 @@ export class CreateTileDto {
   @IsNotEmpty()
   name: string;
 
+  @IsArray()
+  @IsNotEmpty()
+  disciplines: string[];
+
   @IsNumber()
   @IsNotEmpty()
   value: number;

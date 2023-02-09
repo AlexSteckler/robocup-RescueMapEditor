@@ -15,6 +15,9 @@ export class Tile {
   imageId: string;
 
   @Prop()
+  disciplines: string[];
+
+  @Prop()
   location: string;
 }
 

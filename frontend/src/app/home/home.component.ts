@@ -76,6 +76,7 @@ export class HomeComponent {
         name: this.mapName,
         discipline: this.selectedDiscipline,
         category: category.id,
+        isLeftDirection: true,
       }
 
       this.gridCanvasService.createMap(mapDto).subscribe((map) => {

@@ -23,11 +23,11 @@ export class MapsController {
 
 
     @Patch('pdf')
-    async generatePreviewImage(@Body() createImgDto: CreateImgDto): Promise<any> {
+    async generatePreviewImage(@Body() createImgDto: CreateImgDto, @AuthenticatedUser() user: any): Promise<any> {
         console.log("Generating preview image for map " + createImgDto.id)
         // Create a browser instance
-        let size = await this.getMapSize(createImgDto.id);
-        let map = await this.mapService.findOne(createImgDto.id);
+        let size = await this.getMapSize(user, createImgDto.id);
+        let map = await this.mapService.findOnePublic(createImgDto.id);
         let browser;
         if (!process.env.LOCAL) {
             browser = await puppeteer.launch({
@@ -68,11 +68,11 @@ export class MapsController {
     @Get(':id/size')
     @Public()
     async getSize(@Param() findMapDto: FindMapDto, @AuthenticatedUser() user: any) {
-        return this.getMapSize(findMapDto.id);
+        return this.getMapSize(user, findMapDto.id);
     }
 
-    async getMapSize(id) {
-        let map = await this.mapService.findOne(id);
+    async getMapSize(user, id) {
+        let map = await this.mapService.findOnePublic(id);
 
         let leftUpperCorner = {x: 30, y: 30};
         let rightLowerCorner = {x: 0, y: 0};
@@ -108,12 +108,20 @@ export class MapsController {
 
     @Get(':id')
     @NotFound()
-    @Public()
     async getOne(
         @Param() findMapDto: FindMapDto,
         @AuthenticatedUser() user: any,
     ) {
-        return this.mapService.findOne(findMapDto.id);
+        return this.mapService.findOne(user, findMapDto.id);
+    }
+
+    @Get(':id/public')
+    @NotFound()
+    @Public()
+    async getOnePublic(
+        @Param() findMapDto: FindMapDto
+    ) {
+        return this.mapService.findOnePublic(findMapDto.id);
     }
 
     @Get()
@@ -134,7 +142,7 @@ export class MapsController {
     @Post()
     async create(
         @Body() createMapDto: CreateMapDto,
-        @AuthenticatedUser() user: any,
+        @AuthenticatedUser() user: any
     ) {
         return  this.mapService.create(user, createMapDto);
     }
@@ -161,6 +169,7 @@ export class MapsController {
     async updateTile(
         @Body() updateTileDto: UpdateTileDto,
         @Param() findMapDto: FindMapDto,
+        @AuthenticatedUser() user: any
     ) {
         console.log("Update tile");
         await this.mapService.deleteTile(
@@ -170,7 +179,7 @@ export class MapsController {
             updateTileDto.tilePosition.column,
         );
         let newVar = await this.mapService.addTile(updateTileDto, findMapDto.id);
-        this.generatePreviewImage({id: findMapDto.id});
+        this.generatePreviewImage({id: findMapDto.id}, user);
         return newVar;
     }
 
@@ -178,6 +187,7 @@ export class MapsController {
     async deleteTile(
         @Body() deleteTileDto: DeleteTileDto,
         @Param() findMapDto: FindMapDto,
+        @AuthenticatedUser() user: any
     ) {
         console.log("Delete tile");
         let newVar = await this.mapService.deleteTile(
@@ -186,7 +196,7 @@ export class MapsController {
             deleteTileDto.row,
             deleteTileDto.column,
         );
-        this.generatePreviewImage({id: findMapDto.id});
+        this.generatePreviewImage({id: findMapDto.id}, user);
         return newVar;
     }
 
@@ -194,19 +204,20 @@ export class MapsController {
     async updateObstacle(
         @Body() updateObstacleDto: UpdateObstacleDto,
         @Param() findMapDto: FindMapDto,
+        @AuthenticatedUser() user: any
     ) {
         console.log("Update obstacle");
         await this.mapService.deleteObstacle(findMapDto.id, updateObstacleDto.obstacleId);
         let newVar = await this.mapService.addObstacle(findMapDto.id, updateObstacleDto);
-        this.generatePreviewImage({id: findMapDto.id});
+        this.generatePreviewImage({id: findMapDto.id}, user);
         return newVar;
     }
 
     @Delete(':mapId/obstacle/:obstacleId')
-    async deleteObstacle(@Param() findMapDto: FindObstacleInMapDto) {
+    async deleteObstacle(@Param() findMapDto: FindObstacleInMapDto, @AuthenticatedUser() user: any) {
         console.log("Delete obstacle");
         let newVar = await this.mapService.deleteObstacle(findMapDto.mapId, findMapDto.obstacleId);
-        this.generatePreviewImage({id: findMapDto.mapId});
+        this.generatePreviewImage({id: findMapDto.mapId}, user);
         return newVar;
     }
 
@@ -214,21 +225,22 @@ export class MapsController {
     async updateEvacuation(
         @Body() updateEvacuationZoneDto: UpdateEvacuationZoneDto,
         @Param() findMapDto: FindMapDto,
+        @AuthenticatedUser() user: any
     ) {
         console.log("Update evacuation");
         let newVar = await this.mapService.addEvacuationZone(
             updateEvacuationZoneDto,
             findMapDto.id,
         );
-        this.generatePreviewImage({id: findMapDto.id});
+        this.generatePreviewImage({id: findMapDto.id}, user);
         return newVar;
     }
 
     @Delete('evacuation/:id')
-    async deleteEvacuation(@Param() findMapDto: FindMapDto) {
+    async deleteEvacuation(@Param() findMapDto: FindMapDto, @AuthenticatedUser() user: any) {
         console.log("Delete evacuation");
         let newVar = await this.mapService.deleteEvacuationZone(findMapDto.id);
-        this.generatePreviewImage({id: findMapDto.id});
+        this.generatePreviewImage({id: findMapDto.id}, user);
         return newVar;
     }
 

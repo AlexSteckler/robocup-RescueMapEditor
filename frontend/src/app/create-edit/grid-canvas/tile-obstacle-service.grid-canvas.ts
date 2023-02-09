@@ -4,17 +4,24 @@ import {Tile} from "../tile/dto/tile.dto";
 import {ImageService} from "src/app/shared/image.service";
 import {Obstacle} from "../obstacle/dto/obstacle.dto";
 import {DomSanitizer} from "@angular/platform-browser";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { ElementRef, ViewChild } from "@angular/core";
+import { GridCanvasService } from "./grid-canvas.service";
 
 export class TileObstacleServiceGridCanvas {
   constructor(
     private gridCanvasComponent: GridCanvasComponent,
-    private imageService: ImageService,
     private toastr: ToastrService,
-    private sanitizer: DomSanitizer
+    private modalService: NgbModal,
+    private  gridCanvasService: GridCanvasService,
   ) {
   }
 
+
   loadTile() {
+    let failedTile: boolean = false;
+    let failedTileList: any[] = [];
+
     this.gridCanvasComponent.map!.tilePosition.forEach((tilePosition) => {
       if (tilePosition.layer >= this.gridCanvasComponent.grids.length) {
         for (let i = this.gridCanvasComponent.grids.length; i <= tilePosition.layer; i++) {
@@ -23,7 +30,7 @@ export class TileObstacleServiceGridCanvas {
       }
 
       let tile = {...this.gridCanvasComponent.tileSelection.find((tile) => tile.id === tilePosition.tileId)} as Tile;
-      if (tile != undefined) {
+      if (tile != undefined && tile.name != undefined) {
         if (tile.name.includes('start')) {
           this.gridCanvasComponent.startPosition = {
             layer: tilePosition.layer,
@@ -35,9 +42,20 @@ export class TileObstacleServiceGridCanvas {
         this.gridCanvasComponent.grids[tilePosition.layer][tilePosition.row][tilePosition.column] = tile;
         this.addPlaceholder(tilePosition.layer, tilePosition.row, tilePosition.column, tile);
       } else {
-        this.toastr.error('Tile wurde nicht gefunden');
+        failedTile = true;
+
+        this.gridCanvasService.deleteTile(this.gridCanvasComponent.map!.id, tilePosition.layer, tilePosition.row, tilePosition.column).subscribe(() => {});
       }
     });
+
+    if (failedTile) {
+      this.modalService.open(this.gridCanvasComponent.basicModal, {centered: true}).result
+      .then((result) => {
+        this.toastr.info('Alle fehlerhaften Kacheln wurden entfernt.')
+      } , (reason) => {
+        this.toastr.info('Alle fehlerhaften Kacheln wurden entfernt.')
+      });
+    }
   }
 
   addPlaceholder(
@@ -46,17 +64,18 @@ export class TileObstacleServiceGridCanvas {
     colCount: number,
     tile: Tile
   ) {
+
     if (this.gridCanvasComponent.grids[this.gridCanvasComponent.grids.length + layer] == undefined) {
       this.gridCanvasComponent.serviceGridCanvas.addLayer();
     }
     this.gridCanvasComponent.grids[layer + 1][rowCount][colCount] = {
       ...tile,
-      isPlaceholder: true,
-    };
+      isPlaceholder: true
+     };
     if (layer == 1) {
       this.gridCanvasComponent.grids[layer - 1][rowCount][colCount] = {
         ...tile,
-        isPlaceholder: true,
+        isPlaceholder: true
       };
     }
   }

@@ -12,6 +12,7 @@ import { FindMapByDisciplineDto } from './dto/find-map-by-discipline.dto';
 
 @Injectable()
 export class MapService {
+  
   constructor(@InjectModel(Map.name) private mapModel: Model<MapDocument>) {}
 
   findAll(user: any) {
@@ -47,9 +48,16 @@ export class MapService {
     return this.mapModel.findByIdAndDelete(id).exec();
   }
 
-  findOne(id: string) {
+  findOne(user: any, id: string) {
+    if (!user.realm_access.roles.includes('admin')) {
+      return this.mapModel.findOne({ _id: id, createdBy: user.sub }).exec();
+    }
     return this.mapModel.findOne({ _id: id }).exec();
   }
+
+  findOnePublic(id: string) {
+    return this.mapModel.findOne({ _id: id }).exec();
+  } 
 
   updateMap(id: string, updateMapInfoDto: UpdateMapInfoDto) {
     return this.mapModel

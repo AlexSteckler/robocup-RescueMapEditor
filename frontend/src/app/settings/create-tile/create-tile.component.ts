@@ -6,12 +6,14 @@ import { ToastrService } from 'ngx-toastr';
 import { TilesService } from 'src/app/create-edit/tile/tiles.service';
 import { Tile } from 'src/app/create-edit/tile/dto/tile.dto';
 import { ImageService } from 'src/app/shared/image.service';
+import { FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-create-tile',
   templateUrl: './create-tile.component.html',
   styleUrls: ['./create-tile.component.scss']
 })
+
 
 export class CreateTileComponent {
   @ViewChild('basicModal') basicModal: ElementRef | undefined;
@@ -34,13 +36,22 @@ export class CreateTileComponent {
 
   rampChecked: boolean = false;
 
+  line: boolean = false;
+  lineEntry: boolean = false;
+
+  disciplines = this._formBuilder.group({
+    line: false,
+    lineEntry: false
+  });
+
   constructor(
     private toastr : ToastrService,
     private modalService: NgbModal,
     private tilesService: TilesService,
     private imageService: ImageService,
     private sanitizer: DomSanitizer,
-    private keycloakService: KeycloakService) {}
+    private keycloakService: KeycloakService,
+    private _formBuilder: FormBuilder) {}
 
   //--------------------------------------------------------------------------------
 
@@ -114,6 +125,15 @@ export class CreateTileComponent {
     this.modalService.open(this.basicModal, {centered: true}).result
     .then((result) => {
 
+      let activeDisciplines: string[] = [];
+
+      if (this.disciplines.value.line) {
+        activeDisciplines.push('line');
+      }
+      if (this.disciplines.value.lineEntry) {
+        activeDisciplines.push('lineEntry');
+      }
+
       if(this.toUpload) {
         this.imageService.uploadImage(this.toUpload).subscribe((image) => {
 
@@ -129,7 +149,8 @@ export class CreateTileComponent {
               name: this.name,
               value: this.value,
               paths: this.paths,
-              imageId: image.id
+              imageId: image.id,
+              disciplines: activeDisciplines
             }
 
             this.tilesService.createTile(tileDto).subscribe((resultTile: Tile) => {
@@ -162,6 +183,9 @@ export class CreateTileComponent {
     this.value = selectedTile.value!;
     this.paths = selectedTile.paths!;
 
+    this.line = selectedTile.disciplines!.includes('line');
+    this.lineEntry = selectedTile.disciplines!.includes('line entry');
+
     this.modalService.open(this.basicModal, {centered: true}).result
     .then((result) => {
       if (result == 'delete') {
@@ -171,11 +195,23 @@ export class CreateTileComponent {
         });
       } else {
 
+        let activeDisciplines: string[] = [];
+
+          if (this.disciplines.value.line) {
+            activeDisciplines.push('line');
+          }
+          if (this.disciplines.value.lineEntry) {
+            activeDisciplines.push('line entry');
+          }
+
+        console.log(activeDisciplines);
+
         let tileDto = {
           name: this.name,
           value: this.value,
           paths: this.paths,
-          imageId: selectedTile.imageId
+          imageId: selectedTile.imageId,
+          disciplines : activeDisciplines
         }
 
         if (this.toUpload) {

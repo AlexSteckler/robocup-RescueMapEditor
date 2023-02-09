@@ -8,11 +8,12 @@ import { CreateTileDto } from './dto/create-tile.dto';
 import { Tile } from './tile.schema';
 import { FindTileDto } from './dto/find-tile.dto';
 import { TileService } from './tile.service';
+import { MapService } from 'src/maps/map.service';
 
 @Controller({path:'tile', version: '1'})
 export class TilesController {
 
-    constructor(private readonly tileService: TileService) {}
+    constructor(private readonly tileService: TileService, private readonly mapService: MapService) {}
     
     @Get()
     @NotFound()
@@ -40,4 +41,16 @@ export class TilesController {
     async deleteTile(@Param() findTileDto: FindTileDto) : Promise<Tile> {
         return this.tileService.deleteTile(findTileDto.id);
     }
+
+    @Get('/map/:id')
+    @NotFound()
+    async getTilesByMapId(@AuthenticatedUser() user: any, @Param() findTileByMapId: FindTileDto) : Promise<Tile[]> {
+        let map = await this.mapService.findOne(user, findTileByMapId.id);
+
+        if (!map || map.discipline === undefined || map.discipline === null || map.discipline === '') {
+            return [];
+        } 
+        return this.tileService.findTilesByDiscipline(user, map.discipline);
+    }
+
 }

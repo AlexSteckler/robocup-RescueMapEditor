@@ -1,0 +1,4 @@
+<div class="d-flex flex-column flex-sm-row">
+  <button class="btn btn-toggle btn-left" [class.active]="isLeftSelected" (click)="changeToggle(true)">{{left}}</button>
+  <button class="btn btn-toggle btn-right" [class.active]="!isLeftSelected" (click)="changeToggle(false)">{{right}}</button>
+</div>

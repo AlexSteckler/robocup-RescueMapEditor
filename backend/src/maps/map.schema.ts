@@ -57,6 +57,9 @@ export class Map {
     sections: number[];
 
     @Prop()
+    isLeftDirection: boolean;
+    
+    @Prop()
     createdBy: string;
 }
 
