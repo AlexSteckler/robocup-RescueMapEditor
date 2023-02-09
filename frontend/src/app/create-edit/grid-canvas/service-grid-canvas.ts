@@ -90,7 +90,7 @@ export class ServiceGridCanvas {
         };
         orientation = (this.gridCanvasComponent.evacuation.exit.position + 2) % 4;
 
-        multiplier = 4.3904;
+        multiplier = this.gridCanvasComponent.map?.discipline === 'line entry'? 2.744 : 4.3904;
       } else {
         if (!currentTile.paths) {
           orientation = -6;
