@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import {Body, Controller, Delete, Get, Param, Patch, Post,} from '@nestjs/common';
-import {AuthenticatedUser, Public} from 'nest-keycloak-connect';
+import {AuthenticatedUser, Public, Roles} from 'nest-keycloak-connect';
 import {NotFound} from '../util/not-found.decorator';
 import {CreateMapDto} from './dto/create-map.dto';
 import {DeleteTileDto} from './dto/delete-tile.dto';
@@ -23,6 +23,7 @@ export class MapsController {
 
 
     @Patch('pdf')
+    @Roles({roles: ['realm:admin']})
     async generatePreviewImage(@Body() createImgDto: CreateImgDto, @AuthenticatedUser() user: any): Promise<any> {
         console.log("Generating preview image for map " + createImgDto.id)
         // Create a browser instance
@@ -108,6 +109,7 @@ export class MapsController {
 
     @Get(':id')
     @NotFound()
+    @Roles({roles: ['realm:admin','realm:quali']})
     async getOne(
         @Param() findMapDto: FindMapDto,
         @AuthenticatedUser() user: any,
@@ -126,12 +128,14 @@ export class MapsController {
 
     @Get()
     @NotFound()
+    @Roles({roles: ['realm:admin','realm:quali']})
     async getAll(@AuthenticatedUser() user: any) {
         return this.mapService.findAll(user);
     }
 
     @Get(':discipline')
     @NotFound()
+    @Roles({roles: ['realm:admin','realm:quali']})
     async getMapByDiscipline(
         @Body() findMapByDisciplineDto: FindMapByDisciplineDto,
         @AuthenticatedUser() user: any,
@@ -140,6 +144,7 @@ export class MapsController {
     }
 
     @Post()
+    @Roles({roles: ['realm:admin','realm:quali']})
     async create(
         @Body() createMapDto: CreateMapDto,
         @AuthenticatedUser() user: any
@@ -148,6 +153,7 @@ export class MapsController {
     }
 
     @Delete(':id')
+    @Roles({roles: ['realm:admin','realm:quali']})
     async deleteMap(@Param() findMapDto: FindMapDto) {
         console.log("Delete map");
         let newVar = await this.mapService.deleteMap(findMapDto.id);
@@ -158,6 +164,7 @@ export class MapsController {
     }
 
     @Patch(':id')
+    @Roles({roles: ['realm:admin','realm:quali']})
     async updateMap(
         @Body() updateMapInfoDto: UpdateMapInfoDto,
         @Param() findMapDto: FindMapDto,
@@ -166,6 +173,7 @@ export class MapsController {
     }
 
     @Patch(':id/tile')
+    @Roles({roles: ['realm:admin','realm:quali']})
     async updateTile(
         @Body() updateTileDto: UpdateTileDto,
         @Param() findMapDto: FindMapDto,
@@ -184,6 +192,7 @@ export class MapsController {
     }
 
     @Patch('tile/:id/delete')
+    @Roles({roles: ['realm:admin','realm:quali']})
     async deleteTile(
         @Body() deleteTileDto: DeleteTileDto,
         @Param() findMapDto: FindMapDto,
@@ -201,6 +210,7 @@ export class MapsController {
     }
 
     @Patch(':id/obstacle')
+    @Roles({roles: ['realm:admin','realm:quali']})
     async updateObstacle(
         @Body() updateObstacleDto: UpdateObstacleDto,
         @Param() findMapDto: FindMapDto,
@@ -214,6 +224,7 @@ export class MapsController {
     }
 
     @Delete(':mapId/obstacle/:obstacleId')
+    @Roles({roles: ['realm:admin','realm:quali']})
     async deleteObstacle(@Param() findMapDto: FindObstacleInMapDto, @AuthenticatedUser() user: any) {
         console.log("Delete obstacle");
         let newVar = await this.mapService.deleteObstacle(findMapDto.mapId, findMapDto.obstacleId);
@@ -222,6 +233,7 @@ export class MapsController {
     }
 
     @Patch('evacuation/:id')
+    @Roles({roles: ['realm:admin','realm:quali']})
     async updateEvacuation(
         @Body() updateEvacuationZoneDto: UpdateEvacuationZoneDto,
         @Param() findMapDto: FindMapDto,
@@ -237,6 +249,7 @@ export class MapsController {
     }
 
     @Delete('evacuation/:id')
+    @Roles({roles: ['realm:admin','realm:quali']})
     async deleteEvacuation(@Param() findMapDto: FindMapDto, @AuthenticatedUser() user: any) {
         console.log("Delete evacuation");
         let newVar = await this.mapService.deleteEvacuationZone(findMapDto.id);

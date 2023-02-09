@@ -5,3 +5,32 @@
  .transform {
   transform: rotate(90deg);
  }
+
+ .checked {
+  transition: all 0.1s ease-in-out;
+  background: #212529 !important;
+  color: white;
+}
+
+#obstacleSelection {
+  button {
+    height: 40px;
+    border: 2px solid #212529;
+    border-radius: 5px;
+    background: white;
+    padding: 0px;
+
+    &:hover {
+      background: lightgray;
+    }
+
+    &:focus {
+      outline: none;
+      background: lightgray;
+    }
+
+    &:active {
+      font-weight: bold;
+    }
+  }
+}

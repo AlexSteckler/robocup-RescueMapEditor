@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
-import {AuthenticatedUser, Public} from 'nest-keycloak-connect';
+import {AuthenticatedUser, Public, Roles} from 'nest-keycloak-connect';
 import { CreateObstacleDto } from './dto/createObstacle.dto';
 import { FindObstacleDto } from './dto/findObstacle.dto';
 import { Obstacle } from './obstacle.schema';
@@ -19,6 +19,7 @@ export class ObstacleController {
     }
 
     @Post()
+    @Roles({roles: ['realm:admin','realm:quali']})
     async createObstacle(
         @AuthenticatedUser() user: any,
         @Body() createObstacleDto: CreateObstacleDto): Promise<Obstacle> {
@@ -26,6 +27,7 @@ export class ObstacleController {
     }
 
     @Patch(':id')
+    @Roles({roles: ['realm:admin','realm:quali']})
     async updateObstacle(
         @Body() createObstacleDto: CreateObstacleDto,
         @Param() findObstacleDto: FindObstacleDto
@@ -34,6 +36,7 @@ export class ObstacleController {
     }
 
     @Delete(':id')
+    @Roles({roles: ['realm:admin','realm:quali']})
     async deleteObstacle(
         @Param() findObstacleDto: FindObstacleDto): Promise<Obstacle> {
         return this.obstacleService.deleteObstacle(findObstacleDto.id);

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
-import { AuthenticatedUser, Public } from 'nest-keycloak-connect';
+import { AuthenticatedUser, Public, Roles } from 'nest-keycloak-connect';
 import { Category } from './category.schema';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/createCategory.dto';
@@ -19,6 +19,7 @@ export class CategoryController {
     }
 
     @Post()
+    @Roles({roles: ['realm:admin','realm:quali']})
     async createCategory(
         @AuthenticatedUser() user: any,
         @Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
@@ -26,6 +27,7 @@ export class CategoryController {
     }
 
     @Patch(':id')
+    @Roles({roles: ['realm:admin','realm:quali']})
     async updateCategory(
         @Body() createCategoryDto: CreateCategoryDto,
         @Param() findCategoryDto: FindCategoryDto
@@ -34,6 +36,7 @@ export class CategoryController {
     }
 
     @Delete(':id')
+    @Roles({roles: ['realm:admin','realm:quali']})
     async deleteCategory(
         @Param() findCategoryDto: FindCategoryDto): Promise<Category> {
         return this.categoryService.deleteCategory(findCategoryDto.id);
