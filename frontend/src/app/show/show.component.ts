@@ -26,6 +26,8 @@ export class ShowComponent implements OnInit {
 
   overflowTiles: { tile: Tile, x: number, y: number }[] = [];
 
+  startTileLayer: number = 0;
+
   constructor(
     private mapService: GridCanvasService,
     private activatedRoute: ActivatedRoute,
@@ -70,6 +72,9 @@ export class ShowComponent implements OnInit {
           tilePosition.row === row + leftUpperCorner.y && tilePosition.column === col + leftUpperCorner.x && tilePosition.layer <= 1);
         try {
           let completeTile = tiles.find((searchedTile) => searchedTile.id === tile!.tileId);
+          if(completeTile?.name === 'start') {
+            this.startTileLayer = map.tilePosition.find((tilePosition) => tilePosition.tileId === tile!.tileId)?.layer || 0
+          }
           rowArray.push({...completeTile!, rotation: tile!.rotation});
         } catch (e) {
           rowArray.push({name: '', id: '0', border: ['', '', '', '']});
@@ -80,8 +85,12 @@ export class ShowComponent implements OnInit {
 
     map.tilePosition.filter((tilePosition) => tilePosition.layer > 1).forEach((tilePosition) => {
       let completeTile = tiles.find((searchedTile) => searchedTile.id === tilePosition!.tileId);
+      if(completeTile?.name === 'start') {
+        this.startTileLayer = tilePosition.layer;
+      }
       let tile = this.grid[tilePosition.row - leftUpperCorner.y][tilePosition.column - leftUpperCorner.x];
       if (tile === undefined || !tile.name) {
+
         this.grid[tilePosition.row - leftUpperCorner.y][tilePosition.column - leftUpperCorner.x] = {
           ...completeTile!,
           rotation: tilePosition!.rotation
