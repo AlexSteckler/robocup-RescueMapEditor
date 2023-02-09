@@ -52,7 +52,7 @@
       <div class="d-flex flex-column p-3">
         <div class="row justify-content-between">
           <div class="col-8 d-flex flex-column align-items-start">
-            <span>Name:</span>
+            <span><p class="pe-1" style="display:inline; color:red"> *</p>Name:</span>
             <input type="text" class="form-control" placeholder="Name" [(ngModel)]="name"/>
           </div>
           <div class="col-3 d-flex flex-column align-items-start">
@@ -63,7 +63,7 @@
 
         <section class="d-flex flex-row pt-3" [formGroup]="disciplines">
           <div class="d-flex align-items-center">
-            <span>Disziplin/en:</span>
+            <span><p class="pe-1" style="display:inline; color:red">*</p>Disziplin/en:</span>
           </div>
           <div class="d-flex flex-column align-items-start">
             <mat-checkbox [(ngModel)]="line" value="'Line Entry'" formControlName="line">Line</mat-checkbox>
@@ -74,6 +74,7 @@
 
 
         <div class="input-group d-flex p-3 ps-0 pe-0 text-white">
+          <p class="pe-1" style="display:inline; color:red">*</p>
           <input #fileChooser type="file" class="form-control dark-bg text-white" id="formFile" accept="image/*" (change)="onFileSelected($event); readUrl($event)" />
         </div>
 
@@ -142,7 +143,7 @@
       </div>
 
       <div class="p-3">
-        <button *ngIf="!selectedTile" class="btn btn-primary p-1" [class.disabled]="!toUpload || !name" (click)="modal.close()">
+        <button *ngIf="!selectedTile" class="btn btn-primary p-1" [class.disabled]="!toUpload || !name || name.includes('start') || (!line && !lineEntry)" (click)="modal.close()">
           Erstellen
         </button>
 
@@ -150,7 +151,7 @@
           <button class="btn text-danger fs-5" (click)="modal.close('delete')">
             <i class="bi bi-trash3-fill"></i>
           </button>
-          <button class="btn button-link p-1" [class.disabled]="!name" (click)="modal.close()">
+          <button class="btn button-link p-1" [class.disabled]="!name || name.includes('start') || (!line && !lineEntry) " (click)="modal.close()">
             Update
           </button>
         </div>
