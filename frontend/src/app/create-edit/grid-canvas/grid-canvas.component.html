@@ -26,6 +26,7 @@
                     [tile]="tile"
                     [cdkDragDisabled]="tile.id == '0' || tile.isPlaceholder"
                     [isCurrentlyDraggedTile]="currentDraggedTile === tile"
+                    [currentDiscipline]="map?.discipline || ''"
 
                     (contextmenu)="$event.preventDefault();"
                     (evacuationZoneChange)="evacuationZoneGridCanvas.evacuationZoneChange($event)"

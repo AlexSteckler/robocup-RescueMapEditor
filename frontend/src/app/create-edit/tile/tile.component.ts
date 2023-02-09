@@ -29,6 +29,7 @@ export class TileComponent implements OnInit{
   @Input() evacuationZone : Evacuation | undefined ;
   @Input() position : {x: number, y: number, layer: number} | undefined;
   @Input() isCurrentlyDraggedTile: Boolean = false;
+  @Input() currentDiscipline: string = '';
 
   @Output() evacuationZoneChange : EventEmitter<Evacuation> = new EventEmitter<Evacuation>();
   @Output() tileChange : EventEmitter<Tile> = new EventEmitter<Tile>();
@@ -58,7 +59,7 @@ export class TileComponent implements OnInit{
         this.tile!.border![index] = 'black';
         this.evacuationZone.entry = {x: -1, y : -1, position: -1, layer: -1};
       }
-      else if (this.tile!.border![index] == EXITCOLOR) {
+      else if (this.tile!.border![index] == EXITCOLOR && this.currentDiscipline.toLowerCase() != 'line entry') {
         this.tile!.border![index] = 'black';
         this.evacuationZone.exit = {x: -1, y : -1, position: -1, layer: -1};
       }
@@ -67,7 +68,7 @@ export class TileComponent implements OnInit{
         this.tile!.border![index] = ENTRANCECOLOR;
         this.evacuationZone.entry = {x: this.position.x, y : this.position.y, position: index, layer: this.position.layer};
         }
-        else if (this.evacuationZone!.exit == undefined || this.evacuationZone!.exit.x == -1) {
+        else if (this.evacuationZone!.exit == undefined || this.evacuationZone!.exit.x == -1  && this.currentDiscipline.toLowerCase() != 'line entry') {
           this.tile!.border![index] =  EXITCOLOR;
           this.evacuationZone.exit = {x: this.position.x, y : this.position.y, position: index, layer: this.position.layer};
         }

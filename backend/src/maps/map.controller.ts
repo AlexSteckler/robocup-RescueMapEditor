@@ -28,7 +28,6 @@ export class MapsController {
         // Create a browser instance
         let size = await this.getMapSize(user, createImgDto.id);
         let map = await this.mapService.findOnePublic(createImgDto.id);
-        console.log(size, map);
         let browser;
         if (!process.env.LOCAL) {
             browser = await puppeteer.launch({

@@ -78,7 +78,7 @@ export class ServiceGridCanvas {
           orientation = -4;
           continue;
         }
-        if (this.gridCanvasComponent.evacuation.exit == undefined || this.gridCanvasComponent.evacuation.exit.x == -1) {
+        if ((this.gridCanvasComponent.evacuation.exit == undefined || this.gridCanvasComponent.evacuation.exit.x == -1) && this.gridCanvasComponent.map?.discipline.toLowerCase() !== 'line entry') {
           orientation = -5;
           continue;
         }
@@ -91,6 +91,12 @@ export class ServiceGridCanvas {
         orientation = (this.gridCanvasComponent.evacuation.exit.position + 2) % 4;
 
         multiplier = this.gridCanvasComponent.map?.discipline === 'line entry'? 2.744 : 4.3904;
+
+        if (this.gridCanvasComponent.map?.discipline.toLowerCase() == 'line entry') {
+          orientation = -10;
+          continue;
+        }
+
       } else {
         if (!currentTile.paths) {
           orientation = -6;
@@ -198,7 +204,6 @@ export class ServiceGridCanvas {
 
   stopDragForFarAwayMoving() {
     this.gridCanvasComponent.panzoomCanvas.on('transform', (e: any) => {
-      //this.gridCanvasComponent.canvasDummyElement!.nativeElement.style.transform = e.transform;
       this.gridCanvasComponent.canvasValues = this.gridCanvasComponent.panzoomCanvas.getTransform();
       this.gridCanvasComponent.canvasValuesChange.emit(this.gridCanvasComponent.canvasValues);
 

@@ -1,4 +1,4 @@
-import { IsArray, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateMapDto {
   @IsString()
@@ -56,4 +56,8 @@ export class CreateMapDto {
   @IsOptional()
   @IsArray()
   sections: number[];
+
+  @IsOptional()
+  @IsBoolean()
+  isLeftDirection: boolean;
 }

@@ -21,7 +21,7 @@
             <h4 class="base-color p-2 m-0">{{category.name}}</h4>
           </mat-panel-title>
           <mat-panel-description>
-            <!-- TODO: Hier muss die Description stehe der Kategorie -->
+            <!-- TODO: Hier muss die Description der Kategorie stehen-->
           </mat-panel-description>
         </mat-expansion-panel-header>
         <div class="d-flex justify-content-center p-2 pt-3 flex-row">
@@ -48,9 +48,9 @@
           </button>
         </div>
 
-        <div class="row d-flex align-items-center flex-row">
-          <div *ngFor="let map of maps">
-            <div *ngIf="map.category == category.id" class="col-12 col-md-6 col-xxxl-3 p-2 card-color rounded p-2">
+        <div class="row d-flex align-items-start flex-row m-0">
+          <div class="col-12 col-md-6 col-xxxl-3 p-2" *ngFor="let map of maps">
+            <div *ngIf="map.category == category.id" class=" p-2 card-color rounded p-2">
               <div style="max-height: 250px; overflow-y: auto">
                 <img (click)="checkOutMap(map)"  class="w-100 p-2 cursor-pointer" [src]="map.image" alt="" />
               </div>
