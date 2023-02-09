@@ -6,7 +6,7 @@ import {Evacuation} from '../dto/evacuation.dto';
 import {Tile} from '../tile/dto/tile.dto';
 import {Map} from '../dto/map.dto';
 import {GridCanvasService} from './grid-canvas.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {EvacuationZoneGridCanvas} from "./evacuationZone-grid-canvas";
 import {ServiceGridCanvas} from "./service-grid-canvas";
 import {TileObstacleServiceGridCanvas} from "./tile-obstacle-service.grid-canvas";
@@ -63,7 +63,8 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     private gridCanvasService: GridCanvasService,
     private imageService: ImageService,
     private route: ActivatedRoute,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private router: Router
   ) {
     this.evacuationZoneGridCanvas = new EvacuationZoneGridCanvas(this, this.gridCanvasService, this.toastr);
     this.serviceGridCanvas = new ServiceGridCanvas(this, this.gridCanvasService, toastr);
@@ -109,6 +110,9 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
         this.evacuationZoneGridCanvas.loadEvacuation(map.evacuationZonePosition);
         this.serviceGridCanvas.calcTotalPoints();
+      },(error) =>{
+        this.toastr.error('Map wurde nicht gefunden');
+        this.router.navigate(['']);
       });
     });
   }

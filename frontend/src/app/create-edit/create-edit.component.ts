@@ -2,6 +2,7 @@ import { Component, HostListener } from '@angular/core';
 import { Transform } from 'panzoom';
 import { Tile } from './tile/dto/tile.dto';
 import {Obstacle} from "./obstacle/dto/obstacle.dto";
+import {Map} from './dto/map.dto';
 
 @Component({
   selector: 'app-create-edit',
@@ -22,6 +23,7 @@ export class CreateEditComponent {
   innerHeight: number = 0;
   innerWidth: number = 0;
   currentDraggedObstacle: Obstacle | undefined;
+  map: Map | undefined;
 
   ngOnInit(): void {
     this.innerHeight = window.innerHeight - 240;

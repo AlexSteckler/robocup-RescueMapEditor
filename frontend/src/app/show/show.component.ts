@@ -38,7 +38,7 @@ export class ShowComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.params.subscribe((params) => {
-      this.mapService.getMap(params['id']).subscribe((map: Map) => {
+      this.mapService.getMapPublic(params['id']).subscribe((map: Map) => {
         this.drawMap(map);
       });
     })

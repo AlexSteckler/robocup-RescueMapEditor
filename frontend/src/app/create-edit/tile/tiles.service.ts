@@ -26,4 +26,10 @@ export class TilesService {
   public deleteTile(id: string): Observable<any> {
     return this.httpClient.delete(`${environment.baseUrlV1}/tile/${id}`);
   }
+
+  public getTilesByMapId(mapId: string): Observable<Tile[]> {
+    return this.httpClient.get<Tile[]>(`${environment.baseUrlV1}/tile/map/${mapId}`);
+  }
+
+
 }
