@@ -1,13 +1,20 @@
-<div class="d-flex justify-content-between align-items-center position-absolute" style="width: 100px; height: 100px;" *ngIf="this.tile!.border">
-  <div (contextmenu)="onRightClick(3)" (click)="onRightClick(3)" *ngIf="this.tile!.border[3]" class="h-100" style="width: 20px;"></div>
-  <div class="h-100 w-100 d-flex flex-column justify-content-between">
-    <div (contextmenu)="onRightClick(0)" (click)="onRightClick(0)" *ngIf="this.tile!.border[0]" class="w-100" style="height: 20px;"></div>
-    <div (contextmenu)="onRightClick(2)" (click)="onRightClick(2)" *ngIf="this.tile!.border[2]" class="w-100 position-absolute" style="height: 20px; bottom: 0;"></div>
+<div style="position: relative">
+  <div class="d-flex justify-content-between align-items-center position-absolute" style="width: 100px; height: 100px;"
+       *ngIf="this.tile!.border">
+    <div (contextmenu)="onRightClick(3)" (click)="onRightClick(3)" *ngIf="this.tile!.border[3]" class="h-100"
+         style="width: 20px;"></div>
+    <div class="h-100 w-100 d-flex flex-column justify-content-between">
+      <div (contextmenu)="onRightClick(0)" (click)="onRightClick(0)" *ngIf="this.tile!.border[0]" class="w-100"
+           style="height: 20px;"></div>
+      <div (contextmenu)="onRightClick(2)" (click)="onRightClick(2)" *ngIf="this.tile!.border[2]"
+           class="w-100 position-absolute" style="height: 20px; bottom: 0;"></div>
+    </div>
+    <div (contextmenu)="onRightClick(1)" (click)="onRightClick(1)" *ngIf="this.tile!.border[1]" class="h-100"
+         style="width: 20px;"></div>
   </div>
-  <div (contextmenu)="onRightClick(1)"  (click)="onRightClick(1)" *ngIf="this.tile!.border[1]" class="h-100" style="width: 20px;"></div>
-</div>
 
-<img [ngClass]="{'isPlaceholder': tile?.isPlaceholder}" *ngIf="tile?.image" [@rotatedState]='state' [src]="tile?.image" class="w-100" (contextmenu)="onRightClick()" (click)="onRightClick()">
+  <img [ngClass]="{'isPlaceholder': tile?.isPlaceholder}" *ngIf="tile?.image" [@rotatedState]='state'
+       [src]="tile?.image" class="w-100" (contextmenu)="onRightClick()" (click)="onRightClick()">
 
   <div *ngIf="tile?.name!.includes('evacuationZoneAcross') && isCurrentlyDraggedTile" class="draggedTileAcross"></div>
   <div *ngIf="tile?.name!.includes('evacuationZoneUpright') && isCurrentlyDraggedTile" class="draggedTileUpright"></div>
@@ -18,6 +25,8 @@
                   'border-right': this.tile!.border![1]? ((this.tile!.border![1] != 'black' ? '8px solid ' :'solid ') + this.tile!.border![1]) : 'none',
                   'border-bottom': this.tile!.border![2]? ((this.tile!.border![2] != 'black' ? '8px solid ' :'solid ') + this.tile!.border![2]) : 'none',
                   'border-left': this.tile!.border![3]? ((this.tile!.border![3] != 'black' ? '8px solid ' :'solid ') + this.tile!.border![3]) : 'none'}"
-      *ngIf="tile?.border"
-      (contextmenu)="onRightClick()" (click)="onRightClick()">
+       *ngIf="tile?.border"
+       (contextmenu)="onRightClick()" (click)="onRightClick()">
+  </div>
+  <h2 *ngIf="tile?.name === 'start' && !tile?.isPlaceholder" class="p-1" style="position: absolute; left: 0;top: 0">{{position?.layer}}</h2>
 </div>
