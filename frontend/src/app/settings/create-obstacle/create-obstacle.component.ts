@@ -37,7 +37,9 @@ export class CreateObstacleComponent implements OnInit {
   scale: {x: number, y: number} = {x: 100, y: 100};
 
   border: boolean = true;
-  rotate: boolean = true;
+  rotate: boolean = false;
+
+
 
 //--------------------------------------------------------------------------------
 
