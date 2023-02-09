@@ -9,12 +9,12 @@
 
 <img [ngClass]="{'isPlaceholder': tile?.isPlaceholder}" *ngIf="tile?.image" [@rotatedState]='state' [src]="tile?.image" class="w-100" (contextmenu)="onRightClick()" (click)="onRightClick()">
 
-<div *ngIf="tile?.name!.includes('evacuationZoneAcross') && isCurrentlyDraggedTile" class="draggedTileAcross"></div>
-<div *ngIf="tile?.name!.includes('evacuationZoneUpright') && isCurrentlyDraggedTile" class="draggedTileUpright"></div>
+  <div *ngIf="tile?.name!.includes('evacuationZoneAcross') && isCurrentlyDraggedTile" class="draggedTileAcross"></div>
+  <div *ngIf="tile?.name!.includes('evacuationZoneUpright') && isCurrentlyDraggedTile" class="draggedTileUpright"></div>
 
-<div  class="tile-size"
-      [ngClass]="{'isPlaceholder': tile?.isPlaceholder}"
-      [ngStyle]="{'border-top': this.tile!.border![0]? ((this.tile!.border![0] != 'black' ? '8px solid ' : 'solid ') + this.tile!.border![0] ) : 'none',
+  <div class="tile-size"
+       [ngClass]="{'isPlaceholder': tile?.isPlaceholder}"
+       [ngStyle]="{'border-top': this.tile!.border![0]? ((this.tile!.border![0] != 'black' ? '8px solid ' : 'solid ') + this.tile!.border![0] ) : 'none',
                   'border-right': this.tile!.border![1]? ((this.tile!.border![1] != 'black' ? '8px solid ' :'solid ') + this.tile!.border![1]) : 'none',
                   'border-bottom': this.tile!.border![2]? ((this.tile!.border![2] != 'black' ? '8px solid ' :'solid ') + this.tile!.border![2]) : 'none',
                   'border-left': this.tile!.border![3]? ((this.tile!.border![3] != 'black' ? '8px solid ' :'solid ') + this.tile!.border![3]) : 'none'}"
