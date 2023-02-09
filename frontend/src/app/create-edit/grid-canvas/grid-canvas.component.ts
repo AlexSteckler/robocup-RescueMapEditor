@@ -40,6 +40,8 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
   map: Map | undefined;
 
+  showMode = false;
+
   tileSelection: Array<Tile> = [];
   obstacles: Obstacle[] = [];
 

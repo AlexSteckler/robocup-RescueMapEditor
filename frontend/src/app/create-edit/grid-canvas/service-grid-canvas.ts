@@ -97,21 +97,42 @@ export class ServiceGridCanvas {
           continue;
         }
 
+        // Punkteberechnung Line Entry
         let tileRotation = currentTile.rotation!;
-        let tileWay = currentTile.paths!.find(
+        let tileWay = currentTile.paths!.filter(
           (path: { from: number; to: number; layer: number }) =>
             orientation === (path.from + tileRotation) % 4
         );
-        if (tileWay !== undefined) {
-          currentPosition.layer += tileWay.layer;
+        if (tileWay !== undefined && tileWay.length > 0) {
+          if (tileWay.length > 1) {
+            if (this.gridCanvasComponent.map?.discipline === 'Line Entry') {
+              let i = 1;
+              let from = tileWay[0].from;
+              while ( i <= 3 ) {
+                from = (from + (this.gridCanvasComponent.map.isLeftDirection? 1 : -1)) % 4;
+                let exit = tileWay.filter(way => way.to === from);
+                if (exit) {
+                  tileWay = exit;
+                  break;
+                }
+                i++;
+              }
+            } else {
+              this.toastr.warning('Mehr als eine Ausfahrt gefunden!');
+              orientation = -8;
+              continue;
+            }
+          }
+
+          currentPosition.layer += tileWay[0].layer;
           if (currentPosition.layer < 0) {
             this.toastr.warning('Rampe führt ins nichts!');
             orientation = -7;
             continue;
           }
 
-          if (tileWay.to !== -1) {
-            orientation = (tileRotation + tileWay.to + 2) % 4;
+          if (tileWay[0].to !== -1) {
+            orientation = (tileRotation + tileWay[0].to + 2) % 4;
           } else {
             orientation = -1;
           }
@@ -168,7 +189,8 @@ export class ServiceGridCanvas {
     this.gridCanvasComponent.totalPoints = Math.round((currentPoints + (orientation === -1 ? 60 : 0)) * multiplier).toString();
     let mapInfo = {
       scoreCount: +this.gridCanvasComponent.totalPoints,
-      sections: tileCountToCheckpoints
+      sections: tileCountToCheckpoints,
+      isLeftDirection: this.gridCanvasComponent.map?.isLeftDirection
     };
 
     this.gridCanvasSercive.updateMap(this.gridCanvasComponent.map?.id!, mapInfo).subscribe((response: any) => {});

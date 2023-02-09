@@ -45,4 +45,5 @@ export interface Map {
   };
 
   image?: SafeUrl | undefined;
+  isLeftDirection?: boolean;
 }

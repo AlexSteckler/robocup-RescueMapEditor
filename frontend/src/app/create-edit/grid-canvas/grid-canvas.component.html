@@ -74,6 +74,12 @@
   </div>
 </div>
 
+<div *ngIf="map != undefined && map!.discipline.toLowerCase() == 'line entry'" class="position-absolute" style="left: calc( 50% - 62px)">
+  <app-toogle [(isLeftSelected)]="map!.isLeftDirection!" (isLeftSelectedChange)="serviceGridCanvas.calcTotalPoints()">
+  </app-toogle>
+</div>
+
+
 <div class="position-absolute float-left d-flex align-items-center justify-content-start">
   <div class="info p-3 base-color fs-3" mat-button [matMenuTriggerFor]="afterMenu">
     <i class="bi bi-info-circle-fill"></i>

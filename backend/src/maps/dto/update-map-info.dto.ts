@@ -1,4 +1,4 @@
-import { IsArray, IsNumber } from 'class-validator';
+import { IsArray, IsBoolean, IsNumber } from 'class-validator';
 
 export class UpdateMapInfoDto {
   @IsNumber()
@@ -6,4 +6,7 @@ export class UpdateMapInfoDto {
 
   @IsArray()
   sections: number[];
+
+  @IsBoolean()
+  isLeftDirection: boolean;
 }

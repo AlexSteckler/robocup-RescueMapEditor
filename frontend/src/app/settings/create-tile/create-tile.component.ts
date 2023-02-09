@@ -185,7 +185,7 @@ export class CreateTileComponent {
 
     this.disciplines.setValue({
       line: selectedTile.disciplines!.includes('line'),
-      lineEntry: selectedTile.disciplines!.includes('lineEntry')
+      lineEntry: selectedTile.disciplines!.includes('line entry')
     });
 
     this.modalService.open(this.basicModal, {centered: true}).result
@@ -203,7 +203,7 @@ export class CreateTileComponent {
             activeDisciplines.push('line');
           }
           if (this.disciplines.value.lineEntry) {
-            activeDisciplines.push('lineEntry');
+            activeDisciplines.push('line entry');
           }
 
         let tileDto = {

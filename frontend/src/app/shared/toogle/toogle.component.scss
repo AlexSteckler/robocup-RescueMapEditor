@@ -1,0 +1,35 @@
+$base-color: rgb(241, 137, 4);
+.btn-toggle {
+  background-color: rgb(144, 144, 144);
+  border: 1px solid black;
+  border-radius: 4px;
+  color: #333;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #e6e6e6;
+    color: #333;
+  }
+}
+
+.btn-toggle.active {
+  background-color: $base-color;
+  color: white;
+}
+
+.btn-left {
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-right: 0px;
+}
+
+.btn-right {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  border-left: 0px;
+}
+
+
