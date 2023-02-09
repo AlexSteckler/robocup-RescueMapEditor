@@ -5,15 +5,21 @@
   </button>
 </div>
 
-<div *ngIf="locationTiles.length > 0" class="d-flex flex-column">
+<div class="d-flex flex-column">
   <h3 class="text-black">Lokale Kacheln</h3>
-  <div class="d-flex flew-row flex-wrap justify-content-center">
+  <div *ngIf="locationTiles.length > 0" class="d-flex flew-row flex-wrap justify-content-center">
     <div *ngFor="let tile of locationTiles" class="d-flex flex-column p-3 text-black border align-items-center" (click)="updateTile(tile)">
       <img [src]="tile.image" class="img-fluid" style="width: 100px;"/>
       <span class="text-center">{{tile.name}}</span>
     </div>
   </div>
 </div>
+
+<div class="text-center text-dark" *ngIf="locationTiles.length == 0" >
+  -- Keine lokalen Kacheln angelegt. --
+</div>
+
+<hr class="base-color w-100" />
 
 <div class="d-flex flex-column">
   <h3 class="text-black">Globale Kacheln</h3>

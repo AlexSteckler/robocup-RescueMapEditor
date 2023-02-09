@@ -9,4 +9,6 @@ export interface Category {
 
   location?: string;
   createdBy?: string;
+
+  expanded?: boolean;
 }

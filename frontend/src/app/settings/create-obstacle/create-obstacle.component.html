@@ -4,17 +4,21 @@
   </button>
 </div>
 
-<hr class="base-color"/>
-
-<div *ngIf="localObstacles.length > 0" class="d-flex flex-column">
+<div class="d-flex flex-column">
   <h3 class="text-black">Lokale Obstacles</h3>
-  <div class="d-flex flew-row flex-wrap justify-content-center">
+  <div *ngIf="localObstacles.length > 0"  class="d-flex flew-row flex-wrap justify-content-center">
     <div *ngFor="let obstacle of localObstacles" class="d-flex flex-column p-3 text-black border align-items-center">
       <img [src]="obstacle.image" class="img-fluid" style="width: 100px;"/>
       <span class="text-center">{{obstacle.name}}</span>
     </div>
   </div>
+
+  <div class="text-center text-dark" *ngIf="localObstacles.length == 0">
+    -- Keine lokalen Hindernisse angelegt. --
+  </div>
 </div>
+
+<hr class="base-color w-100" />
 
 <div class="d-flex flex-column">
   <h3 class="text-black">Globale Obstacles</h3>

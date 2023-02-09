@@ -52,7 +52,11 @@ export class HomeComponent {
     this.authenticated = await this.keycloakService.isLoggedIn();
 
     this.homeService.getAllCategorys().subscribe((categories) => {
-      this.categories = categories;
+      let first = true;
+      categories.forEach((category) => {
+        this.categories.push({...category, expanded: first });
+        first = false;
+      } );
 
       this.gridCanvasService.getMaps().subscribe((maps) => {
         this.maps = maps;
