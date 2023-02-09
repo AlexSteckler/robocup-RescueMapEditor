@@ -37,6 +37,8 @@ export class HomeComponent {
   categoryDiscipline: string[] = [];
   categoryDiscription: string = '';
 
+  roles: string[] = [];
+
   constructor(
     private gridCanvasService: GridCanvasService,
     private toastr: ToastrService,
@@ -51,7 +53,9 @@ export class HomeComponent {
   async ngOnInit() {
     this.authenticated = await this.keycloakService.isLoggedIn();
 
-    if (this.authenticated) {
+    this.roles = this.keycloakService.getUserRoles();
+
+    if (this.authenticated && this.roles.includes('admin') || this.roles.includes('quali')) {
       this.homeService.getAllCategorys().subscribe((categories) => {
         let first = true;
         categories.forEach((category) => {

@@ -7,6 +7,7 @@
         style="height: 60px; padding-left: 20px; padding-right: 20px"
       />
       <span class="navbar-brand text-light" routerLink="/">MapEditor</span>
+
     </a>
     <button
       class="navbar-toggler second-button navbar-dark"
@@ -24,6 +25,7 @@
         >
           <!--Übersicht-->
           <a
+            *ngIf="roles.includes('admin') || roles.includes('quali') || roles.includes('default')"
             routerLink="home"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
@@ -31,6 +33,7 @@
             >Home
           </a>
           <a
+            *ngIf="roles.includes('admin') || roles.includes('quali') || roles.includes('default')"
             routerLink="home"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
@@ -42,6 +45,7 @@
 
           <!--Einstellungen-->
           <a
+            *ngIf="roles.includes('admin') || roles.includes('quali')"
             routerLink="settings"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
@@ -49,6 +53,7 @@
             >Einstellungen
           </a>
           <a
+            *ngIf="roles.includes('admin') || roles.includes('quali')"
             routerLink="settings"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
@@ -70,7 +75,16 @@
             (click)="login()"
             >Anmelden
           </a>
-          <span *ngIf="authenticated" class="p-3 ps-0 pe-0 text-white">{{name}}  |</span>
+          <div class="d-flex flex-row">
+            <div class="d-flex flex-column p-2 align-items-center">
+              <span *ngIf="authenticated" class="ps-0 pe-0 text-white">{{name}}</span>
+              <span *ngIf="roles.includes('volunteer')">Volunteer</span>
+              <span *ngIf="roles.includes('admin')">Admin</span>
+              <span *ngIf="roles.includes('quali')" class="base-color-blue">Quali</span>
+            </div>
+            <div *ngIf="authenticated" class="border-right"></div>
+          </div>
+
           <a
             *ngIf="authenticated"
             class="nav-link p-3 text-uppercase text-center text-lg-end fw-bold link-base-reverse"

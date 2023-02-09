@@ -17,6 +17,8 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {CreateObstacleComponent} from './settings/create-obstacle/create-obstacle.component';
 import {GlobalErrorHandler} from "./shared/GlobalErrorHandler";
+import {MatTooltipModule} from '@angular/material/tooltip';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 
 function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -67,7 +69,9 @@ function initializeKeycloak(keycloak: KeycloakService) {
     FormsModule,
     MatExpansionModule,
     MatCheckboxModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatTooltipModule,
+    NgbTooltip,
   ]
 })
 export class AppModule {
