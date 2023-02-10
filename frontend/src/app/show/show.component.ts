@@ -140,11 +140,11 @@ export class ShowComponent implements OnInit {
       this.grid[y + 1][x + 1] = {name: 'evacuationZoneUpright_11', border: ['', '', '', '']};
       this.grid[y + 2][x + 1] = {name: 'evacuationZoneUpright_21', border: ['', '', '', '']};
     }
-    if (evacuationZonePosition.entry) {
+    if (evacuationZonePosition.entry && evacuationZonePosition.entry.x !== -1) {
       this.grid[evacuationZonePosition.entry.y - leftUpperCorner.y][evacuationZonePosition.entry.x - leftUpperCorner.x]
         .border![evacuationZonePosition.entry.position] = ENTRANCECOLOR;
     }
-    if (evacuationZonePosition.exit) {
+    if (evacuationZonePosition.exit && evacuationZonePosition.exit.x !== -1) {
       this.grid[evacuationZonePosition.exit.y - leftUpperCorner.y][evacuationZonePosition.exit.x - leftUpperCorner.x]
         .border![evacuationZonePosition.exit.position] = EXITCOLOR;
     }
