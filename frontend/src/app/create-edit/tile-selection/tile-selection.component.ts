@@ -7,7 +7,7 @@ import {Obstacle} from "../obstacle/dto/obstacle.dto";
 import {ImageService} from 'src/app/shared/image.service';
 import {ObstacleService} from '../obstacle/obstacle.service';
 import {firstValueFrom} from "rxjs";
-import { ActivatedRoute } from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 
 
 @Component({
@@ -47,7 +47,7 @@ export class TileSelectionComponent implements OnInit {
 
       let loaded = 0;
       let tiles = await firstValueFrom(this.tilesService.getTilesByMapId(params['id']));
-      tiles.sort((a, b) => ((a as any).createdAt as Date) < ((b as any).createdAt as Date) ? 1 : -1);
+      tiles.sort((a: any, b: any) => ((new Date(a.createdAt).getTime()) < (new Date(b.createdAt).getTime())) ? 1 : -1);
 
       let obstacles = await firstValueFrom(this.obstacleService.getObstacles());
 
