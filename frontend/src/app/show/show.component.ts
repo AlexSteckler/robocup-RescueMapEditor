@@ -172,7 +172,7 @@ export class ShowComponent implements OnInit {
         && (obstacle.y) < (rightLowerCorner.y + 1) * 100
       ) {
         this.obstacles.push({
-          id: obstacle.obstacleId,
+          id: obstacle.id,
           imageId: obstacleOriginal.imageId,
           layer: obstacle.layer,
           x: obstacle.x - (leftUpperCorner.x * 100) + 5,

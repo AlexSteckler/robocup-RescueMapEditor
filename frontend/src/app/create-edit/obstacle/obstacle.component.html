@@ -1,2 +1,8 @@
 
-<img [src]="obstacle?.image" [ngStyle]="{'width.px': obstacle?.width, 'height.px': obstacle?.height}" [class.is-NotRated]="obstacle?.rated !== undefined && !obstacle?.rated!"/>
+<img id="obstacle"
+      [src]="obstacle?.image"
+      [ngStyle]="{'width.px': obstacle?.width, 'height.px': obstacle?.height, 'transform': 'rotate(' + obstacle?.rotation + 'deg)'}"
+      [class.is-NotRated]="obstacle?.rated !== undefined && !obstacle?.rated!"
+      (click)="rotateObstacle(true)"
+      (contextmenu)="rotateObstacle(false)"
+      />

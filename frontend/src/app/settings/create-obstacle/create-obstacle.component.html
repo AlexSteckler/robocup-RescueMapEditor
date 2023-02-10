@@ -69,11 +69,11 @@
       <input #fileChooser type="file" class="form-control dark-bg text-white" id="formFile" accept="image/*" (change)="onFileSelected($event); readUrl($event)" />
     </div>
 
-    <div class="d-flex justify-content-center w-100 h-auto p-3">
-      <img src="../assets/tiles/Example_Line.png" class="w-100">
+    <div class="d-flex justify-content-center w-100 p-3">
+      <img src="../assets/tiles/Example_Line.png" class="w-auto" style="max-height: 100px;">
 
 
-      <div class="position-absolute d-flex align-items-center justify-content-center w-100" style="height: 150px; max-width: 150px;">
+      <div class="position-absolute d-flex align-items-center justify-content-center w-100" style="height: 100px; max-width: 100px;">
         <img *ngIf="obstacleImage" [src]="obstacleImage" [ngStyle]="{'width.px': scale.x, 'height.px': scale.y}"  class="img-fluid " [class.transform]="!rotate" [class.clickBorder]="border"/>
       </div>
     </div>
@@ -97,7 +97,7 @@
     </div>
 
     <div class="p-3">
-      <button *ngIf="!selectedObstacle" class="btn btn-primary p-1" [class.disabled]="!toUpload || !name || name.includes('checkpoint')" (click)="checkObstacle(modal)">
+      <button *ngIf="!selectedObstacle" class="btn btn-primary p-1" [class.disabled]="!toUpload || !name || name.includes('checkpoint') || scale.x == null || scale.y == null " (click)="checkObstacle(modal)">
         Erstellen
       </button>
 

@@ -24,9 +24,11 @@ export class UpdateObstacleDto {
     @IsNotEmpty()
     @IsNumber()
     rotation: number;
+
     @IsNotEmpty()
     @IsNumber()
     width: number;
+    
     @IsNotEmpty()
     @IsNumber()
     height: number;

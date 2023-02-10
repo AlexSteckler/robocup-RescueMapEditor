@@ -161,16 +161,14 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         width: this.currentObstacle.width,
         height: this.currentObstacle.height,
         image: this.currentObstacle.image,
-        value: this.currentObstacle.value,
         name: this.currentObstacle.name,
       }
 
       let centerObstacle = {x: tmpObstacle.x + tmpObstacle.width! / 2, y: tmpObstacle.y + tmpObstacle.height! / 2};
 
-      //check on which tile ist obstacle in grid
+      //check on which tile is obstacle in grid
       let colX = Math.floor(centerObstacle.x / 100);
       let rowY = Math.floor(centerObstacle.y / 100);
-      console.log();
 
       if (((this.grids[this.layer][rowY][colX].value
           && this.grids[this.layer][rowY][colX].value! > 0)
@@ -391,6 +389,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
       if (((this.grids[this.layer][rowY][colX].value
             && this.grids[this.layer][rowY][colX].value! > 0)
+            && this.map?.discipline.includes('Line Entry')
           || (this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
                               && Math.floor(obstacleFind.y / 100) == rowY
                               && obstacleFind.name?.includes('Checkpoint')
@@ -399,6 +398,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
             && (this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
                               && Math.floor(obstacleFind.y / 100) == rowY
                               && obstacle.id != obstacleFind.id) != undefined)
+          || this.grids[this.layer][rowY][colX].name?.includes('start')
       )
       ) {
         obstacle.x -= ($event.distance.x) / scale;
