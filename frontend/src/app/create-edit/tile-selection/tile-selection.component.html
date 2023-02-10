@@ -18,9 +18,11 @@
     [cdkDragConstrainPosition]="dragConstrainPoint"
   >
     <app-tile *cdkDragPreview [tile]="tile"
+
               [canvasValues]="canvasValues"
               [ngStyle]="{'width.px': 100 * canvasValues!.scale, 'height.px': 100 * canvasValues!.scale}"
     ></app-tile>
+    <div *cdkDragPlaceholder class="border-none"></div>
   </app-tile>
 </div>
 
@@ -51,7 +53,8 @@
      [cdkDropListData]="greenTiles">
   <div class="d-flex align-items-center flex-column">
     <app-tile [canvasValues]="canvasValues" [class.white]="tile.id" *ngFor="let tile of greenTiles" class="mb-2 me-2"
-              [tile]="tile" cdkDrag></app-tile>
+              [tile]="tile" cdkDrag>
+            <div *cdkDragPlaceholder class="border-none"></div></app-tile>
   </div>
 </div>
 
