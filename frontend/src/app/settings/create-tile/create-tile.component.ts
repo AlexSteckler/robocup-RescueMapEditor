@@ -80,7 +80,7 @@ export class CreateTileComponent {
   //--------------------------------------------------------------------------------
 
   addDeletePath(add : boolean) {
-    if(this.paths.length < 4 && add) {
+    if(this.paths.length < 12 && add) {
       this.paths.push({ from: 0, to: 0, layer: 0 });
     } else if (!add) {
       this.paths.pop();
