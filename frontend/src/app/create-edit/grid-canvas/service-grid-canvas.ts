@@ -2,7 +2,7 @@ import {Tile} from "../tile/dto/tile.dto";
 import {GridCanvasComponent, OutsideDrag, TileCount} from "./grid-canvas.component";
 import {ToastrService} from "ngx-toastr";
 import {Obstacle} from "../obstacle/dto/obstacle.dto";
-import { GridCanvasService } from "./grid-canvas.service";
+import {GridCanvasService} from "./grid-canvas.service";
 
 export class ServiceGridCanvas {
   constructor(
@@ -39,6 +39,8 @@ export class ServiceGridCanvas {
 
     let multiplier: number = 1;
 
+    let lastRamp = -2;
+    let doubleRampCount = 0;
     while (orientation >= 0 && loopCount++ <= 1000) {
       switch (orientation) {
         case 0:
@@ -90,7 +92,7 @@ export class ServiceGridCanvas {
         };
         orientation = (this.gridCanvasComponent.evacuation.exit.position + 2) % 4;
 
-        multiplier = this.gridCanvasComponent.map?.discipline.toLowerCase() == 'line entry'? 2.744 : 4.3904;
+        multiplier = this.gridCanvasComponent.map?.discipline.toLowerCase() == 'line entry' ? 2.744 : 4.3904;
 
         if (this.gridCanvasComponent.map?.discipline.toLowerCase() == 'line entry') {
           orientation = -10;
@@ -103,21 +105,28 @@ export class ServiceGridCanvas {
           continue;
         }
 
-        // Punkteberechnung Line Entry
         let tileRotation = currentTile.rotation!;
         let tileWay = currentTile.paths!.filter(
           (path: { from: number; to: number; layer: number }) =>
             orientation === (path.from + tileRotation) % 4
         );
+        // Punkteberechnung Line Entry
         if (tileWay !== undefined && tileWay.length > 0) {
           if (tileWay.length > 1) {
             if (this.gridCanvasComponent.map?.discipline === 'Line Entry') {
               let i = 1;
-              let from = tileWay[0].from;
-              while ( i <= 3 ) {
-                from = (from + (this.gridCanvasComponent.map.isLeftDirection? 1 : -1)) % 4;
-                let exit = tileWay.filter(way => way.to === from);
-                if (exit) {
+              let from = (tileWay[0].from + tileRotation) % 4
+              while (i <= 3) {
+                if (this.gridCanvasComponent.map?.isLeftDirection) {
+                  from = (from + 1) % 4;
+                } else {
+                  from = (from - 1) % 4;
+                  if (from < 0) {
+                    from = 3;
+                  }
+                }
+                let exit = tileWay.filter(way => (way.to + tileRotation) % 4 === from);
+                if (exit.length) {
                   tileWay = exit;
                   break;
                 }
@@ -144,6 +153,13 @@ export class ServiceGridCanvas {
           }
 
           tilePositionList.push({...currentPosition});
+          //Rampe
+          if (tileWay[0].layer !== 0) {
+            if (lastRamp === loopCount - 1) {
+              doubleRampCount++;
+            }
+            lastRamp = loopCount;
+          }
           currentPoints += currentTile.value ? currentTile.value : 0;
         } else {
           orientation = -9;
@@ -162,20 +178,24 @@ export class ServiceGridCanvas {
         position.layer == obstacle.layer
         && position.x == Math.floor((obstacle.x + (obstacle.width / 2)) / 100)
         && position.y == Math.floor((obstacle.y + (obstacle.height / 2)) / 100))) {
-          if (!obstacle.name?.includes('Checkpoint')) {
-            currentPoints += obstacle.value !== undefined ? obstacle.value : 0;
-            obstacle.rated = true;
-          } else {
-            checkpointPosition.push({ layer: obstacle.layer, x: Math.floor((obstacle.x + (obstacle.width / 2)) / 100), y: Math.floor((obstacle.y + (obstacle.height / 2)) / 100) });
-            obstacle.rated = true;
-          }
+        if (!obstacle.name?.includes('Checkpoint')) {
+          currentPoints += obstacle.value !== undefined ? obstacle.value : 0;
+          obstacle.rated = true;
+        } else {
+          checkpointPosition.push({
+            layer: obstacle.layer,
+            x: Math.floor((obstacle.x + (obstacle.width / 2)) / 100),
+            y: Math.floor((obstacle.y + (obstacle.height / 2)) / 100)
+          });
+          obstacle.rated = true;
+        }
       } else {
         obstacle.rated = false;
       }
     });
 
     if (checkpointPosition.length > 0) {
-      let tileCount : number = 0;
+      let tileCount: number = 0;
       for (let i = 0; i < tilePositionList.length; i++) {
         tileCount++;
         let checkpointPos = checkpointPosition.find((position: { layer: number, x: number, y: number }) =>
@@ -183,7 +203,7 @@ export class ServiceGridCanvas {
           && position.x == tilePositionList[i].x
           && position.y == tilePositionList[i].y);
         {
-          if (checkpointPos !== undefined)  {
+          if (checkpointPos !== undefined) {
             currentPoints += 5 * tileCount;
             tileCountToCheckpoints.push(tileCount);
             tileCount = 0;
@@ -192,14 +212,15 @@ export class ServiceGridCanvas {
       }
     }
 
-    this.gridCanvasComponent.totalPoints = Math.round((currentPoints + (orientation === -1 ? 60 : 0)) * multiplier).toString();
+    this.gridCanvasComponent.totalPoints = Math.round(((currentPoints - doubleRampCount * 10) + (orientation === -1 ? 60 : 0)) * multiplier).toString();
     let mapInfo = {
       scoreCount: +this.gridCanvasComponent.totalPoints,
       sections: tileCountToCheckpoints,
       isLeftDirection: this.gridCanvasComponent.map?.isLeftDirection
     };
 
-    this.gridCanvasSercive.updateMap(this.gridCanvasComponent.map?.id!, mapInfo).subscribe((response: any) => {});
+    this.gridCanvasSercive.updateMap(this.gridCanvasComponent.map?.id!, mapInfo).subscribe((response: any) => {
+    });
   }
 
   stopDragForFarAwayMoving() {
