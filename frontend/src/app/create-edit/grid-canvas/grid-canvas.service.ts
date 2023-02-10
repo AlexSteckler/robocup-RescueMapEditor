@@ -76,7 +76,7 @@ export class GridCanvasService {
   }
 
   updateObstacle( mapId: string, dto: any) {
-    return this.httpClient.patch<Map>(`${environment.baseUrlV1}/map/${mapId}/obstacle/`, dto);
+    return this.httpClient.patch<Map>(`${environment.baseUrlV1}/map/${mapId}/obstacle/`, {...dto, obstacleId: dto.id});
   }
 
   deleteObstacle(mapId: string, obstacleId: string) {
