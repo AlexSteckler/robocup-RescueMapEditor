@@ -1,7 +1,7 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg fixed-top bg-dark text-light p-0" *ngIf="!showMode">
   <div class="container-fluid navbar-brand p-0">
-    <a class="text-decoration-none d-flex align-items-center" routerLink="home" >
+    <a class="text-decoration-none d-flex align-items-center" routerLink="home">
       <img
         src="../assets/resources/rc_logo.png"
         style="height: 60px; padding-left: 20px; padding-right: 20px"
@@ -30,7 +30,7 @@
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             class="link-base link-light p-3 d-none d-lg-block"
-            >Home
+          >Home
           </a>
           <a
             *ngIf="roles.includes('admin') || roles.includes('quali') || roles.includes('default')"
@@ -40,7 +40,7 @@
             class="link-base link-light p-3 d-block d-lg-none"
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse"
-            >Home
+          >Home
           </a>
 
           <!--Einstellungen-->
@@ -50,7 +50,7 @@
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             class="link-base link-light p-3 d-none d-lg-block"
-            >Einstellungen
+          >Einstellungen
           </a>
           <a
             *ngIf="roles.includes('admin') || roles.includes('quali')"
@@ -60,20 +60,30 @@
             class="link-base link-light p-3 d-block d-lg-none"
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse"
-            >Einstellungen
-          </a>
+          >Einstellungen </a>
         </div>
 
         <!--Abmelden-->
-        <div
-          class="d-flex flex-row justify-content-center align-items-center base-color"
-        >
+        <div class="d-flex flex-row justify-content-center align-items-center base-color">
+          <!--Scoring-->
+          <a
+            *ngIf="roles.includes('admin') || roles.includes('quali')"
+            href="https://scoring.robocupjunior.de" target="_blank"
+            class="link-base link-light p-3 d-none d-lg-block"
+          >Zum Scoring <i class="bi bi-arrow-right-circle"></i></a>
+          <a
+            *ngIf="roles.includes('admin') || roles.includes('quali')"
+            class="link-base link-light p-3 d-block d-lg-none"
+            href="https://scoring.robocupjunior.de" target="_blank"
+            data-bs-toggle="collapse"
+            data-bs-target=".navbar-collapse"
+          >Zum Scoring <i class="bi bi-arrow-right-circle"></i></a>
           <a
             *ngIf="authenticated === false"
             class="nav-link p-3 text-center text-lg-end text-uppercase fw-bold link-base-reverse"
             style="cursor: pointer"
             (click)="login()"
-            >Anmelden
+          >Anmelden
           </a>
           <div class="d-flex flex-row">
             <div class="d-flex flex-column p-2 align-items-center">
@@ -90,7 +100,7 @@
             class="nav-link p-3 text-uppercase text-center text-lg-end fw-bold link-base-reverse"
             style="cursor: pointer"
             (click)="logout()"
-            >Abmelden
+          >Abmelden
           </a>
         </div>
       </div>
@@ -99,7 +109,7 @@
 </nav>
 
 <!--Main Content-->
-    <router-outlet></router-outlet>
+<router-outlet></router-outlet>
 
 <!--Footer-->
 <footer class="dark-bg mt-auto" *ngIf="!showMode">
@@ -109,17 +119,17 @@
     <a
       class="nav-link link-light p-2 p-sm-3 link-base"
       href="https://robocupjunior.de/impressum"
-      >Impressum</a
+    >Impressum</a
     >
     <a
       class="nav-link link-light p-2 p-sm-3 link-base"
       href="https://robocupjunior.de/datenschutz"
-      >Datenschutz</a
+    >Datenschutz</a
     >
     <a
       class="nav-link link-light p-2 p-sm-3 link-base"
       href="mailto:support@robocupjunior.de"
-      >Support</a
+    >Support</a
     >
   </div>
 
@@ -128,13 +138,13 @@
       <span
         class="text-muted mx-auto d-block"
         style="font-size: 13px; text-align: center"
-        >&copy; 2022 RoboCup</span
+      >&copy; 2022 RoboCup</span
       >
       <span class="p-3 text-white d-sm-block d-none pt-0 pb-0">|</span>
       <a
         class="nav-link link-light p-1 p-sm-0 base-color white-color-hover"
         href="https://robocupjunior.de/"
-        >robocupjunior.de</a
+      >robocupjunior.de</a
       >
     </div>
   </div>
