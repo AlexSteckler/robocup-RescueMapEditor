@@ -13,7 +13,7 @@ import {TileObstacleServiceGridCanvas} from "./tile-obstacle-service.grid-canvas
 import {Obstacle} from "../obstacle/dto/obstacle.dto";
 import {ImageService} from 'src/app/shared/image.service';
 import {DomSanitizer} from '@angular/platform-browser';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 export const TileCount = 30;
 export const OutsideDrag = 100;
@@ -114,7 +114,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
         this.evacuationZoneGridCanvas.loadEvacuation(map.evacuationZonePosition);
         this.serviceGridCanvas.calcTotalPoints();
-      },(error) =>{
+      }, (error) => {
         this.toastr.error('Map wurde nicht gefunden');
         this.router.navigate(['']);
       });
@@ -173,14 +173,14 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
       if (((this.grids[this.layer][rowY][colX].value
           && this.grids[this.layer][rowY][colX].value! > 0)
-          || this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
-                            && Math.floor(obstacleFind.y / 100) == rowY
-                            && obstacleFind.name?.includes('Checkpoint')
-                            && tmpObstacle.id != obstacleFind.id) != undefined
-          || tmpObstacle.name?.includes('Checkpoint')
-          && this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
-                            && Math.floor(obstacleFind.y / 100) == rowY
-                            && tmpObstacle.id != obstacleFind.id) != undefined
+        || this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
+          && Math.floor(obstacleFind.y / 100) == rowY
+          && obstacleFind.name?.includes('Checkpoint')
+          && tmpObstacle.id != obstacleFind.id) != undefined
+        || tmpObstacle.name?.includes('Checkpoint')
+        && this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
+          && Math.floor(obstacleFind.y / 100) == rowY
+          && tmpObstacle.id != obstacleFind.id) != undefined
       )
       ) {
         this.toastr.info('Checkpoints dürfen sich nicht auf Kacheln mit Wertungselementen befinden')
@@ -321,7 +321,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
           this.gridCanvasService.deleteTile(this.map!.id, this.layer, rowCount, colCount)
             .subscribe((map: Map) => this.map = map);
         } else {
-          this.grids[layerCount][rowCount][colCount].rotation! =  (this.grids[layerCount][rowCount][colCount].rotation! - 1) % 4;
+          this.grids[layerCount][rowCount][colCount].rotation! = (this.grids[layerCount][rowCount][colCount].rotation! - 1) % 4;
         }
       }
     }
@@ -388,23 +388,21 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       let colX = Math.floor(centerObstacle.x / 100);
       let rowY = Math.floor(centerObstacle.y / 100);
 
-      if (((this.grids[this.layer][rowY][colX].value
-            && this.grids[this.layer][rowY][colX].value! > 0)
-            && this.map?.discipline.includes('Line Entry')
-          || (this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
-                              && Math.floor(obstacleFind.y / 100) == rowY
-                              && obstacleFind.name?.includes('Checkpoint')
-                              && obstacle.id != obstacleFind.id) != undefined)
-          || obstacle.name?.includes('Checkpoint')
-            && (this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
-                              && Math.floor(obstacleFind.y / 100) == rowY
-                              && obstacle.id != obstacleFind.id) != undefined)
-          || this.grids[this.layer][rowY][colX].name?.includes('start')
-      )
+      if (
+        (this.grids[this.layer][rowY][colX].value && this.grids[this.layer][rowY][colX].value! > 0 && this.map?.discipline.includes('Line Entry'))
+        || (this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
+          && Math.floor(obstacleFind.y / 100) == rowY
+          && obstacleFind.name?.includes('Checkpoint')
+          && obstacle.id != obstacleFind.id) != undefined)
+        || (obstacle.name?.includes('Checkpoint')
+          && (this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
+            && Math.floor(obstacleFind.y / 100) == rowY
+            && obstacle.id != obstacleFind.id) != undefined))
+        || this.grids[this.layer][rowY][colX].name?.includes('start')
       ) {
         obstacle.x -= ($event.distance.x) / scale;
         obstacle.y -= ($event.distance.y) / scale;
-        this.toastr.info('Checkpoints dürfen sich nicht auf Kacheln mit Wertungselementen befinden')
+        this.toastr.info(`${obstacle.name?.toLowerCase()?.includes('checkpoint') ? "Checkpoints" : "Obstacles"} dürfen sich nicht auf Kacheln mit Wertungselementen befinden`)
       }
 
       let newObstacle = {...obstacle};
