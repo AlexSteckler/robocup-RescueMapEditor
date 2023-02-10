@@ -19,7 +19,8 @@
   >
     <app-tile *cdkDragPreview [tile]="tile"
               [canvasValues]="canvasValues"
-              [ngStyle]="{'width.px': 100 * canvasValues!.scale, 'height.px': 100 * canvasValues!.scale}"
+              [ngStyle]="{'width.px': 50 * canvasValues!.scale, 'height.px': 50 * canvasValues!.scale}"
+              style="z-index: 2"
     ></app-tile>
   </app-tile>
 </div>
