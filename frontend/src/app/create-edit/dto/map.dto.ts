@@ -27,6 +27,7 @@ export interface Map {
     obstacleId: string;
     imageId: string;
     layer: number;
+    value: number;
     x: number;
     y: number;
     rotation: number;

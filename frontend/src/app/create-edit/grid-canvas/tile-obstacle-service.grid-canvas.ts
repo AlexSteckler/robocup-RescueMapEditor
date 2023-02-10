@@ -17,10 +17,8 @@ export class TileObstacleServiceGridCanvas {
   ) {
   }
 
-
   loadTile() {
     let failedTile: boolean = false;
-    let failedTileList: any[] = [];
 
     this.gridCanvasComponent.map!.tilePosition.forEach((tilePosition) => {
       if (tilePosition.layer >= this.gridCanvasComponent.grids.length) {
@@ -82,8 +80,8 @@ export class TileObstacleServiceGridCanvas {
 
   loadObstacle(obstacleSelection: Obstacle[]) {
     this.gridCanvasComponent.map!.obstaclePosition.forEach((obstaclePosition) => {
-        let image = obstacleSelection.find((obstacle: Obstacle) => obstacle.imageId === obstaclePosition.imageId)?.image;
-        let obstacle = {...obstaclePosition, id: obstaclePosition.obstacleId, image, name: obstaclePosition.name} as Obstacle;
+        let foundObstacle = obstacleSelection.find((obstacle: Obstacle) => obstacle.imageId === obstaclePosition.imageId);
+        let obstacle = {...obstaclePosition, id: obstaclePosition.obstacleId, image : foundObstacle?.image, name: obstaclePosition.name, value: foundObstacle?.value} as Obstacle;
         this.gridCanvasComponent.obstacles.push(obstacle);
       }
     );

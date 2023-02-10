@@ -11,5 +11,14 @@ export class ObstacleComponent {
   @Input() obstacle: Obstacle | undefined;
   @Input() canvasValues: Transform | undefined;
 
-  
+  rotateObstacle(direction: boolean) {
+    if (this.obstacle) {
+      if (direction) {
+        this.obstacle!.rotation! += 10;
+      } else {
+        this.obstacle!.rotation! -= 10;
+      }
+    }
+    return false;
+  }
 }

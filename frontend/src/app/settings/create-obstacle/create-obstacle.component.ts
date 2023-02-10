@@ -124,6 +124,7 @@ export class CreateObstacleComponent implements OnInit {
 //--------------------------------------------------------------------------------
 
   updateObstacle(selectedObstacle: Obstacle) {
+    console.log(selectedObstacle);
     if (!this.roles.includes('admin')) return;
     this.modalHeader = 'Hindernis bearbeiten';
     this.selectedObstacle = selectedObstacle;

@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {Map} from '../dto/map.dto';
 import {Tile} from '../tile/dto/tile.dto';
 import {environment} from '../../../environments/environment';
+import { Obstacle } from '../obstacle/dto/obstacle.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -74,12 +75,8 @@ export class GridCanvasService {
     );
   }
 
-  updateObstacle(
-    mapId: string,
-    dto: any
-  ) {
-    return this.httpClient.patch<Map>(`${environment.baseUrlV1}/map/${mapId}/obstacle/`,
-      {...dto, obstacleId: dto.id});
+  updateObstacle( mapId: string, dto: any) {
+    return this.httpClient.patch<Map>(`${environment.baseUrlV1}/map/${mapId}/obstacle/`, {...dto, obstacleId: dto.id});
   }
 
   deleteObstacle(mapId: string, obstacleId: string) {
