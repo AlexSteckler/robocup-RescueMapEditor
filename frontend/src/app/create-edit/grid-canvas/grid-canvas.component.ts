@@ -162,6 +162,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         height: this.currentObstacle.height,
         image: this.currentObstacle.image,
         name: this.currentObstacle.name,
+        value: this.currentObstacle.value,
       }
 
       let centerObstacle = {x: tmpObstacle.x + tmpObstacle.width! / 2, y: tmpObstacle.y + tmpObstacle.height! / 2};
