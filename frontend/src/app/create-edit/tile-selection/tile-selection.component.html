@@ -18,12 +18,15 @@
     [cdkDragConstrainPosition]="dragConstrainPoint"
   >
     <app-tile *cdkDragPreview [tile]="tile"
-
               [canvasValues]="canvasValues"
               [ngStyle]="{'width.px': 50 * canvasValues!.scale, 'height.px': 50 * canvasValues!.scale}"
               style="z-index: 2"
     ></app-tile>
-    <div *cdkDragPlaceholder class="border-none"></div>
+    <div *cdkDragPlaceholder
+              style="z-index: 2 !important; background-color: white; position: fixed !important; padding-top: 0 !important;"
+              [ngStyle]="{'width.px': 100, 'height.px': 100}"
+              style="z-index: 3"
+    ></div>
   </app-tile>
 </div>
 
@@ -33,13 +36,13 @@
   <div class="evacuationZone" cdkDrag>
     <div class="evacuationZone"
          *cdkDragPreview
-         style="width: 500px; background-color: red;"
+         style="width: 500px; background-color: lightgrey; border: 1px solid black"
          [ngStyle]="{'width.px': 400 * canvasValues!.scale, 'height.px': 300 * canvasValues!.scale}">
     </div>
   </div>
   <div class="evacuationZoneUpright" cdkDrag>
     <div class="evacuationZoneUpright"
-         *cdkDragPreview style="width: 300px; background-color: red;"
+         *cdkDragPreview style="width: 300px; background-color: lightgrey; border: 1px solid black; z-index: 10000;"
          [ngStyle]="{'width.px': 300 * canvasValues!.scale, 'height.px': 400 * canvasValues!.scale}">
     </div>
   </div>
