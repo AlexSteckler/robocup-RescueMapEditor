@@ -121,17 +121,20 @@ export class CreateTileComponent {
     this.value = 0;
     this.toUpload = null;
 
+    this.line = true;
+    this.lineEntry = true;
+
 
     this.modalService.open(this.basicModal, {centered: true}).result
     .then((result) => {
 
       let activeDisciplines: string[] = [];
 
-      if (this.disciplines.value.line) {
+      if (this.line) {
         activeDisciplines.push('line');
       }
-      if (this.disciplines.value.lineEntry) {
-        activeDisciplines.push('lineEntry');
+      if (this.lineEntry) {
+        activeDisciplines.push('line entry');
       }
 
       if(this.toUpload) {
@@ -176,6 +179,7 @@ export class CreateTileComponent {
   //--------------------------------------------------------------------------------
 
   updateTile(selectedTile: Tile) {
+    this.toUpload = null;
     this.selectedTile = selectedTile;
 
     this.tileImage = selectedTile.image;
