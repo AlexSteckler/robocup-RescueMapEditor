@@ -47,7 +47,7 @@ export class MapsController {
 
         await page.setViewport({width: (size.width * 100) + 10, height: (size.height * 100) + 10})
 
-        await page.goto(`${process.env.URI}/show/${createImgDto.id}`, {waitUntil: 'networkidle2'});
+        await page.goto(`${process.env.URI}/show/${createImgDto.id}`, {waitUntil: 'networkidle0'});
 
         await page.emulateMediaType('screen');
 
