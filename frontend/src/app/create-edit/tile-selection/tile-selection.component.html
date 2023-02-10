@@ -15,6 +15,7 @@
     (cdkDragStarted)="draggedStart(tile)"
     (cdkDragEnded)="draggedEnd(tile)"
     [canvasValues]="canvasValues"
+    [cdkDragConstrainPosition]="dragConstrainPoint"
   >
     <app-tile *cdkDragPreview [tile]="tile"
               [canvasValues]="canvasValues"
@@ -59,19 +60,20 @@
      cdkDropList
      cdkDropListSortingDisabled>
   <div
-        *ngFor="let obstacle of obstacles"
-        cdkDrag
-        (cdkDragStarted)="draggedStartObstacle(obstacle)"
-        (cdkDragEnded)="draggedEndObstacle(obstacle)"
-        class="borderObstacle d-flex align-items-center justify-content-center"
-    >
-    <app-obstacle [obstacle]="obstacle" [ngStyle]="{'width.px': obstacle.width, 'height.px': obstacle.height}"></app-obstacle>
+    *ngFor="let obstacle of obstacles"
+    cdkDrag
+    (cdkDragStarted)="draggedStartObstacle(obstacle)"
+    (cdkDragEnded)="draggedEndObstacle(obstacle)"
+    class="borderObstacle d-flex align-items-center justify-content-center"
+  >
+    <app-obstacle [obstacle]="obstacle"
+                  [ngStyle]="{'width.px': obstacle.width, 'height.px': obstacle.height}"></app-obstacle>
 
     <app-obstacle *cdkDragPreview
-                [obstacle]="obstacle"
-                [canvasValues]="canvasValues"
-                [ngStyle]="{'width.px': obstacle.width! * canvasValues!.scale, 'height.px': obstacle.height! * canvasValues!.scale}"
-      ></app-obstacle>
+                  [obstacle]="obstacle"
+                  [canvasValues]="canvasValues"
+                  [ngStyle]="{'width.px': obstacle.width! * canvasValues!.scale, 'height.px': obstacle.height! * canvasValues!.scale}"
+    ></app-obstacle>
     <div *cdkDragPlaceholder class="border-none"></div>
   </div>
 </div>

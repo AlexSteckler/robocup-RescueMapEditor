@@ -113,4 +113,19 @@ export class TileSelectionComponent implements OnInit {
   draggedEndObstacle(obstacle: Obstacle) {
     this.currentDraggedObstacle.emit(undefined);
   }
+
+  dragConstrainPoint = (point: any, dragRef: any) => {
+    let zoomMoveXDifference = 0;
+    let zoomMoveYDifference = 0;
+    let scale = this.canvasValues!.scale;
+
+    if (scale != 1) {
+      zoomMoveXDifference = (1 - scale) * dragRef.getFreeDragPosition().x;
+      zoomMoveYDifference = (1 - scale) * dragRef.getFreeDragPosition().y;
+    }
+    return {
+      x: point.x + zoomMoveXDifference - scale * 50,
+      y: point.y + zoomMoveYDifference - scale * 50,
+    };
+  }
 }
