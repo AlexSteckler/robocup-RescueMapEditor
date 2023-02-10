@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import {Body, Controller, Delete, Get, Param, Patch, Post,} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Logger, Param, Patch, Post,} from '@nestjs/common';
 import {AuthenticatedUser, Public, Roles} from 'nest-keycloak-connect';
 import {NotFound} from '../util/not-found.decorator';
 import {CreateMapDto} from './dto/create-map.dto';
@@ -18,6 +18,7 @@ import { FindMapByDisciplineDto } from './dto/find-map-by-discipline.dto';
 
 @Controller({path: 'map', version: '1'})
 export class MapsController {
+    logger = new Logger("MapController");
     constructor(private readonly mapService: MapService, private readonly imageService: ImageService) {
     }
 
@@ -25,7 +26,7 @@ export class MapsController {
     @Patch('pdf')
     @Roles({roles: ['realm:admin']})
     async generatePreviewImage(@Body() createImgDto: CreateImgDto, @AuthenticatedUser() user: any): Promise<any> {
-        console.log("Generating preview image for map " + createImgDto.id)
+        this.logger.log("Generating preview image for map " + createImgDto.id)
         // Create a browser instance
         let size = await this.getMapSize(user, createImgDto.id);
         let map = await this.mapService.findOnePublic(createImgDto.id);
@@ -53,6 +54,9 @@ export class MapsController {
         const content = await page.$("body");
         const imageBuffer = await content.screenshot({omitBackground: true});
 
+        this.logger.log("Map Size is " + size.width + "x" + size.height);
+        this.logger.log("Image Size is " + imageBuffer.length);
+
         if(imageBuffer) {
             if (map.imageId !== undefined) {
                 await this.imageService.updateImage(map.imageId, imageBuffer);
@@ -62,7 +66,7 @@ export class MapsController {
             }
         }
 
-
+        this.logger.log("Finished generating preview image for map " + createImgDto.id)
         await browser.close();
     }
 
