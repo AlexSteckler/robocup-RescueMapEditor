@@ -63,6 +63,7 @@ export class ServiceGridCanvas {
         orientation = -2;
         continue;
       }
+      console.log(currentPosition);
       let currentTile =
         this.gridCanvasComponent.grids[currentPosition.layer][currentPosition.y][currentPosition.x]!;
       if (!currentTile!.name || currentTile.isPlaceholder) {
@@ -85,12 +86,14 @@ export class ServiceGridCanvas {
           continue;
         }
 
-        currentPosition = {
-          layer: this.gridCanvasComponent.evacuation.exit.layer,
-          x: this.gridCanvasComponent.evacuation.exit.x,
-          y: this.gridCanvasComponent.evacuation.exit.y,
-        };
-        orientation = (this.gridCanvasComponent.evacuation.exit.position + 2) % 4;
+        if (this.gridCanvasComponent.evacuation.exit !== undefined && this.gridCanvasComponent.evacuation.exit.x !== -1) {
+          currentPosition = {
+            layer: this.gridCanvasComponent.evacuation.exit.layer,
+            x: this.gridCanvasComponent.evacuation.exit.x,
+            y: this.gridCanvasComponent.evacuation.exit.y,
+          };
+          orientation = (this.gridCanvasComponent.evacuation.exit.position + 2) % 4;
+        }
 
         multiplier = this.gridCanvasComponent.map?.discipline.toLowerCase() == 'line entry' ? 2.744 : 4.3904;
 
