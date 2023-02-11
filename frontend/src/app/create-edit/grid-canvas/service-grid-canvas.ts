@@ -63,7 +63,6 @@ export class ServiceGridCanvas {
         orientation = -2;
         continue;
       }
-      console.log(currentPosition);
       let currentTile =
         this.gridCanvasComponent.grids[currentPosition.layer][currentPosition.y][currentPosition.x]!;
       if (!currentTile!.name || currentTile.isPlaceholder) {

@@ -19,6 +19,7 @@ import {CreateObstacleComponent} from './settings/create-obstacle/create-obstacl
 import {GlobalErrorHandler} from "./shared/GlobalErrorHandler";
 import {MatTooltipModule} from '@angular/material/tooltip';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import {GetMapsForCategoryPipe} from "./home/pipe/pipe";
 
 function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -37,13 +38,14 @@ function initializeKeycloak(keycloak: KeycloakService) {
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    SettingsComponent,
-    CreateTileComponent,
-    CreateObstacleComponent,
-  ],
+    declarations: [
+        AppComponent,
+        HomeComponent,
+        SettingsComponent,
+        CreateTileComponent,
+        CreateObstacleComponent,
+        GetMapsForCategoryPipe,
+    ],
   providers: [
     {
       provide: APP_INITIALIZER,
