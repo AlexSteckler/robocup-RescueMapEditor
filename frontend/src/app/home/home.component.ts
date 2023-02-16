@@ -150,4 +150,27 @@ export class HomeComponent {
       SendFileToUser.send(image, map.name + '.png');
     })
   }
+
+  deleteCategory(category: Category) {
+    this.header = 'Diese Kategorie und enthaltende Karten wirklich löschen?';
+
+    this.modalService.open(this.basicModal, { centered: true }).result.then(
+      (result) => {
+        this.homeService.deleteCategory(category.id).subscribe(() => {
+          this.categories = this.categories.filter((c) => c.id !== category.id);
+          this.maps.forEach((map) => {
+            if (map.category == category.id) {
+              this.gridCanvasService.deleteMap(map.id).subscribe(() => {
+                this.maps = this.maps.filter((m) => m.id !== map.id);
+              });
+            }
+          });
+          this.toastr.success('Kategorie ' + category.name + ' gelöscht');
+        });
+      },
+      (reason) => {
+        this.toastr.info('Kategorie nicht gelöscht');
+      }
+    );
+  }
 }

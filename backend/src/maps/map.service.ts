@@ -19,7 +19,7 @@ export class MapService {
     if (user.realm_access.roles.includes('admin')) {
       return this.mapModel.find().exec();
     } else {
-      return this.mapModel.find({ createdBy: user.sub }).exec();
+      return this.mapModel.find({ location: user.location }).exec();
     }
   }
 

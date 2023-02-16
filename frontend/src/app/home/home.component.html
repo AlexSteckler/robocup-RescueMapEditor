@@ -27,9 +27,13 @@
 
       <mat-accordion>
         <mat-expansion-panel *ngFor="let category of categories" class="mb-2 p-0" style="border-radius: 4px !important;" [expanded]="category.expanded">
+
           <mat-expansion-panel-header >
             <mat-panel-title>
-              <span class="base-color p-2 m-0 fs-6">{{category.name}}</span>
+              <span class="base-color p-2 m-0 fs-6">{{category.name}} |</span>
+              <button class="btn text-danger fs-5" (click)="deleteCategory(category)">
+                <i class="bi bi-trash3-fill fs-6"></i>
+              </button>
             </mat-panel-title>
           </mat-expansion-panel-header>
           <div class="d-flex flex-column flex-md-row justify-content-center p-md-2 pt-md-3">
