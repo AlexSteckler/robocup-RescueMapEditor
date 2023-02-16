@@ -40,6 +40,7 @@ export class UserProfileComponent implements OnInit {
   async ngOnInit() {
     this.userProfile = await this.keycloakService.loadUserProfile();
     this.roles = this.keycloakService.getUserRoles()
+    console.log('test');
   }
 
   editValues() {

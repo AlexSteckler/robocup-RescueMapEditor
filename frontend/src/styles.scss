@@ -25,6 +25,20 @@ body {
   color: $base-blue !important;
 }
 
+.rc-link {
+  color: $base-color !important;
+  background-color: none !important;
+  cursor: pointer;
+  text-align: center;
+
+  &:hover {
+    color: white !important;
+    transition-duration: 200ms;
+    transition-property: color !important;
+  }
+}
+
+
 .link-base {
   cursor: pointer;
   color: whitesmoke;

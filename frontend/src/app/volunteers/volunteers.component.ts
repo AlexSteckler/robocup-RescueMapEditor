@@ -25,7 +25,7 @@ export class VolunteersComponent {
   }
 
   ngOnInit(): void {
-    this.userService.getVolunteers().subscribe((userRepresentations: UserRepresentation[]) => this.dataSource.data = userRepresentations);
+    this.userService.getMapper().subscribe((userRepresentations: UserRepresentation[]) => this.dataSource.data = userRepresentations);
   }
 
   openChosenModal(userRepresentation: UserRepresentation) {
@@ -36,7 +36,7 @@ export class VolunteersComponent {
         let index = this.dataSource.data.findIndex((user: UserRepresentation) => user.id === userRepresentation.id!);
         const tmp = this.dataSource.data;
         if (result === 'verify') {
-          this.userService.setVolunteerRole(userRepresentation.id!).subscribe((user) => {
+          this.userService.setMapperRole(userRepresentation.id!).subscribe((user) => {
             if (index > -1) {
               tmp.splice(index, 1, user);
               this.dataSource.data = tmp;
@@ -44,7 +44,7 @@ export class VolunteersComponent {
             }
           });
         } else {
-          this.userService.deleteVolunteerRole(userRepresentation.id!).subscribe((user) => {
+          this.userService.deleteMapperRole(userRepresentation.id!).subscribe((user) => {
             if (index > -1) {
               tmp.splice(index, 1, user);
               this.dataSource.data = tmp;

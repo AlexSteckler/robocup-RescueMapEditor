@@ -1,6 +1,6 @@
 
 <div class="row d-flex justify-content-center m-0">
-  <div class="col-12">
+  <div class="col-9 pt-3">
     <h1>Volunteers für den Map-Editor</h1>
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" id="tableHover">
 
@@ -22,9 +22,9 @@
       <ng-container matColumnDef="verified">
         <th class="text-center" style="min-width: 50px" mat-header-cell *matHeaderCellDef>Freigeschaltet</th>
         <td class="text-center" mat-cell *matCellDef="let element" (click)="openChosenModal(element)">
-          <span *ngIf="element.realmRoles.includes('futureVolunteer')"><i
+          <span *ngIf="element.realmRoles.includes('futureMapper')"><i
             class="bi bi-x-circle-fill text-danger"></i></span>
-          <span *ngIf="element.realmRoles.includes('volunteer')"><i class="bi bi-check-circle-fill text-success"></i></span>
+          <span *ngIf="element.realmRoles.includes('mapper')"><i class="bi bi-check-circle-fill text-success"></i></span>
         </td>
       </ng-container>
 
@@ -44,8 +44,8 @@
 
   <!--#################################################################################################################-->
   <ng-template #chooseModal let-modal>
-    <div class="modal-header">
-      <h4 class="modal-title">Volunteer freischalten</h4>
+    <div class="modal-header base-bg">
+      <h4 class="modal-title text-white">Volunteer freischalten</h4>
       <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="modal.dismiss()"></button>
     </div>
     <div class="modal-body bg-dark text-white" style="text-align: center;">
@@ -57,11 +57,11 @@
         Abbrechen
       </button>
       <button type="submit" class="btn base-bg text-white" (click)="modal.close('verify')"
-              *ngIf="currentUserRepresentation!.realmRoles?.includes('futureVolunteer')">
+              *ngIf="currentUserRepresentation!.realmRoles?.includes('futureMapper')">
         Freischalten
       </button>
       <button type="submit" class="btn base-bg text-white" (click)="modal.close()"
-              *ngIf="currentUserRepresentation!.realmRoles?.includes('volunteer')">
+              *ngIf="currentUserRepresentation!.realmRoles?.includes('mapper')">
         Sperren
       </button>
     </div>

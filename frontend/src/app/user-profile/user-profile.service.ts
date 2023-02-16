@@ -21,23 +21,23 @@ export class UserProfileService {
       .delete<UserRepresentation>(`${environment.baseUrlV1}/admin`);
   }
 
-  registerVolunteer(location: string) {
+  registerMapper(location: string) {
     return this.http
-      .post<UserRepresentation>(`${environment.baseUrlV1}/admin/registerVolunteer`, {location});
+      .post<UserRepresentation>(`${environment.baseUrlV1}/admin/registerMapper`, {location});
   }
 
-  getVolunteers() {
+  getMapper() {
     return this.http
-      .get<UserRepresentation[]>(`${environment.baseUrlV1}/admin/getVolunteers`);
+      .get<UserRepresentation[]>(`${environment.baseUrlV1}/admin/getMapper`);
   }
 
-  setVolunteerRole(id: string) {
+  setMapperRole(id: string) {
     return this.http
-      .patch<UserRepresentation>(`${environment.baseUrlV1}/admin/setVolunteerRole`, {id});
+      .patch<UserRepresentation>(`${environment.baseUrlV1}/admin/setMapperRole`, {id});
   }
 
-  deleteVolunteerRole(id: string) {
+  deleteMapperRole(id: string) {
     return this.http
-      .patch<UserRepresentation>(`${environment.baseUrlV1}/admin/deleteVolunteerRole`, {id});
+      .patch<UserRepresentation>(`${environment.baseUrlV1}/admin/deleteMapperRole`, {id});
   }
 }

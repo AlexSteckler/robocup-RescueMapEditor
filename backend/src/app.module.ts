@@ -15,6 +15,7 @@ import { TileModule } from './tiles/tile.module';
 import { MapModule } from './maps/map.module';
 import { ObstacleModule } from './obstacle/obstacle.module';
 import { CategoryModule } from './category/category.module';
+import { AdminModule } from './admin';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { CategoryModule } from './category/category.module';
       }),
       inject: [ConfigService],
     }),
+    AdminModule,
     TileModule,
     MapModule,
     ObstacleModule,
