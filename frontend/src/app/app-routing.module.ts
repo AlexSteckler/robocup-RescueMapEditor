@@ -32,6 +32,22 @@ const routes: Routes = [
     },
   },
   {
+    path: 'nutzer',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./user-profile/user-profile.module').then((m) => m.UserProfileModule),
+    data: {
+      roles: ['default-roles-robocup']
+    }
+  },
+  {
+    path: 'volunteers',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./volunteers/volunteers.module').then((m) => m.VolunteersModule),
+    data: {
+      roles: ['quali']
+    }
+  },
+  {
     path: 'show',
     loadChildren: () => import('./show/show.module').then((m) => m.ShowModule),
     canActivate: [AuthGuard],

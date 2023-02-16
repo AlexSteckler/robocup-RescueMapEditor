@@ -56,6 +56,14 @@ body {
   box-shadow: 10px 10px 10px 1px rgba(20, 20, 20, 0.3);
 }
 
+.topButton {
+  height: 38px !important;
+  color: white !important;
+  background-color: #555555;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
 h1 {
   color: $base-color;
   padding-bottom: 20px;

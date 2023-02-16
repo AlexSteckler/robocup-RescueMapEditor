@@ -61,6 +61,25 @@
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse"
           >Einstellungen </a>
+
+          <!--Volunteers-->
+          <a
+            *ngIf="roles.includes('quali')"
+            routerLink="volunteers"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="link-base link-light p-3 d-none d-lg-block"
+          >Volunteers
+          </a>
+          <a
+            *ngIf="roles.includes('quali')"
+            routerLink="volunteers"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="link-base link-light p-3 d-block d-lg-none"
+            data-bs-toggle="collapse"
+            data-bs-target=".navbar-collapse"
+          >Volunteers </a>
         </div>
 
         <!--Abmelden-->
@@ -85,11 +104,11 @@
             (click)="login()"
           >Anmelden
           </a>
-          <div class="d-flex flex-row">
-            <div class="d-flex flex-column p-2 align-items-center">
-              <span *ngIf="authenticated" class="ps-0 pe-0 text-white">{{name}}</span>
+          <div class="d-flex flex-row" routerLink="nutzer">
+            <div class="d-flex flex-column p-2 align-items-center link-base">
+              <span *ngIf="authenticated" class="ps-0 pe-0 link-base link-light">{{name}}</span>
               <span *ngIf="roles.includes('volunteer')">Volunteer</span>
-              <span *ngIf="roles.includes('admin')">Admin</span>
+              <span class="base-color" *ngIf="roles.includes('admin')">Admin</span>
               <span *ngIf="roles.includes('quali')" class="base-color-blue">Quali</span>
             </div>
             <div *ngIf="authenticated" class="border-right"></div>
@@ -109,7 +128,11 @@
 </nav>
 
 <!--Main Content-->
-<router-outlet></router-outlet>
+<div class="d-flex justify-content-center" id="mainContent">
+  <div class="card h-100" style="background-color: transparent; border: none;">
+    <router-outlet></router-outlet>
+  </div>
+</div>
 
 <!--Footer-->
 <footer class="dark-bg mt-auto" *ngIf="!showMode">
