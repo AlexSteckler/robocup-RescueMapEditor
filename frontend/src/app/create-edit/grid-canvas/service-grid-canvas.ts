@@ -35,8 +35,6 @@ export class ServiceGridCanvas {
         2) %
       4;
 
-    this.gridCanvasComponent.totalPoints = currentPoints.toString();
-
     let multiplier: number = 1;
 
     let lastRamp = -2;
@@ -66,8 +64,13 @@ export class ServiceGridCanvas {
       let currentTile =
         this.gridCanvasComponent.grids[currentPosition.layer][currentPosition.y][currentPosition.x]!;
       if (!currentTile!.name || currentTile.isPlaceholder) {
-        orientation = -3;
-        continue;
+        if(currentPosition.layer > 0 && this.gridCanvasComponent.grids[currentPosition.layer][currentPosition.y][currentPosition.x]!.name) {
+          currentTile = this.gridCanvasComponent.grids[currentPosition.layer-1][currentPosition.y][currentPosition.x]!;
+        } else {
+          orientation = -3;
+          continue;
+        }
+
       }
 
       if (currentTile.name.includes('evacuationZone')) {
@@ -170,8 +173,7 @@ export class ServiceGridCanvas {
       }
     }
     if (loopCount >= 1000) {
-      this.gridCanvasComponent.totalPoints =
-        'Ihre Bahn erzeugt eine Schleife. Parkour nicht zugelassen!';
+      this.gridCanvasComponent.totalPoints = 'Ihre Bahn erzeugt eine Schleife. Parkour nicht zugelassen!';
       return;
     }
 
