@@ -45,7 +45,7 @@ export class MapsController {
         // Create a new page
         const page = await browser.newPage();
 
-        await page.setViewport({width: (size.width * 100) + 10, height: (size.height * 100) + 10})
+        await page.setViewport({width: (Math.max(size.width, 1) * 100) + 10, height: (Math.max(size.height, 1) * 100) + 10})
 
         await page.goto(`${process.env.URI}/show/${createImgDto.id}`, {waitUntil: 'networkidle0'});
 
