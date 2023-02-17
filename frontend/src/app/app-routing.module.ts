@@ -28,7 +28,7 @@ const routes: Routes = [
     component: SettingsComponent,
     canActivate: [AuthGuard],
     data: {
-      roles: ['quali', 'admin'],
+      roles: ['quali', 'mapper', 'admin'],
     },
   },
   {

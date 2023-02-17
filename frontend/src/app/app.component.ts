@@ -39,25 +39,26 @@ export class AppComponent implements OnInit {
   async ngOnInit() {
     this.authenticated = await this.keycloakService.isLoggedIn();
     if (this.authenticated) {
-      this.keycloakService.loadUserProfile().then((profile) => {
-        this.userProfile = profile;
-        this.name = profile.firstName + ' ' + profile.lastName;
-      });
-      this.roles = this.keycloakService.getUserRoles(true);
+        this.userProfile = await this.keycloakService.loadUserProfile();
 
-        if (this.roles.length <= 4) {
+        this.name = this.userProfile.firstName + ' ' + this.userProfile.lastName;
+
+        this.roles = this.keycloakService.getUserRoles(true);
+
+        if (!this.roles.includes('mapper') && !this.roles.includes('admin') && !this.roles.includes('quali')  ) {
           this.registerMapper();
         } else {
-          if(this.roles.includes('volunteer') && (this.userProfile as any).attributes && !(this.userProfile as any).attributes.location) {
+          if((this.userProfile as any).attributes && !(this.userProfile as any).attributes.location && !this.roles.includes('admin')) {
             this.toastr.info('Sie sind keinem Standort zugeordnet. Bitte wenden Sie sich an das Support Team', 'Kein Standort zugewiesen', {
               timeOut: 0,
               extendedTimeOut: 0,
               closeButton: true,
             });
+            return;
           }
         }
-
     }
+
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.showMode = event.url.startsWith('/show');

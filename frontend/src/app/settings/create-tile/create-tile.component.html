@@ -63,7 +63,7 @@
               <i class="bi bi-info-circle-fill info base-color pe-1" placement="bottom" [ngbTooltip]="'Die 5 Punkte fürs Erreichen einer Kachel sind in der Anwendung bereits kalkuliert.'"></i>
               <span>Punktzahl:</span>
             </div>
-            <input type="number" class="form-control" placeholder="Value" [(ngModel)]="value"/>
+            <input type="number" class="form-control" min="0" max="100" placeholder="Value" [(ngModel)]="value"/>
           </div>
         </div>
 
