@@ -86,12 +86,12 @@
         <div class="d-flex flex-row justify-content-center align-items-center base-color">
           <!--Scoring-->
           <a
-            *ngIf="roles.includes('admin') || roles.includes('quali')"
+            *ngIf="roles.includes('admin') || roles.includes('quali') || roles.includes('mapper')"
             href="https://scoring.robocupjunior.de" target="_blank"
             class="link-base link-light p-3 d-none d-lg-block"
           >Zum Scoring <i class="bi bi-arrow-right-circle"></i></a>
           <a
-            *ngIf="roles.includes('admin') || roles.includes('quali')"
+            *ngIf="roles.includes('admin') || roles.includes('quali') || roles.includes('mapper')"
             class="link-base link-light p-3 d-block d-lg-none"
             href="https://scoring.robocupjunior.de" target="_blank"
             data-bs-toggle="collapse"
@@ -107,7 +107,7 @@
           <div class="d-flex flex-row" routerLink="nutzer">
             <div class="d-flex flex-column p-2 align-items-center link-base">
               <span *ngIf="authenticated" class="ps-0 pe-0 link-base link-light">{{name}}</span>
-              <span *ngIf="roles.includes('volunteer')">Volunteer</span>
+              <span *ngIf="roles.includes('volunteer') || roles.includes('mapper')" class="text-secondary">Volunteer</span>
               <span class="base-color" *ngIf="roles.includes('admin')">Admin</span>
               <span *ngIf="roles.includes('quali')" class="base-color-blue">Quali</span>
             </div>

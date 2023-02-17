@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
@@ -49,7 +50,8 @@ export class MapService {
 
     findOne(user: any, id: string) {
         if (!user.realm_access.roles.includes('admin')) {
-            return this.mapModel.findOne({_id: id, createdBy: user.sub}).exec();
+            console.log(user);
+            return this.mapModel.findOne({_id: id, location: user.location}).exec();
         }
         return this.mapModel.findOne({_id: id}).exec();
     }

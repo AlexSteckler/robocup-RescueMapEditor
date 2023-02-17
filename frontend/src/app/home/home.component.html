@@ -12,7 +12,7 @@
     </div>
     <div *ngIf="roles.includes('admin') || roles.includes('quali') || roles.includes('mapper') ">
       <div class="d-flex flex-column flex-md-row align-items-center p-3">
-        <div class="col-12 col-md-9 p-1">
+        <div class="col-12 col-md-8 p-1">
           <input [class.isInvalid]="!categoryName"
                 type="text"
                 class="form-control"
@@ -21,97 +21,120 @@
                 (keydown.enter)="createCategory()"
             />
         </div>
-        <div class="col-12 col-md-3 d-flex justify-content-center p-1">
-          <button [class.disabled]="!categoryName" class=" w-100 btn base-bg" (click)="createCategory()"><i class="bi bi-plus-circle"></i> <span class="ps-1">Kategorie erstellen</span></button>
+        <div class="col-12 col-md-4 d-flex justify-content-center p-1">
+          <div class="p-1">
+            <button [class.disabled]="!categoryName" class=" w-100 btn base-bg" (click)="createCategory()">
+              <i class="bi bi-plus-circle"></i> <span class="ps-1">Kategorie erstellen</span>
+            </button>
+          </div>
+          <div class="p-1">
+            <button [class.edit]="editMode" (click)="editMode = !editMode" class=" w-100 btn bg-secondary">
+              <i class="bi bi-pencil-square text-light"></i>
+            </button>
+          </div>
         </div>
       </div>
 
       <mat-accordion>
-        <mat-expansion-panel *ngFor="let category of categories" class="mb-2 p-0" style="border-radius: 4px !important;" [expanded]="category.expanded">
-
-          <mat-expansion-panel-header >
-            <mat-panel-title>
-              <span class="base-color p-2 m-0 fs-6">{{category.name}} |</span>
-              <button class="btn text-danger fs-5" (click)="deleteCategory(category)">
-                <i class="bi bi-trash3-fill fs-6"></i>
-              </button>
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <div class="d-flex flex-column flex-md-row justify-content-center p-md-2 pt-md-3">
-            <div class="col-md-5 p-2">
-              <div class="w-100 align-items-center">
-                <label class="text-dark">Name<p style="display:inline; color:red"> *</p></label>
-                <input
-                  [class.isInvalid]="!mapName"
-                  type="text"
-                  class="form-control"
-                  placeholder="Name"
-                  [(ngModel)]="mapName"
-                  (keydown.enter)="createMap(category)"
-                />
-              </div>
-            </div>
-            <div class="col-md-4 d-flex flex-column justify-content-center p-2 ps-md-2 pe-md-2">
-              <label class="text-dark">Disziplin<p style="display:inline; color:red"> *</p></label>
-              <select class="form-select p-1 w-auto" [class.isInvalid]="!selectedDiscipline" [(ngModel)]="selectedDiscipline">
-                <option value="" selected disabled >- Bitte wählen -</option>
-                <option *ngFor="let discipline of disciplines" value="{{discipline}}">{{discipline}}</option>
-              </select>
-            </div>
-            <div class="col-12 col-md-3 d-flex justify-content-center p-2 p-md-0">
-              <button class="btn base-bg" [class.disabled]="!selectedDiscipline || !mapName" (click)="createMap(category)">
-                <i class="bi bi-plus-circle"></i> <span class="ps-1">Karte erstellen</span>
-              </button>
-            </div>
-          </div>
-
-          <hr class="base-color w-100"/>
-
-          <div class="row d-flex align-items-start flex-column m-0">
-            <div class="pb-3" *ngFor="let map of (category.id | GetMapsForCategory : maps)">
-              <div *ngIf="map.category == category.id" class="row m-0 d-flex flex-md-row flex-column p-2 card-color rounded p-2">
-                <div *ngIf=" map.imageId != undefined" class="col-md-6 col-12 p-2">
-                  <img (click)="checkOutMap(map)"  class="col-12 cursor-pointer" [src]="map.image" alt="" />
+        <div *ngFor="let category of categories" class="d-flex flex-row">
+          <mat-expansion-panel class="mb-2 p-0 w-100" style="border-radius: 4px !important;" [expanded]="category.expanded">
+            <mat-expansion-panel-header>
+              <mat-panel-title class="w-100">
+                <span *ngIf="!editMode" class="base-color p-2 m-0 fs-6">{{category.name}}</span>
+                <div *ngIf="editMode">
+                  <input type="text"
+                    class="form-control w-100"
+                    (input)="updateCategory(category)"
+                    placeholder="{{category.name}}"
+                    [(ngModel)]="category.name"
+                  />
                 </div>
-                <div [ngClass]="map.imageId != undefined ? 'col-md-6 col-12' : 'col-12'" class="d-flex flex-column justify-content-between">
-                  <div (click)="checkOutMap(map)" class="col d-flex flex-column justify-content-center align-items-center p-2 text-white fs-5 ">
-                    <div class="p-2 d-flex flex-column align-items-center">
-                      <span class="cursor-pointer fw-bold p-1">{{ map.name }}</span>
-                      <span class="text-white fw-none fs-6 p-1">{{map.discipline}}</span>
-                    </div>
-                    <hr class="base-color w-100 p-0 m-0"/>
-                    <div *ngIf="map.scoreCount" class="fs-6 p-2">
-                      <span>Gesamtpunktzahl:</span><span class="base-color "> {{map.scoreCount}}</span>
-                    </div>
-                  </div>
-                  <div [ngClass]="map.imageId != undefined ? 'justify-content-between' : 'justify-content-end' " class="d-flex">
-                    <div *ngIf=" map.imageId != undefined" class="pe-1">
-                      <button class="btn base-color fs-5" (click)="sendMap(map)">
-                        <i class="bi bi-download"></i>
-                      </button>
-                    </div>
-                    <div class="d-flex flex-row">
-                      <!--
-                        TODO: Update Map
 
-                      <div class="ps-1">
-                        <button class="btn base-color-blue fs-5" (click)="updateMap(map)">
-                          <i class="bi bi-pencil-square"></i>
-                        </button>
-                      </div>
-                    -->
-                      <div class="ps-1">
-                        <button class="btn text-danger fs-5" (click)="deleteMap(map)">
-                          <i class="bi bi-trash3-fill"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="d-flex flex-column flex-md-row justify-content-center p-md-2 pt-md-3">
+              <div class="col-md-5 p-2">
+                <div class="w-100 align-items-center">
+                  <label class="text-dark">Name<p style="display:inline; color:red"> *</p></label>
+                  <input
+                    [class.isInvalid]="!mapName"
+                    type="text"
+                    class="form-control"
+                    placeholder="Name"
+                    [(ngModel)]="mapName"
+                    (keydown.enter)="createMap(category)"
+                  />
+                </div>
+              </div>
+              <div class="col-md-4 d-flex flex-column justify-content-center p-2 ps-md-2 pe-md-2">
+                <label class="text-dark">Disziplin<p style="display:inline; color:red"> *</p></label>
+                <select class="form-select p-1 w-auto" [class.isInvalid]="!selectedDiscipline" [(ngModel)]="selectedDiscipline">
+                  <option value="" selected disabled >- Bitte wählen -</option>
+                  <option *ngFor="let discipline of disciplines" value="{{discipline}}">{{discipline}}</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-3 d-flex justify-content-center p-2 p-md-0">
+                <div class="d-flex align-items-end p-2">
+                  <button class="btn base-bg" [class.disabled]="!selectedDiscipline || !mapName" (click)="createMap(category)">
+                    <i class="bi bi-plus-circle"></i> <span class="ps-1">Karte erstellen</span>
+                  </button>
                 </div>
               </div>
             </div>
+
+            <hr class="base-color w-100"/>
+
+            <div class="row d-flex align-items-start flex-column m-0">
+              <div class="pb-3" *ngFor="let map of (category.id | GetMapsForCategory : maps)">
+                <div *ngIf="map.category == category.id" class="row m-0 d-flex flex-md-row flex-column p-2 card-color rounded p-2">
+                  <div *ngIf=" map.imageId != undefined" class="col-md-6 col-12 p-2">
+                    <img (click)="checkOutMap(map)"  class="col-12 cursor-pointer" [src]="map.image" alt="" />
+                  </div>
+                  <div [ngClass]="map.imageId != undefined ? 'col-md-6 col-12' : 'col-12'" class="d-flex flex-column justify-content-between">
+                    <div (click)="checkOutMap(map)" class="col d-flex flex-column justify-content-center align-items-center p-2 text-white fs-5 ">
+                      <div class="p-2 d-flex flex-column align-items-center">
+                        <span class="cursor-pointer fw-bold p-1">{{ map.name }}</span>
+                        <span class="text-white fw-none fs-6 p-1">{{map.discipline}}</span>
+                      </div>
+                      <hr class="base-color w-100 p-0 m-0"/>
+                      <div *ngIf="map.scoreCount" class="fs-6 p-2">
+                        <span>Gesamtpunktzahl:</span><span class="base-color "> {{map.scoreCount}}</span>
+                      </div>
+                    </div>
+                    <div [ngClass]="map.imageId != undefined ? 'justify-content-between' : 'justify-content-end' " class="d-flex">
+                      <div *ngIf=" map.imageId != undefined" class="pe-1">
+                        <button class="btn base-color fs-5" (click)="sendMap(map)">
+                          <i class="bi bi-download"></i>
+                        </button>
+                      </div>
+                      <div class="d-flex flex-row">
+                        <!--
+                          TODO: Update Map
+
+                        <div class="ps-1">
+                          <button class="btn base-color-blue fs-5" (click)="updateMap(map)">
+                            <i class="bi bi-pencil-square"></i>
+                          </button>
+                        </div>
+                      -->
+                        <div class="ps-1">
+                          <button class="btn text-danger fs-5" (click)="deleteMap(map)">
+                            <i class="bi bi-trash3-fill"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-expansion-panel>
+          <div *ngIf="editMode" class="d-flex align-items-start ps-2 pt-2">
+            <button class="btn text-danger fs-5 p-0" *ngIf="category.name != 'Standart'" (click)="deleteCategory(category)">
+              <i class="bi bi-trash3-fill fs-6"></i>
+            </button>
           </div>
-        </mat-expansion-panel>
+        </div>
       </mat-accordion>
     </div>
   </div>

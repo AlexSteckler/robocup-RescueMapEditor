@@ -12,7 +12,7 @@ const routes: Routes = [
     component: CreateEditComponent,
     canActivate: [AuthGuard],
     data: {
-      roles: ['quali', 'admin'],
+      roles: ['quali', 'mapper', 'admin'],
     },
   },
   {

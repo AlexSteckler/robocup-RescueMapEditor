@@ -32,6 +32,7 @@ export class HomeComponent {
   header: string = '';
 
   panelOpenState = true;
+  editMode = false;
 
   categoryName: string = '';
   categoryDiscipline: string[] = [];
@@ -172,5 +173,13 @@ export class HomeComponent {
         this.toastr.info('Kategorie nicht gelöscht');
       }
     );
+  }
+
+  updateCategory(category: Category) {
+    let tmpCategory = {
+      name: category.name,
+    }
+    this.homeService.updateCategory(category.id, tmpCategory).subscribe(() => {
+    });
   }
 }
