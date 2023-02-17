@@ -194,7 +194,12 @@ export class CreateTileComponent {
     .then((result) => {
       if (result == 'delete') {
         this.tilesService.deleteTile(selectedTile.id!).subscribe(() => {
-          this.tiles = this.tiles.filter((tile) => tile.id != selectedTile.id);
+          if(selectedTile.location) {
+            this.locationTiles = this.locationTiles.filter((tile) => tile.id != selectedTile.id);
+          } else {
+            this.tiles = this.tiles.filter((tile) => tile.id != selectedTile.id);
+          }
+
           this.toastr.success('Kachel wurde gelöscht');
         });
       } else {
