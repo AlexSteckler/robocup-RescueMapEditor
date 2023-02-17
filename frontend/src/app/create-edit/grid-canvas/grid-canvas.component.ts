@@ -378,6 +378,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       this.gridCanvasService.deleteObstacle(this.map?.id!, obstacle.id).subscribe((map: Map) => {
         this.map = map
         this.obstacles = this.obstacles.filter(o => o.id !== obstacle.id);
+        this.serviceGridCanvas.calcTotalPoints();
       });
     } else {
       let scale = this.canvasValues!.scale;
