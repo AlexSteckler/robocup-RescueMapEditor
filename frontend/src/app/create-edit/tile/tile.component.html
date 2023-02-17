@@ -14,7 +14,7 @@
   </div>
 
   <img [ngClass]="{'isPlaceholder': tile?.isPlaceholder}" *ngIf="tile?.image" [@rotatedState]='state'
-       [src]="tile?.image" class="w-100" (contextmenu)="onRightClick()" (click)="onRightClick()">
+       [src]="tile?.image" class="w-100" (contextmenu)="onRightClick()">
 
   <div *ngIf="tile?.name!.includes('evacuationZoneAcross') && isCurrentlyDraggedTile" class="draggedTileAcross"></div>
   <div *ngIf="tile?.name!.includes('evacuationZoneUpright') && isCurrentlyDraggedTile" class="draggedTileUpright"></div>

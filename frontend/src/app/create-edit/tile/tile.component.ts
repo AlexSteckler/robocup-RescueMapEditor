@@ -43,6 +43,7 @@ export class TileComponent implements OnInit{
   }
 
   onRightClick(position:number = -1) {
+    if(this.tile?.isPlaceholder) return;
     if (this.tile?.name.includes('evacuationZone') && position != -1) {
       this.colorSwap(position);
     }

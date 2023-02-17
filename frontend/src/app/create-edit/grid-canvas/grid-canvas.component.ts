@@ -255,6 +255,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   dragStartMovement(tile: Tile) {
+    if(tile.isPlaceholder) return;
     this.currentDraggedTile = tile;
     this.currentDraggedTileChange.emit(this.currentDraggedTile);
     this.isInTrash = false;
@@ -265,6 +266,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   dragEndMovement(tile: Tile, $event: CdkDragEnd, layerCount: number, rowCount: number, colCount: number) {
+    if(tile.isPlaceholder) return;
     let x = $event.distance.x / this.canvasValues!.scale;
     let y = $event.distance.y / this.canvasValues!.scale;
 
