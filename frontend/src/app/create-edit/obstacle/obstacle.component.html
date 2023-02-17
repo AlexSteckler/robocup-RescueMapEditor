@@ -1,8 +1,12 @@
 
 <img id="obstacle"
       [src]="obstacle?.image"
-      [ngStyle]="{'width.px': obstacle?.width, 'height.px': obstacle?.height, 'transform': 'rotate(' + obstacle?.rotation + 'deg)'}"
+      [ngStyle]="{
+      'width.px': obstacle?.width && canvasValues? obstacle!.width * canvasValues.scale : obstacle?.width,
+      'height.px': obstacle?.height && canvasValues? obstacle!.height * canvasValues.scale : obstacle?.height,
+      'transform': 'rotate(' + obstacle?.rotation + 'deg)'}"
       [class.is-NotRated]="obstacle?.rated !== undefined && !obstacle?.rated!"
       (click)="rotateObstacle(true)"
       (contextmenu)="rotateObstacle(false)"
+     style="border: #212529 1px solid"
       />

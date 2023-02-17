@@ -72,14 +72,15 @@
     (cdkDragStarted)="draggedStartObstacle(obstacle)"
     (cdkDragEnded)="draggedEndObstacle(obstacle)"
     class="borderObstacle d-flex align-items-center justify-content-center"
+    [cdkDragConstrainPosition]="dragConstrainPoint"
   >
     <app-obstacle [obstacle]="obstacle"
-                  [ngStyle]="{'width.px': obstacle.width, 'height.px': obstacle.height}"></app-obstacle>
+                  [ngStyle]="{'width.px': obstacle.width, 'height.px': obstacle.height}"
+                  ></app-obstacle>
 
     <app-obstacle *cdkDragPreview
                   [obstacle]="obstacle"
                   [canvasValues]="canvasValues"
-                  [ngStyle]="{'width.px': obstacle.width! * canvasValues!.scale, 'height.px': obstacle.height! * canvasValues!.scale}"
     ></app-obstacle>
     <div *cdkDragPlaceholder class="border-none"></div>
   </div>

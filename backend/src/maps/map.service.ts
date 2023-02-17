@@ -50,7 +50,6 @@ export class MapService {
 
     findOne(user: any, id: string) {
         if (!user.realm_access.roles.includes('admin')) {
-            console.log(user);
             return this.mapModel.findOne({_id: id, location: user.location}).exec();
         }
         return this.mapModel.findOne({_id: id}).exec();

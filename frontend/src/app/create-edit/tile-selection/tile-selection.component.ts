@@ -27,9 +27,10 @@ export class TileSelectionComponent implements OnInit {
   @Input() innerHeight: number = 0;
 
   @Input() currentDraggedTile: Tile | undefined;
+  currentDraggedObstacle: Obstacle | undefined;
   @Input() evacuationExists: boolean = false;
 
-  @Output() currentDraggedObstacle = new EventEmitter<Obstacle>;
+  @Output() currentDraggedObstacleChange = new EventEmitter<Obstacle>;
 
 
   constructor(
@@ -108,11 +109,13 @@ export class TileSelectionComponent implements OnInit {
   }
 
   draggedStartObstacle(obstacle: Obstacle) {
-    this.currentDraggedObstacle.emit(obstacle);
+    this.currentDraggedObstacle = obstacle;
+    this.currentDraggedObstacleChange.emit(obstacle);
   }
 
   draggedEndObstacle(obstacle: Obstacle) {
-    this.currentDraggedObstacle.emit(undefined);
+    this.currentDraggedObstacle = undefined;
+    this.currentDraggedObstacleChange.emit(undefined);
   }
 
   dragConstrainPoint = (point: any, dragRef: any) => {
@@ -125,8 +128,8 @@ export class TileSelectionComponent implements OnInit {
       zoomMoveYDifference = (1 - scale) * dragRef.getFreeDragPosition().y;
     }
     return {
-      x: point.x + zoomMoveXDifference - scale * 25,
-      y: point.y + zoomMoveYDifference - scale * 25,
+      x: point.x + zoomMoveXDifference - scale * (this.currentDraggedObstacle === undefined ? 50 : this.currentDraggedObstacle.width! / 2),
+      y: point.y + zoomMoveYDifference - scale * (this.currentDraggedObstacle === undefined ? 50 : this.currentDraggedObstacle.height! / 2),
     };
   }
 }

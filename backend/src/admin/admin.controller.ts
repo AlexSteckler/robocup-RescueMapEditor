@@ -137,7 +137,6 @@ export class AdminController implements OnModuleInit {
   async getQuali(
     @AuthenticatedUser() user: any,
   ): Promise<UserRepresentation[]> {
-    console.log(user.location);
     let userRepresentations = await this.kcAdminClient.roles.findUsersWithRole({
       name: 'mapper',
     });

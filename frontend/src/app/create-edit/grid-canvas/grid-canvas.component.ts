@@ -92,7 +92,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.panzoomCanvas = panzoom(this.canvasElement!.nativeElement, {
-      maxZoom: 2,
+      maxZoom: 1.9,
       minZoom: 0.5,
       zoomDoubleClickSpeed: 1,
     });
@@ -143,11 +143,18 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   //---------- Drag & Drop -----------//
   drop($event: CdkDragDrop<Tile[]>, layer: number, rowCount: number, colCount: number) {
     if (this.currentObstacle !== undefined) {
+      console.log(this.canvasWrapperElement?.nativeElement.getBoundingClientRect());
       let x = this.innerWidth - $event.dropPoint.x
-      let y = $event.dropPoint.y - 160
+      let y = $event.dropPoint.y - this.canvasWrapperElement?.nativeElement.getBoundingClientRect().top;
       let scale = this.canvasValues!.scale;
-      let top = (y - this.canvasValues!.y) / scale
-      let left = (this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x - 5) / scale;
+      let top = (y - this.canvasValues!.y) / scale - this.currentObstacle.height / 2;
+      let left = (this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x) / scale - (3 * scale);
+
+      if(top < 0 || left < 0) {
+        return;
+      }
+
+      console.log("x: " + x + " y: " + y + " scale: " + scale + " top: " + top + " left: " + left);
 
       let tmpId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
