@@ -20,6 +20,7 @@ import {GlobalErrorHandler} from "./shared/GlobalErrorHandler";
 import {MatTooltipModule} from '@angular/material/tooltip';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import {GetMapsForCategoryPipe} from "./home/pipe/pipe";
+import { VolunteersModule } from './volunteers/volunteers.module';
 
 function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -44,7 +45,7 @@ function initializeKeycloak(keycloak: KeycloakService) {
         SettingsComponent,
         CreateTileComponent,
         CreateObstacleComponent,
-        GetMapsForCategoryPipe,
+        GetMapsForCategoryPipe
     ],
   providers: [
     {
@@ -73,7 +74,7 @@ function initializeKeycloak(keycloak: KeycloakService) {
     MatCheckboxModule,
     ReactiveFormsModule,
     MatTooltipModule,
-    NgbTooltip,
+    NgbTooltip
   ]
 })
 export class AppModule {

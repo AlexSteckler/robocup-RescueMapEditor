@@ -12,7 +12,7 @@ const routes: Routes = [
     component: CreateEditComponent,
     canActivate: [AuthGuard],
     data: {
-      roles: ['quali', 'admin'],
+      roles: ['quali', 'mapper', 'admin'],
     },
   },
   {
@@ -30,6 +30,22 @@ const routes: Routes = [
     data: {
       roles: ['quali', 'admin'],
     },
+  },
+  {
+    path: 'nutzer',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./user-profile/user-profile.module').then((m) => m.UserProfileModule),
+    data: {
+      roles: ['default-roles-robocup']
+    }
+  },
+  {
+    path: 'volunteers',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./volunteers/volunteers.module').then((m) => m.VolunteersModule),
+    data: {
+      roles: ['quali']
+    }
   },
   {
     path: 'show',

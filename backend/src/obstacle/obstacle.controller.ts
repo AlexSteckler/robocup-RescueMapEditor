@@ -19,7 +19,7 @@ export class ObstacleController {
     }
 
     @Post()
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async createObstacle(
         @AuthenticatedUser() user: any,
         @Body() createObstacleDto: CreateObstacleDto): Promise<Obstacle> {
@@ -27,7 +27,7 @@ export class ObstacleController {
     }
 
     @Patch(':id')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async updateObstacle(
         @Body() createObstacleDto: CreateObstacleDto,
         @Param() findObstacleDto: FindObstacleDto
@@ -36,7 +36,7 @@ export class ObstacleController {
     }
 
     @Delete(':id')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async deleteObstacle(
         @Param() findObstacleDto: FindObstacleDto): Promise<Obstacle> {
         return this.obstacleService.deleteObstacle(findObstacleDto.id);

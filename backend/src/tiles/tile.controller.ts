@@ -24,7 +24,7 @@ export class TilesController {
     }
 
     @Post()
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async create(
         @AuthenticatedUser() user: any, 
         @Body() createTileDto: CreateTileDto) : Promise<Tile> {
@@ -32,7 +32,7 @@ export class TilesController {
     }
 
     @Patch(':id')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async updateTile(
         @Body() createTileDto: CreateTileDto, 
         @Param() findTileDto: FindTileDto) : Promise<Tile> {
@@ -40,14 +40,14 @@ export class TilesController {
     }
 
     @Delete(':id')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async deleteTile(@Param() findTileDto: FindTileDto) : Promise<Tile> {
         return this.tileService.deleteTile(findTileDto.id);
     }
 
     @Get('/map/:id')
     @NotFound()
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async getTilesByMapId(@AuthenticatedUser() user: any, @Param() findTileByMapId: FindTileDto) : Promise<Tile[]> {
         let map = await this.mapService.findOne(user, findTileByMapId.id);
 

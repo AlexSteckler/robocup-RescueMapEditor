@@ -32,6 +32,7 @@ export class HomeComponent {
   header: string = '';
 
   panelOpenState = true;
+  editMode = false;
 
   categoryName: string = '';
   categoryDiscipline: string[] = [];
@@ -55,7 +56,7 @@ export class HomeComponent {
 
     this.roles = this.keycloakService.getUserRoles();
 
-    if (this.authenticated && this.roles.includes('admin') || this.roles.includes('quali')) {
+    if (this.authenticated && this.roles.includes('admin') || this.roles.includes('quali') || this.roles.includes('mapper') ) {
       this.homeService.getAllCategorys().subscribe((categories) => {
         let first = true;
         categories.forEach((category) => {
@@ -172,5 +173,13 @@ export class HomeComponent {
         this.toastr.info('Kategorie nicht gelöscht');
       }
     );
+  }
+
+  updateCategory(category: Category) {
+    let tmpCategory = {
+      name: category.name,
+    }
+    this.homeService.updateCategory(category.id, tmpCategory).subscribe(() => {
+    });
   }
 }

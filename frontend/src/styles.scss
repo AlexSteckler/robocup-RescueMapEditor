@@ -25,6 +25,20 @@ body {
   color: $base-blue !important;
 }
 
+.rc-link {
+  color: $base-color !important;
+  background-color: none !important;
+  cursor: pointer;
+  text-align: center;
+
+  &:hover {
+    color: white !important;
+    transition-duration: 200ms;
+    transition-property: color !important;
+  }
+}
+
+
 .link-base {
   cursor: pointer;
   color: whitesmoke;
@@ -54,6 +68,14 @@ body {
 
 .card-shadow {
   box-shadow: 10px 10px 10px 1px rgba(20, 20, 20, 0.3);
+}
+
+.topButton {
+  height: 38px !important;
+  color: white !important;
+  background-color: #555555;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 h1 {

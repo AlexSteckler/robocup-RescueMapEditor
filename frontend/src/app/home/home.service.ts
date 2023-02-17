@@ -23,4 +23,8 @@ export class HomeService {
     return this.httpClient.delete<Category>(`${environment.baseUrlV1}/category/${id}`);
   }
 
+  public updateCategory(id: string, dto: any): Observable<Category> {
+    return this.httpClient.patch<Category>(`${environment.baseUrlV1}/category/${id}`, dto);
+  }
+
 }
