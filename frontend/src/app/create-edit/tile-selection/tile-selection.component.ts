@@ -128,8 +128,8 @@ export class TileSelectionComponent implements OnInit {
       zoomMoveYDifference = (1 - scale) * dragRef.getFreeDragPosition().y;
     }
     return {
-      x: point.x + zoomMoveXDifference - scale * (this.currentDraggedObstacle === undefined ? 50 : this.currentDraggedObstacle.width! / 2),
-      y: point.y + zoomMoveYDifference - scale * (this.currentDraggedObstacle === undefined ? 50 : this.currentDraggedObstacle.height! / 2),
+      x: point.x + zoomMoveXDifference - scale * (this.currentDraggedObstacle === undefined ? 25 : this.currentDraggedObstacle.width! / 2),
+      y: point.y + zoomMoveYDifference - scale * (this.currentDraggedObstacle === undefined ? 25 : this.currentDraggedObstacle.height! / 2),
     };
   }
 }
