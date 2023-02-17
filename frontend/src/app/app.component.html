@@ -25,7 +25,7 @@
         >
           <!--Übersicht-->
           <a
-            *ngIf="roles.includes('admin') || roles.includes('quali') || roles.includes('default')"
+            *ngIf="roles.includes('admin') || roles.includes('quali') || roles.includes('mapper') || roles.includes('default')"
             routerLink="home"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
@@ -33,7 +33,7 @@
           >Home
           </a>
           <a
-            *ngIf="roles.includes('admin') || roles.includes('quali') || roles.includes('default')"
+            *ngIf="roles.includes('admin') || roles.includes('quali')|| roles.includes('mapper') || roles.includes('default')"
             routerLink="home"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"

@@ -18,7 +18,7 @@ export class CategoryController {
     }
 
     @Post()
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async createCategory(
         @AuthenticatedUser() user: any,
         @Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
@@ -26,7 +26,7 @@ export class CategoryController {
     }
 
     @Patch(':id')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async updateCategory(
         @Body() createCategoryDto: CreateCategoryDto,
         @Param() findCategoryDto: FindCategoryDto
@@ -35,7 +35,7 @@ export class CategoryController {
     }
 
     @Delete(':id')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async deleteCategory(
         @AuthenticatedUser() user: any,
         @Param() findCategoryDto: FindCategoryDto): Promise<Category> {

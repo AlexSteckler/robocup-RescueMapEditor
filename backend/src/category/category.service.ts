@@ -31,6 +31,6 @@ export class CategoryService {
     }
 
     async deleteCategory(user: any, id: string): Promise<Category> {
-        return this.categoryModel.findOneAndDelete({_id: id, createdBy: user.sub});
+        return this.categoryModel.findOneAndDelete({_id: id, location: user.location});
     }
 }

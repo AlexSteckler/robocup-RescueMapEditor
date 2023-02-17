@@ -113,7 +113,7 @@ export class MapsController {
 
     @Get(':id')
     @NotFound()
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async getOne(
         @Param() findMapDto: FindMapDto,
         @AuthenticatedUser() user: any,
@@ -132,14 +132,14 @@ export class MapsController {
 
     @Get()
     @NotFound()
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async getAll(@AuthenticatedUser() user: any) {
         return this.mapService.findAll(user);
     }
 
     @Get(':discipline')
     @NotFound()
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async getMapByDiscipline(
         @Body() findMapByDisciplineDto: FindMapByDisciplineDto,
         @AuthenticatedUser() user: any,
@@ -148,7 +148,7 @@ export class MapsController {
     }
 
     @Post()
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async create(
         @Body() createMapDto: CreateMapDto,
         @AuthenticatedUser() user: any
@@ -157,7 +157,7 @@ export class MapsController {
     }
 
     @Delete(':id')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async deleteMap(@Param() findMapDto: FindMapDto) {
         console.log("Delete map");
         let newVar = await this.mapService.deleteMap(findMapDto.id);
@@ -168,7 +168,7 @@ export class MapsController {
     }
 
     @Patch(':id')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async updateMap(
         @Body() updateMapInfoDto: UpdateMapInfoDto,
         @Param() findMapDto: FindMapDto,
@@ -177,7 +177,7 @@ export class MapsController {
     }
 
     @Patch(':id/tile')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async updateTile(
         @Body() updateTileDto: UpdateTileDto,
         @Param() findMapDto: FindMapDto,
@@ -196,7 +196,7 @@ export class MapsController {
     }
 
     @Patch('tile/:id/delete')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async deleteTile(
         @Body() deleteTileDto: DeleteTileDto,
         @Param() findMapDto: FindMapDto,
@@ -214,7 +214,7 @@ export class MapsController {
     }
 
     @Patch(':id/obstacle')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async updateObstacle(
         @Body() updateObstacleDto: UpdateObstacleDto,
         @Param() findMapDto: FindMapDto,
@@ -228,7 +228,7 @@ export class MapsController {
     }
 
     @Delete(':mapId/obstacle/:obstacleId')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async deleteObstacle(@Param() findMapDto: FindObstacleInMapDto, @AuthenticatedUser() user: any) {
         console.log("Delete obstacle");
         let newVar = await this.mapService.deleteObstacle(findMapDto.mapId, findMapDto.obstacleId);
@@ -237,7 +237,7 @@ export class MapsController {
     }
 
     @Patch('evacuation/:id')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async updateEvacuation(
         @Body() updateEvacuationZoneDto: UpdateEvacuationZoneDto,
         @Param() findMapDto: FindMapDto,
@@ -253,7 +253,7 @@ export class MapsController {
     }
 
     @Delete('evacuation/:id')
-    @Roles({roles: ['realm:admin','realm:quali']})
+    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
     async deleteEvacuation(@Param() findMapDto: FindMapDto, @AuthenticatedUser() user: any) {
         console.log("Delete evacuation");
         let newVar = await this.mapService.deleteEvacuationZone(findMapDto.id);

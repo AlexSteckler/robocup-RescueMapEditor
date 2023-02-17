@@ -10,7 +10,7 @@
         zu erstellen!</p>
         <p class="p-3 text-muted fst-italic">*Maze und Maze Entry sind in Arbeit!</p>
     </div>
-    <div *ngIf="roles.includes('admin') || roles.includes('quali')">
+    <div *ngIf="roles.includes('admin') || roles.includes('quali') || roles.includes('mapper') ">
       <div class="d-flex flex-column flex-md-row align-items-center p-3">
         <div class="col-12 col-md-9 p-1">
           <input [class.isInvalid]="!categoryName"

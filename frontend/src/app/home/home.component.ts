@@ -55,7 +55,7 @@ export class HomeComponent {
 
     this.roles = this.keycloakService.getUserRoles();
 
-    if (this.authenticated && this.roles.includes('admin') || this.roles.includes('quali')) {
+    if (this.authenticated && this.roles.includes('admin') || this.roles.includes('quali') || this.roles.includes('mapper') ) {
       this.homeService.getAllCategorys().subscribe((categories) => {
         let first = true;
         categories.forEach((category) => {
