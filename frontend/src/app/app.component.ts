@@ -45,7 +45,7 @@ export class AppComponent implements OnInit {
 
         this.roles = this.keycloakService.getUserRoles(true);
 
-        if (!this.roles.includes('mapper') && !this.roles.includes('admin') && !this.roles.includes('quali')  ) {
+        if (!this.roles.includes('mapper') && !this.roles.includes('admin') && !this.roles.includes('quali') && !this.roles.includes('futureMapper') ) {
           this.registerMapper();
         } else {
           if((this.userProfile as any).attributes && !(this.userProfile as any).attributes.location && !this.roles.includes('admin')) {
