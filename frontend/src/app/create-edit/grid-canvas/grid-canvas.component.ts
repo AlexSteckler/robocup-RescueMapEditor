@@ -363,18 +363,20 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   dragConstrainPoint = (point: any, dragRef: any) => {
-    let zoomMoveXDifference = 0;
-    let zoomMoveYDifference = 0;
     let scale = this.canvasValues!.scale;
-
-    if (scale != 1) {
-      zoomMoveXDifference = (1 - scale) * dragRef.getFreeDragPosition().x;
-      zoomMoveYDifference = (1 - scale) * dragRef.getFreeDragPosition().y;
+    let zoomMoveXDifference = Math.floor((1 - scale) * dragRef.getFreeDragPosition().x);
+    let zoomMoveYDifference = Math.floor((1 - scale) * dragRef.getFreeDragPosition().y);
+    if(this.currentObstacle !== undefined) {
+      return {
+        x: Math.floor(point.x + zoomMoveXDifference - scale *  (this.currentObstacle.width / 2)),
+        y: Math.floor(point.y + zoomMoveYDifference - scale *  (this.currentObstacle.height / 2)),
+      };
+    } else {
+      return {
+        x: Math.floor(point.x + zoomMoveXDifference - scale * 50),
+        y: Math.floor(point.y + zoomMoveYDifference - scale * 50),
+      };
     }
-    return {
-      x: point.x + zoomMoveXDifference - scale * (this.currentObstacle === undefined ? 50 : this.currentObstacle.width! / 2),
-      y: point.y + zoomMoveYDifference - scale * (this.currentObstacle === undefined ? 50 : this.currentObstacle.height! / 2),
-    };
   }
 
   moveObsStart(obstacle: Obstacle) {
