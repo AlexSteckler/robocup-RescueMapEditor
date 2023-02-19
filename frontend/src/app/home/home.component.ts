@@ -133,7 +133,9 @@ export class HomeComponent {
     }
 
     this.homeService.createCategory(categoryDto).subscribe((category) => {
-      this.categories.push(category);
+      category.expanded = true;
+      this.categories.unshift(category);
+
       this.toastr.success('Kategorie erstellt');
     });
   }

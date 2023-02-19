@@ -14,7 +14,13 @@ export class CategoryController {
     @Get()
     async getAll(
         @AuthenticatedUser() user: any): Promise<Category[]> {
-        return this.categoryService.findAll(user);
+        let categories = await this.categoryService.findAll(user);
+        return categories.sort((a: any, b: any) => {
+            if (a.name == 'Standart') return 1;
+            if (b.name == 'Standart') return -1;
+            return ((new Date(a.createdAt).getTime()) < (new Date(b.createdAt).getTime())) ? 1 : -1}
+        );
+        
     }
 
     @Post()

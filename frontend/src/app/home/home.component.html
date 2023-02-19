@@ -41,7 +41,7 @@
             <mat-expansion-panel-header>
               <mat-panel-title class="w-100">
                 <span *ngIf="!editMode" class="base-color p-2 m-0 fs-6">{{category.name}}</span>
-                <div *ngIf="editMode">
+                <div *ngIf="editMode && category.location">
                   <input type="text"
                     class="form-control w-100"
                     (input)="updateCategory(category)"
@@ -49,8 +49,12 @@
                     [(ngModel)]="category.name"
                   />
                 </div>
+                <span class="base-color p-2 m-0 fs-6" *ngIf="editMode && !category.location" >{{category.name}}</span>
 
               </mat-panel-title>
+              <mat-panel-description *ngIf="roles.includes('admin')">
+                {{category.location ? category.location : 'Alle'}}
+              </mat-panel-description>
             </mat-expansion-panel-header>
             <div class="d-flex flex-column flex-md-row justify-content-center p-md-2 pt-md-3">
               <div class="col-md-5 p-2">
@@ -117,7 +121,7 @@
                           </button>
                         </div>
                       -->
-                        <div class="ps-1">
+                        <div class="ps-1" *ngIf="roles.includes('admin') || roles.includes('quali')">
                           <button class="btn text-danger fs-5" (click)="deleteMap(map)">
                             <i class="bi bi-trash3-fill"></i>
                           </button>
