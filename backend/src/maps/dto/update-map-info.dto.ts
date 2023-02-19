@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsNumber } from 'class-validator';
+import { IsArray, IsBoolean, IsMongoId, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateMapInfoDto {
   @IsNumber()
@@ -9,4 +9,12 @@ export class UpdateMapInfoDto {
 
   @IsBoolean()
   isLeftDirection: boolean;
+
+  @IsOptional()
+  @IsString()
+  name: string;
+
+  @IsOptional()
+  @IsMongoId()
+  category: string;
 }

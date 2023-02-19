@@ -28,7 +28,7 @@
             </button>
           </div>
           <div class="p-1">
-            <button [class.edit]="editMode" (click)="editMode = !editMode" class=" w-100 btn bg-secondary">
+            <button [class.edit]="editCategoryMode" (click)="editCategoryMode = !editCategoryMode" class=" w-100 btn bg-secondary">
               <i class="bi bi-pencil-square text-light"></i>
             </button>
           </div>
@@ -36,12 +36,13 @@
       </div>
 
       <mat-accordion>
-        <div *ngFor="let category of categories" class="d-flex flex-row">
-          <mat-expansion-panel class="mb-2 p-0 w-100" style="border-radius: 4px !important;" [expanded]="category.expanded">
+        <div *ngFor="let category of categories" id="{{category.id}}" class="d-flex flex-row">
+          <mat-expansion-panel class="mb-2 p-0 w-100" style="border-radius: 4px !important;" (opened)="category.expanded = true"
+          (closed)="category.expanded = false" [expanded]="category.expanded">
             <mat-expansion-panel-header>
               <mat-panel-title class="w-100">
-                <span *ngIf="!editMode" class="base-color p-2 m-0 fs-6">{{category.name}}</span>
-                <div *ngIf="editMode && category.location">
+                <span *ngIf="!editCategoryMode" class="base-color p-2 m-0 fs-6">{{category.name}}</span>
+                <div *ngIf="editCategoryMode && category.location">
                   <input type="text"
                     class="form-control w-100"
                     (input)="updateCategory(category)"
@@ -49,7 +50,7 @@
                     [(ngModel)]="category.name"
                   />
                 </div>
-                <span class="base-color p-2 m-0 fs-6" *ngIf="editMode && !category.location" >{{category.name}}</span>
+                <span class="base-color p-2 m-0 fs-6" *ngIf="editCategoryMode && !category.location" >{{category.name}}</span>
 
               </mat-panel-title>
               <mat-panel-description *ngIf="roles.includes('admin')">
@@ -89,7 +90,8 @@
             <hr class="base-color w-100"/>
 
             <div class="row d-flex align-items-start flex-column m-0">
-              <div class="pb-3" *ngFor="let map of (category.id | GetMapsForCategory : maps)">
+              <div class="pb-3" id="{{map.id}}" *ngFor="let map of (category.id | GetMapsForCategory : maps)">
+
                 <div *ngIf="map.category == category.id" class="row m-0 d-flex flex-md-row flex-column p-2 card-color rounded p-2">
                   <div *ngIf=" map.imageId != undefined" class="col-md-6 col-12 p-2">
                     <img (click)="checkOutMap(map)"  class="col-12 cursor-pointer" [src]="map.image" alt="" />
@@ -122,6 +124,9 @@
                         </div>
                       -->
                         <div class="ps-1" *ngIf="roles.includes('admin') || roles.includes('quali')">
+                          <button class="btn text-warning fs-5" (click)="updateMap(map)">
+                            <i class="bi bi-pencil-square text-light"></i>
+                          </button>
                           <button class="btn text-danger fs-5" (click)="deleteMap(map)">
                             <i class="bi bi-trash3-fill"></i>
                           </button>
@@ -133,7 +138,7 @@
               </div>
             </div>
           </mat-expansion-panel>
-          <div *ngIf="editMode" class="d-flex align-items-start ps-2 pt-2">
+          <div *ngIf="editCategoryMode" class="d-flex align-items-start ps-2 pt-2">
             <button class="btn text-danger fs-5 p-0" *ngIf="category.name != 'Standart'" (click)="deleteCategory(category)">
               <i class="bi bi-trash3-fill fs-6"></i>
             </button>
@@ -198,6 +203,8 @@
   </div>
 </div>
 
+<!-- Modale -->
+
 <ng-template #basicModal let-modal>
   <div class="modal-header base-bg">
     <h4 class="modal-title text-white">{{header}}</h4>
@@ -209,6 +216,32 @@
       <button type="button" class="btn btn-danger" (click)="modal.close()">Löschen</button>
       <button type="button" class="btn" style="color: grey; padding-right: 15px;" (click)="modal.dismiss()">Abbrechen
       </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #mapModal let-modal>
+  <div class="modal-header base-bg">
+    <h4 class="modal-title text-white">{{header}}</h4>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body bg-dark text-white" style="text-align: center;">
+
+      <div class="p-3 d-flex flex-column align-items-start ">
+        <span>Karten Name</span>
+        <input type="text" class="form-control" placeholder="Name" [(ngModel)]="selectedMap!.name">
+      </div>
+
+      <div class="p-3 d-flex flex-column align-items-start ">
+        <span>Kategorie</span>
+        <select class="form-select" [(ngModel)]="selectedCategory">
+          <option *ngFor="let category of categories" value="{{category.id}}">{{category.name}}</option>
+        </select>
+      </div>
+
+    <div class="d-flex flex-row justify-content-end p-3">
+      <button type="button" class="btn" style="color: grey; padding-right: 15px;" (click)="modal.dismiss()">Abbrechen</button>
+      <button [class.disabled]="!selectedMap!.name.trim()" type="button" class="btn base-bg text-white" (click)="modal.close()">Update</button>
     </div>
   </div>
 </ng-template>

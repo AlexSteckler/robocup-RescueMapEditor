@@ -10,6 +10,7 @@ import {DomSanitizer} from "@angular/platform-browser";
 import {SendFileToUser} from "../shared/sendFileToUser";
 import { Category } from './dto/category.dto';
 import { HomeService } from './home.service';
+import { ViewportScroller } from '@angular/common';
 
 @Component({
   selector: 'app-home',
@@ -18,12 +19,14 @@ import { HomeService } from './home.service';
 })
 export class HomeComponent {
   @ViewChild('basicModal') basicModal: ElementRef | undefined;
+  @ViewChild('mapModal') mapModal: ElementRef | undefined;
 
   authenticated : boolean = false;
 
   mapName: string = '';
   selectedDiscipline: string = '';
   selectedCategory: string = '';
+  selectedMap: Map | undefined;
 
   maps: Map[] = [];
   disciplines: string[] = ['Line', 'Line Entry'];
@@ -32,7 +35,7 @@ export class HomeComponent {
   header: string = '';
 
   panelOpenState = true;
-  editMode = false;
+  editCategoryMode = false;
 
   categoryName: string = '';
   categoryDiscipline: string[] = [];
@@ -49,6 +52,7 @@ export class HomeComponent {
     private imageService: ImageService,
     private homeService: HomeService,
     private sanitizer: DomSanitizer,
+    private scroller: ViewportScroller,
   ) {}
 
   async ngOnInit() {
@@ -183,5 +187,34 @@ export class HomeComponent {
     }
     this.homeService.updateCategory(category.id, tmpCategory).subscribe(() => {
     });
+  }
+
+  updateMap(map: Map) {
+    this.header = 'Karteninfos bearbeiten';
+    this.selectedMap = map;
+    let tmpMapName = map.name;
+    let tmpCategory = map.category;
+    this.selectedCategory = map.category;
+    this.modalService.open(this.mapModal, { centered: true }).result.then(
+      (result) => {
+        let tmpMap = {...map, name: this.selectedMap!.name, category: this.selectedCategory}
+
+        this.gridCanvasService.updateMap(map.id, tmpMap).subscribe(() => {
+          map.category = this.selectedCategory;
+          this.categories.find((c) => c.id == tmpCategory)!.expanded = false;
+          this.categories.find((c) => c.id == this.selectedCategory)!.expanded = true;
+          this.maps = Object.assign([], this.maps);
+          setTimeout(() => {
+            this.scroller.scrollToAnchor(map.id);
+          }, 100);
+          this.toastr.success('Map geändert');
+        });
+
+      } ,
+      (reason) => {
+        map.name = tmpMapName;
+        this.toastr.info('Map ' + map.name + ' nicht geändert');
+      }
+    );
   }
 }
