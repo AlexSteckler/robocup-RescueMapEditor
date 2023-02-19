@@ -63,6 +63,8 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   tileObstacleServiceGridCanvas: TileObstacleServiceGridCanvas;
 
   mouseEvent: any;
+  private yCorrection: number = 0;
+  private xCorrection: number = 0
 
   constructor(
     private toastr: ToastrService,
@@ -97,7 +99,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
     //get mouse position
     this.canvasWrapperElement!.nativeElement.addEventListener('mousedown', (event: any) => {
       this.mouseEvent = event;
-      });
+    });
 
     this.panzoomCanvas = panzoom(this.canvasElement!.nativeElement, {
       maxZoom: 1.9,
@@ -158,11 +160,9 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       let top = (y - this.canvasValues!.y) / scale - this.currentObstacle.height / 2;
       let left = (this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x) / scale - (3 * scale);
 
-      if(top < 0 || left < 0) {
+      if (top < 0 || left < 0) {
         return;
       }
-
-      console.log("x: " + x + " y: " + y + " scale: " + scale + " top: " + top + " left: " + left);
 
       let tmpId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
@@ -193,7 +193,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
           && obstacleFind.name?.includes('Checkpoint')
           && tmpObstacle.id != obstacleFind.id) != undefined
         || tmpObstacle.name?.includes('Checkpoint')
-          && this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
+        && this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
           && Math.floor(obstacleFind.y / 100) == rowY
           && tmpObstacle.id != obstacleFind.id) != undefined
         || this.grids[this.layer][rowY][colX].name?.includes('start')
@@ -264,7 +264,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   dragStartMovement(tile: Tile) {
-    if(tile.isPlaceholder) return;
+    if (tile.isPlaceholder) return;
     this.currentDraggedTile = tile;
     this.currentDraggedTileChange.emit(this.currentDraggedTile);
     this.isInTrash = false;
@@ -275,7 +275,7 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   dragEndMovement(tile: Tile, $event: CdkDragEnd, layerCount: number, rowCount: number, colCount: number) {
-    if(tile.isPlaceholder) return;
+    if (tile.isPlaceholder) return;
     let x = $event.distance.x / this.canvasValues!.scale;
     let y = $event.distance.y / this.canvasValues!.scale;
 
@@ -378,12 +378,10 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   moveObsStart(obstacle: Obstacle) {
-    let x = this.innerWidth - this.mouseEvent.x
-      let y = this.mouseEvent.y - this.canvasWrapperElement?.nativeElement.getBoundingClientRect().top;
-      //console.log(this.mouseEvent.x - this.innerWidth + this.canvasWrapperElement?.nativeElement.getBoundingClientRect().width + 16)
-      console.log(y)
-      //let top = (y - this.canvasValues!.y) / scale - this.currentObstacle.height / 2;
-      //let left = (this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x) / scale - (3 * scale);
+    let x = this.mouseEvent.x - this.innerWidth + this.canvasWrapperElement?.nativeElement.getBoundingClientRect().width + 16;
+    let y = this.mouseEvent.y - this.canvasWrapperElement?.nativeElement.getBoundingClientRect().top;
+    this.xCorrection = Math.floor((x - this.canvasValues!.x) / this.canvasValues!.scale - (obstacle.x + obstacle.width! / 2));
+    this.yCorrection = Math.floor((y - this.canvasValues!.y) / this.canvasValues!.scale - (obstacle.y + obstacle.height! / 2));
 
     this.currentObstacle = obstacle;
     this.panzoomCanvas.pause();
@@ -404,8 +402,8 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
         && (obstacle.x + ($event.distance.x) / scale) < TileCount * 100 - obstacle.width!
         && (obstacle.y + ($event.distance.y) / scale) < TileCount * 100 - obstacle.height!
       ) {
-        obstacle.x += ($event.distance.x) / scale;
-        obstacle.y += ($event.distance.y) / scale;
+        obstacle.x += ($event.distance.x - 1.5) / scale + this.xCorrection;
+        obstacle.y += ($event.distance.y - 1.5) / scale + this.yCorrection;
       }
 
       let centerObstacle = {x: obstacle.x + obstacle.width! / 2, y: obstacle.y + obstacle.height! / 2};
