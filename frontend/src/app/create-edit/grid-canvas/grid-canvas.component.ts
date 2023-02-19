@@ -62,6 +62,8 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   serviceGridCanvas: ServiceGridCanvas;
   tileObstacleServiceGridCanvas: TileObstacleServiceGridCanvas;
 
+  mouseEvent: any;
+
   constructor(
     private toastr: ToastrService,
     private gridCanvasService: GridCanvasService,
@@ -91,6 +93,12 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+
+    //get mouse position
+    this.canvasWrapperElement!.nativeElement.addEventListener('mousedown', (event: any) => {
+      this.mouseEvent = event;
+      });
+
     this.panzoomCanvas = panzoom(this.canvasElement!.nativeElement, {
       maxZoom: 1.9,
       minZoom: 0.5,
@@ -178,19 +186,20 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
       let colX = Math.floor(centerObstacle.x / 100);
       let rowY = Math.floor(centerObstacle.y / 100);
 
-      if (((this.grids[this.layer][rowY][colX].value
-          && this.grids[this.layer][rowY][colX].value! > 0)
+      if ((
+        (this.grids[this.layer][rowY][colX].value && this.grids[this.layer][rowY][colX].value! > 0 && this.map?.discipline.includes('Line Entry'))
         || this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
           && Math.floor(obstacleFind.y / 100) == rowY
           && obstacleFind.name?.includes('Checkpoint')
           && tmpObstacle.id != obstacleFind.id) != undefined
         || tmpObstacle.name?.includes('Checkpoint')
-        && this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
+          && this.obstacles.find(obstacleFind => Math.floor(obstacleFind.x / 100) == colX
           && Math.floor(obstacleFind.y / 100) == rowY
           && tmpObstacle.id != obstacleFind.id) != undefined
+        || this.grids[this.layer][rowY][colX].name?.includes('start')
       )
       ) {
-        this.toastr.info('Checkpoints dürfen sich nicht auf Kacheln mit Wertungselementen befinden')
+        this.toastr.info(`${tmpObstacle.name?.toLowerCase()?.includes('checkpoint') ? "Checkpoints" : "Obstacles"} dürfen sich nicht auf Kacheln mit Wertungselementen befinden`)
       } else {
 
         this.obstacles.push((tmpObstacle) as Obstacle);
@@ -369,6 +378,13 @@ export class GridCanvasComponent implements OnInit, AfterViewInit {
   }
 
   moveObsStart(obstacle: Obstacle) {
+    let x = this.innerWidth - this.mouseEvent.x
+      let y = this.mouseEvent.y - this.canvasWrapperElement?.nativeElement.getBoundingClientRect().top;
+      //console.log(this.mouseEvent.x - this.innerWidth + this.canvasWrapperElement?.nativeElement.getBoundingClientRect().width + 16)
+      console.log(y)
+      //let top = (y - this.canvasValues!.y) / scale - this.currentObstacle.height / 2;
+      //let left = (this.canvasWrapperElement!.nativeElement.getBoundingClientRect().width - x - this.canvasValues!.x) / scale - (3 * scale);
+
     this.currentObstacle = obstacle;
     this.panzoomCanvas.pause();
   }

@@ -143,7 +143,7 @@ export class ServiceGridCanvas {
               continue;
             }
           }
-
+          tilePositionList.push({...currentPosition});
           currentPosition.layer += tileWay[0].layer;
           if (currentPosition.layer < 0) {
             this.toastr.warning('Rampe führt ins nichts!');
@@ -157,7 +157,7 @@ export class ServiceGridCanvas {
             orientation = -1;
           }
 
-          tilePositionList.push({...currentPosition});
+
           //Rampe
           if (tileWay[0].layer !== 0) {
             if (lastRamp === loopCount - 1) {
@@ -193,6 +193,7 @@ export class ServiceGridCanvas {
           });
           obstacle.rated = true;
         }
+
       } else {
         obstacle.rated = false;
       }
@@ -200,6 +201,7 @@ export class ServiceGridCanvas {
 
     if (checkpointPosition.length > 0) {
       let tileCount: number = 0;
+
       for (let i = 0; i < tilePositionList.length; i++) {
         tileCount++;
         let checkpointPos = checkpointPosition.find((position: { layer: number, x: number, y: number }) =>
