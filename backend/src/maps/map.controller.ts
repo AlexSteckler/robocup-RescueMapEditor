@@ -157,7 +157,7 @@ export class MapsController {
     }
 
     @Delete(':id')
-    @Roles({roles: ['realm:admin','realm:quali','realm:mapper']})
+    @Roles({roles: ['realm:admin','realm:quali']})
     async deleteMap(@Param() findMapDto: FindMapDto) {
         console.log("Delete map");
         let newVar = await this.mapService.deleteMap(findMapDto.id);
