@@ -20,7 +20,8 @@ export class TilesController {
     @Public()
     async getAll(
         @AuthenticatedUser() user: any) : Promise<Tile[]>  {
-        return this.tileService.findAll(user);
+        let tiles = await this.tileService.findAll(user);
+        return tiles.sort((a: any, b: any) => ((new Date(a.createdAt).getTime()) < (new Date(b.createdAt).getTime())) ? -1 : 1);
     }
 
     @Post()
@@ -54,7 +55,8 @@ export class TilesController {
         if (!map || map.discipline === undefined || map.discipline === null || map.discipline === '') {
             return [];
         } 
-        return this.tileService.findTilesByDiscipline(user, map.discipline);
+        let tilesDiscipline = await this.tileService.findTilesByDiscipline(user, map.discipline);
+        return tilesDiscipline.sort((a: any, b: any) => ((new Date(a.createdAt).getTime()) < (new Date(b.createdAt).getTime())) ? 1 : -1);
     }
 
 }

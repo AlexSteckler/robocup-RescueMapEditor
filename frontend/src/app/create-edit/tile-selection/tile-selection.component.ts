@@ -48,7 +48,6 @@ export class TileSelectionComponent implements OnInit {
 
       let loaded = 0;
       let tiles = await firstValueFrom(this.tilesService.getTilesByMapId(params['id']));
-      tiles.sort((a: any, b: any) => ((new Date(a.createdAt).getTime()) < (new Date(b.createdAt).getTime())) ? 1 : -1);
 
       let obstacles = await firstValueFrom(this.obstacleService.getObstacles());
 
