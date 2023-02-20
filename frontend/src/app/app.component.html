@@ -107,7 +107,7 @@
           <div class="d-flex flex-row" routerLink="nutzer">
             <div class="d-flex flex-column p-2 align-items-center link-base">
               <span *ngIf="authenticated" class="ps-0 pe-0 link-base link-light">{{name}}</span>
-              <span *ngIf="roles.includes('volunteer') || roles.includes('mapper')" class="text-secondary">Volunteer</span>
+              <span *ngIf="roles.includes('mapper' || 'futureMapper') && !roles.includes('quali')" class="text-secondary">Volunteer</span>
               <span class="base-color" *ngIf="roles.includes('admin')">Admin</span>
               <span *ngIf="roles.includes('quali')" class="base-color-blue">Quali</span>
             </div>
