@@ -11,6 +11,7 @@ import {SendFileToUser} from "../shared/sendFileToUser";
 import { Category } from './dto/category.dto';
 import { HomeService } from './home.service';
 import { ViewportScroller } from '@angular/common';
+import { KeycloakProfile } from 'keycloak-js';
 
 @Component({
   selector: 'app-home',
@@ -22,6 +23,8 @@ export class HomeComponent {
   @ViewChild('mapModal') mapModal: ElementRef | undefined;
 
   authenticated : boolean = false;
+  userProfile: KeycloakProfile | null = null;
+  userLocation: string = '';
 
   mapName: string = '';
   selectedDiscipline: string = '';
@@ -61,6 +64,12 @@ export class HomeComponent {
     this.roles = this.keycloakService.getUserRoles();
 
     if (this.authenticated && this.roles.includes('admin') || this.roles.includes('quali') || this.roles.includes('mapper') ) {
+      this.userProfile = await this.keycloakService.loadUserProfile();
+      if ((this.userProfile as any).attributes && (this.userProfile as any).attributes.location) {
+        this.userLocation = (this.userProfile as any).attributes.location;
+      }
+
+
       this.homeService.getAllCategorys().subscribe((categories) => {
         let first = true;
         categories.forEach((category) => {

@@ -1,7 +1,11 @@
 <div *ngIf="authenticated" class="row d-flex justify-content-center pt-3">
 
   <div class="col-12 col-md-9 col-xxl-6">
-    <h1>Home</h1>
+    <div class="d-flex flex-row justify-content-start align-items-center">
+      <h1 class="p-0 m-0">Karten Übersicht |</h1>
+      <h2 *ngIf="userLocation" class="fw-bold text-dark p-3 m-0">{{userLocation}}</h2>
+      <h2 *ngIf="!userLocation" class="fw-bold text-dark p-3 m-0">Alle</h2>
+    </div>
 
     <div *ngIf="roles.includes('futureMapper')" class="card card-shadow p-3">
       <h3 class="p-3 m-0 text-white">Sie sind als Volunteer angemeldet</h3>
@@ -42,7 +46,7 @@
             <mat-expansion-panel-header>
               <mat-panel-title class="w-100">
                 <span *ngIf="!editCategoryMode" class="base-color p-2 m-0 fs-6">{{category.name}}</span>
-                <div *ngIf="editCategoryMode && category.location">
+                <div *ngIf="editCategoryMode && (userLocation == category.location || roles.includes('admin'))">
                   <input type="text"
                     class="form-control w-100"
                     (input)="updateCategory(category)"
@@ -50,10 +54,10 @@
                     [(ngModel)]="category.name"
                   />
                 </div>
-                <span class="base-color p-2 m-0 fs-6" *ngIf="editCategoryMode && !category.location" >{{category.name}}</span>
+                <span class="base-color p-2 m-0 fs-6" [class.d-none]="editCategoryMode && roles.includes('admin')" *ngIf="editCategoryMode && userLocation != category.location" >{{category.name}}</span>
 
               </mat-panel-title>
-              <mat-panel-description *ngIf="roles.includes('admin')">
+              <mat-panel-description >
                 {{category.location ? category.location : 'Alle'}}
               </mat-panel-description>
             </mat-expansion-panel-header>
@@ -139,7 +143,7 @@
             </div>
           </mat-expansion-panel>
           <div *ngIf="editCategoryMode" class="d-flex align-items-start ps-2 pt-2">
-            <button class="btn text-danger fs-5 p-0" *ngIf="category.name != 'Standard'" (click)="deleteCategory(category)">
+            <button class="btn text-danger fs-5 p-0" *ngIf="userLocation == category.location || roles.includes('admin')" (click)="deleteCategory(category)">
               <i class="bi bi-trash3-fill fs-6"></i>
             </button>
           </div>

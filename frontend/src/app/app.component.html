@@ -30,7 +30,7 @@
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             class="link-base link-light p-3 d-none d-lg-block"
-          >Home
+          >Übersicht
           </a>
           <a
             *ngIf="roles.includes('admin') || roles.includes('quali') || roles.includes('mapper') || roles.includes('default')"
@@ -40,7 +40,7 @@
             class="link-base link-light p-3 d-block d-lg-none"
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse"
-          >Home
+          >Übersicht
           </a>
 
           <!--Einstellungen-->

@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, Output, ViewChild} from '@angular/core';
 import {KeycloakService} from 'keycloak-angular';
 import {NavigationEnd, Router} from "@angular/router";
 import {GlobalErrorHandler} from "./shared/GlobalErrorHandler";
