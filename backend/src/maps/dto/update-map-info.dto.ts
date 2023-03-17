@@ -7,6 +7,9 @@ export class UpdateMapInfoDto {
   @IsArray()
   sections: number[];
 
+  @IsNumber()
+  evacuationZoneSection: number;
+
   @IsBoolean()
   isLeftDirection: boolean;
 
@@ -17,4 +20,5 @@ export class UpdateMapInfoDto {
   @IsOptional()
   @IsMongoId()
   category: string;
+
 }

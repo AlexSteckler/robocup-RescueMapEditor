@@ -183,7 +183,6 @@ export class MapsController {
         @Param() findMapDto: FindMapDto,
         @AuthenticatedUser() user: any
     ) {
-        console.log("Update tile");
         await this.mapService.deleteTile(
             findMapDto.id,
             updateTileDto.tilePosition.layer,

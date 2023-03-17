@@ -14,6 +14,7 @@ export class ServiceGridCanvas {
 
   calcTotalPoints() {
     let loopCount = 0;
+    let evacuationZoneSection = 0;
     let tileCountToCheckpoints: number[] = [];
     let tilePositionList: { layer: number, x: number, y: number }[] = [];
     let checkpointPosition: { layer: number, x: number, y: number }[] = [];
@@ -64,8 +65,8 @@ export class ServiceGridCanvas {
       let currentTile =
         this.gridCanvasComponent.grids[currentPosition.layer][currentPosition.y][currentPosition.x]!;
       if (!currentTile!.name || currentTile.isPlaceholder) {
-        if(currentPosition.layer > 0 && this.gridCanvasComponent.grids[currentPosition.layer][currentPosition.y][currentPosition.x]!.name) {
-          currentTile = this.gridCanvasComponent.grids[currentPosition.layer-1][currentPosition.y][currentPosition.x]!;
+        if (currentPosition.layer > 0 && this.gridCanvasComponent.grids[currentPosition.layer][currentPosition.y][currentPosition.x]!.name) {
+          currentTile = this.gridCanvasComponent.grids[currentPosition.layer - 1][currentPosition.y][currentPosition.x]!;
         } else {
           orientation = -3;
           continue;
@@ -74,6 +75,7 @@ export class ServiceGridCanvas {
       }
 
       if (currentTile.name.includes('evacuationZone')) {
+        evacuationZoneSection = loopCount;
         if (
           this.gridCanvasComponent.evacuation.entry == undefined ||
           this.gridCanvasComponent.evacuation.entry.x != currentPosition.x ||
@@ -208,18 +210,27 @@ export class ServiceGridCanvas {
           position.layer == tilePositionList[i].layer
           && position.x == tilePositionList[i].x
           && position.y == tilePositionList[i].y);
-        {
-          if (checkpointPos !== undefined) {
-            currentPoints += 5 * tileCount;
-            tileCountToCheckpoints.push(tileCount);
-            tileCount = 0;
-          }
+
+        if (checkpointPos !== undefined) {
+          currentPoints += 5 * tileCount;
+          tileCountToCheckpoints.push(tileCount);
+          tileCount = 0;
         }
+
       }
     }
 
     this.gridCanvasComponent.totalPoints = Math.round(((currentPoints - doubleRampCount * 10) + (orientation === -1 ? 60 : 0)) * multiplier).toString();
+    for (let i = 0; i < tileCountToCheckpoints.length + 1; i++) {
+      if (evacuationZoneSection - tileCountToCheckpoints[i] > 0) {
+        evacuationZoneSection -= tileCountToCheckpoints[i];
+      } else {
+        evacuationZoneSection = i + 1;
+        break;
+      }
+    }
     let mapInfo = {
+      evacuationZoneSection,
       scoreCount: +this.gridCanvasComponent.totalPoints,
       sections: tileCountToCheckpoints,
       isLeftDirection: this.gridCanvasComponent.map?.isLeftDirection
